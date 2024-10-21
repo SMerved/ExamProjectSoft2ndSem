@@ -1,0 +1,27 @@
+name: Frontend Test, Build and Deploy
+on:
+    push:
+        branches:
+            - deploy
+jobs:
+    Test_Build_and_Deploy:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: ['18.x','20.x']
+
+        steps:
+            - name: checkout
+              uses: actions/checkout@v2
+            
+            - name: Use Node.js ${{ matrix.node-version}} to test 
+              uses: actions/setup-node@v4
+              with:
+                node-version: ${{matrix.node-version}}
+                cache: 'npm'
+            - run: npm install
+            - run: npm test
+            
+            - name: Deploy to server
+              run: 
