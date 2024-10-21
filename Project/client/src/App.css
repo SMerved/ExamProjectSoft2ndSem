@@ -1,0 +1,73 @@
+.App {
+  display: flex;
+  flex-direction: column; /* Align elements vertically */
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+}
+
+.container {
+  width: 50%; /* Make sure header takes full width */
+  padding: 20px; /* Space around the button */
+  border: 1px solid;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end; /* Align button to the right */
+  width: 100%; /* Make sure header takes full width */
+}
+
+.add-task-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.table-container {
+  width: 100%;
+  margin-top: 20px; /* Space between the button and the table */
+}
+
+.table-cell {
+  padding: 10px;
+}
+
+.table-cell-header {
+  text-align: left;
+}
+
+.table-content {
+  width: 100%;
+  border-collapse: collapse;
+  padding: 30px;
+}
+
+.input-field {
+  margin-right: 20px;
+  padding: 10px;
+}
+
+.tabs {
+  margin-bottom: 20px; /* Space below the tabs */
+}
+
+.tabs button {
+  margin: 0 10px; /* Horizontal margin between buttons */
+  padding: 10px 20px; /* Adjust padding if needed */
+  border: 1px solid #ccc; /* Add a border if desired */
+  border-radius: 5px; /* Rounded corners */
+  background-color: #f0f0f0; /* Background color */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.tabs button:hover {
+  background-color: #ddd; /* Background color on hover */
+}
+
+select {
+  padding: 2px 2px;
+  font-size: 14px;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  cursor: pointer;
+}
