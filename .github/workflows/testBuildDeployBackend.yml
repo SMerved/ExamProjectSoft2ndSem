@@ -13,7 +13,7 @@ jobs:
 
         defaults:
           run:
-            working-directory: api        
+            working-directory: Project/api        
 
         steps:
             - name: checkout
@@ -24,5 +24,6 @@ jobs:
               with:
                 node-version: ${{matrix.node-version}}
                 cache: 'npm'
+                cache-dependency-path: Project/api/package-lock.json
             - run: npm install
             - run: npm test
