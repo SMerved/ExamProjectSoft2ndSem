@@ -11,6 +11,10 @@ jobs:
             matrix:
                 node-version: ['18.x','20.x']
 
+        defaults:
+          run:
+            working-directory: Project/api        
+
         steps:
             - name: checkout
               uses: actions/checkout@v2
@@ -20,6 +24,5 @@ jobs:
               with:
                 node-version: ${{matrix.node-version}}
                 cache: 'npm'
-                path: Project/api
             - run: npm install
             - run: npm test
