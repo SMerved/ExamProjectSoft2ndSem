@@ -13,7 +13,7 @@ jobs:
 
         defaults:
           run:
-            working-directory: Project/api        
+            working-directory: api        
 
         steps:
             - name: checkout
