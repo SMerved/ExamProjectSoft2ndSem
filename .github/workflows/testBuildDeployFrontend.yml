@@ -11,6 +11,10 @@ jobs:
             matrix:
                 node-version: ['18.x','20.x']
 
+        defaults:
+          run:
+            working-directory: Project/client        
+
         steps:
             - name: checkout
               uses: actions/checkout@v2
@@ -20,7 +24,6 @@ jobs:
               with:
                 node-version: ${{matrix.node-version}}
                 cache: 'npm'
+                cache-dependency-path: Project/client/package-lock.json
             - run: npm install
-              working-directory: Project/client 
             - run: npm test
-              working-directory: Project/client 
