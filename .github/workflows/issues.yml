@@ -1,11 +1,7 @@
-name: Automate issues
-on:
-    issues:
-        types: 
-          - edited
+on: issues
 
 jobs:
-    View_information:
+    job1:
         runs-on: ubuntu-latest
         steps:
             - run: |
