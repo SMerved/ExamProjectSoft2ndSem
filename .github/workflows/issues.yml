@@ -7,7 +7,6 @@ on:
 jobs:
     View_information:
         runs-on: ubuntu-latest
-        name: View issue information
         steps:
             - run: |
                 echo "Issue title: ${{ github.event.issue.title }}"
