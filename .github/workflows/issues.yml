@@ -1,4 +1,6 @@
-on: issues
+on: 
+    issues:
+        types: [edited]
 
 jobs:
     job1:
