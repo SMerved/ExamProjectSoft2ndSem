@@ -3,8 +3,9 @@ name: Create Branch on Issue Status Update
 on:
   issues:
     types:
-      - edited
       - opened
+      - edited
+      - labeled
 
 jobs:
   create-branch:
@@ -14,56 +15,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Get issue details
-        id: get_issue
+      - name: Get Issue Details
+        id: issue_details
         run: |
-          ISSUE_URL="${{ github.event.issue.url }}"
-          echo "ISSUE_URL=${ISSUE_URL}" >> $GITHUB_ENV
+          # Get the issue title and project associations
+          echo "ISSUE_URL=${{ github.event.issue.url }}" >> $GITHUB_ENV
+          echo "ISSUE_TITLE=${{ github.event.issue.title }}" >> $GITHUB_ENV
+          echo "ISSUE_ID=${{ github.event.issue.id }}" >> $GITHUB_ENV
 
-      - name: Check if issue is in 'In Progress' column
+      - name: Get Project Cards for the Issue
+        id: project_cards
+        run: |
+          # Fetch project cards linked to the issue using GitHub API
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/issues/${{ github.event.issue.number }}/projects")
+
+          echo "Response: $response"
+          
+          # Store the response (projects) in an output variable
+          echo "::set-output name=project_cards::$response"
+
+      - name: Check if Issue is in "In Progress" column
         id: check_in_progress
         run: |
-          # Set the project board ID and 'In Progress' column name
-          PROJECT_ID="<YOUR_PROJECT_ID>"  # Replace with your project ID
-          IN_PROGRESS_COLUMN="In Progress"  # Replace with your actual column name
+          # Parse project card response to check if issue is in "In Progress" column
+          project_cards="${{ steps.project_cards.outputs.project_cards }}"
+          
+          # Check if project card is in the "In Progress" column
+          in_progress_column=$(echo "$project_cards" | jq -r '.[] | select(.column_name == "In Progress") | .column_name')
 
-          # Fetch project cards for the given project board
-          project_cards=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                              -H "Accept: application/vnd.github.v3+json" \
-                              "https://api.github.com/projects/${PROJECT_ID}/columns")
-
-          # Loop through each column to find the 'In Progress' column
-          column_id=$(echo "$project_cards" | jq -r ".[] | select(.name == \"$IN_PROGRESS_COLUMN\") | .id")
-          echo "In Progress Column ID: $column_id"
-
-          # Check if issue is in 'In Progress'
-          issue_cards=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                              -H "Accept: application/vnd.github.v3+json" \
-                              "https://api.github.com/issues/${{ github.event.issue.number }}/projects")
-
-          # Check if the issue is assigned to the 'In Progress' column
-          in_progress=$(echo "$issue_cards" | jq -r "select(.[] | .column_url == \"https://api.github.com/projects/columns/${column_id}\")")
-
-          if [[ -n "$in_progress" ]]; then
-            echo "Issue is in 'In Progress' column."
+          if [[ "$in_progress_column" == "In Progress" ]]; then
+            echo "This issue is in the 'In Progress' column."
             echo "create_branch=true" >> $GITHUB_ENV
           else
-            echo "Issue is not in 'In Progress'. Skipping branch creation."
+            echo "Issue is not in 'In Progress' column. Skipping branch creation."
             echo "create_branch=false" >> $GITHUB_ENV
 
-      - name: Create a new branch if it doesn't exist
+      - name: Create Branch if it doesn't exist
         if: env.create_branch == 'true'
         run: |
-          # Get the issue details using the issue URL
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               ${{ env.ISSUE_URL }} > issue_details.json
-
-          # Extract the issue title and sanitize to create a branch name
-          issue_title=$(jq -r '.title' issue_details.json)
-          branch_name="issue-${issue_title}"  # Customize branch naming convention
-          branch_name=$(echo $branch_name | sed 's/[^a-zA-Z0-9]/-/g')
-
+          # Sanitize the issue title to create a valid branch name
+          branch_name=$(echo "issue-${{ env.ISSUE_TITLE }}" | sed 's/[^a-zA-Z0-9]/-/g')
           echo "Branch name: $branch_name"
 
           # Check if the branch already exists
@@ -76,4 +69,3 @@ jobs:
             git push origin $branch_name
           else
             echo "Branch $branch_name already exists. Skipping branch creation."
-          fi
