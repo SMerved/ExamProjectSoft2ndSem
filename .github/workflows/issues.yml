@@ -1,11 +1,9 @@
 name: Create Branch on Issue Status Update
 
 on:
-  issues:
+  project_card:
     types:
-      - opened
-      - edited
-      - labeled
+      - moved
 
 jobs:
   create-branch:
@@ -15,48 +13,46 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Get Issue Details
-        id: issue_details
+      - name: Get project card details
+        id: get_project_card
         run: |
-          # Get the issue title and project associations
-          echo "ISSUE_URL=${{ github.event.issue.url }}" >> $GITHUB_ENV
-          echo "ISSUE_TITLE=${{ github.event.issue.title }}" >> $GITHUB_ENV
-          echo "ISSUE_ID=${{ github.event.issue.id }}" >> $GITHUB_ENV
+          # Get the project card details from the event payload
+          echo "PROJECT_CARD_URL=${{ github.event.project_card.url }}" >> $GITHUB_ENV
+          echo "ISSUE_URL=${{ github.event.project_card.content_url }}" >> $GITHUB_ENV
 
-      - name: Get Project Cards for the Issue
-        id: project_cards
+      - name: Check if project card moved to 'In Progress'
+        id: check_column
         run: |
-          # Fetch project cards linked to the issue using GitHub API
-          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/issues/${{ github.event.issue.number }}/projects")
+          # Fetch project card details using GitHub API
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               ${{ env.PROJECT_CARD_URL }} > card_details.json
 
-          echo "Response: $response"
-          
-          # Store the response (projects) in an output variable
-          echo "::set-output name=project_cards::$response"
+          # Extract column name from the response
+          column_name=$(jq -r '.column_name' card_details.json)
+          echo "Column: $column_name"
 
-      - name: Check if Issue is in "In Progress" column
-        id: check_in_progress
-        run: |
-          # Parse project card response to check if issue is in "In Progress" column
-          project_cards="${{ steps.project_cards.outputs.project_cards }}"
-          
-          # Check if project card is in the "In Progress" column
-          in_progress_column=$(echo "$project_cards" | jq -r '.[] | select(.column_name == "In Progress") | .column_name')
-
-          if [[ "$in_progress_column" == "In Progress" ]]; then
-            echo "This issue is in the 'In Progress' column."
+          # Check if the card was moved to 'In Progress'
+          if [[ "$column_name" == "In Progress" ]]; then
+            echo "This issue is now 'In Progress'. Proceeding to create a branch."
             echo "create_branch=true" >> $GITHUB_ENV
           else
-            echo "Issue is not in 'In Progress' column. Skipping branch creation."
+            echo "Column is not 'In Progress'. Skipping branch creation."
             echo "create_branch=false" >> $GITHUB_ENV
+          fi
 
-      - name: Create Branch if it doesn't exist
+      - name: Create a new branch if it doesn't exist
         if: env.create_branch == 'true'
         run: |
-          # Sanitize the issue title to create a valid branch name
-          branch_name=$(echo "issue-${{ env.ISSUE_TITLE }}" | sed 's/[^a-zA-Z0-9]/-/g')
+          # Get the issue details using the issue URL
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               ${{ env.ISSUE_URL }} > issue_details.json
+
+          # Extract the issue title and sanitize to create a branch name
+          issue_title=$(jq -r '.title' issue_details.json)
+          branch_name=$(echo "issue-${issue_title}" | sed 's/[^a-zA-Z0-9]/-/g')
+
           echo "Branch name: $branch_name"
 
           # Check if the branch already exists
@@ -69,3 +65,4 @@ jobs:
             git push origin $branch_name
           else
             echo "Branch $branch_name already exists. Skipping branch creation."
+          fi
