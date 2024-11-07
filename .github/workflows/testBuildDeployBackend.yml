@@ -35,7 +35,6 @@ jobs:
             - name: Save Docker image to tarball
               run: |
                 docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
-                sudo find / -name backendapp-${{ github.sha }}.tar
 
             - name: Copy Docker image to remote server
               uses: appleboy/scp-action@v0.1.0
@@ -46,7 +45,7 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
-                target: "~/app/backendapp-${{ github.sha }}.tar"    
+                target: "~/app/"    
                 debug: true
 
             - name: Deploy Docker image on remote server
@@ -58,7 +57,9 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 script: |
-                  cd app/Project/api
+                  cd app
+
+                  docker build -t backendapp:${{ github.sha }}
 
                   # Load the Docker image from the tarball
                   docker load -i backendapp-${{ github.sha }}.tar
