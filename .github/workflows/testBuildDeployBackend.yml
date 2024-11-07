@@ -31,14 +31,13 @@ jobs:
             - name: List Docker Images
               run: docker images
               
+            # Save the Docker image as a tarball file
             - name: Save Docker image to tarball
               run: |
                 docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
-                ls -lh backendapp-${{ github.sha }}.tar 
-                ls -al .
 
             - name: Copy Docker image to remote server
-              uses: appleboy/scp-action@v0.1.0
+              uses: appleboy/scp-action@latests
               with:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
@@ -46,11 +45,11 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 source: "backendapp-${{ github.sha }}.tar"
-                target: "/app/backendapp-${{ github.sha }}.tar"      
+                target: "../app/backendapp-${{ github.sha }}.tar"    
                 debug: true
 
             - name: Deploy Docker image on remote server
-              uses: appleboy/ssh-action@v0.1.5
+              uses: appleboy/ssh-action@latests
               with:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
