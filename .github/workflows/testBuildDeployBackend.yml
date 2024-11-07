@@ -41,11 +41,10 @@ jobs:
               with:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
-                password: ${{ secrets.REMOTE_PASSWORD }}
+                key: ${{ secrets.REMOTE_PASSWORD }}
                 port: 22
                 source: "backendapp-${{ github.sha }}.tar"
-                target: "/app" 
-                debug: true 
+                target: "/home/app" 
 
             - name: Deploy Docker image on remote server
               uses: appleboy/ssh-action@v0.1.5
