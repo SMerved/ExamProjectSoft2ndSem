@@ -45,8 +45,8 @@ jobs:
                 key: ${{ secrets.REMOTE_PASSWORD }}
                 passphrase: "ftu58fqs"
                 port: 22
-                source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/"
-                target: "~/app/"    
+                source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
+                target: "~/app/backendapp-${{ github.sha }}.tar"    
                 debug: true
 
             - name: Deploy Docker image on remote server
@@ -59,7 +59,7 @@ jobs:
                 port: 22
                 script: |
                   # Load the Docker image from the tarball
-                  docker load -i /home/app/backendapp-${{ github.sha }}.tar
+                  docker load -i ~/app/backendapp-${{ github.sha }}.tar
             
                   # Stop and remove any running container (optional)
                   docker stop backendapp || true
