@@ -58,8 +58,10 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 script: |
+                  cd app/Project/api
+
                   # Load the Docker image from the tarball
-                  docker load -i ~/app/backendapp-${{ github.sha }}.tar
+                  docker load -i backendapp-${{ github.sha }}.tar
             
                   # Stop and remove any running container (optional)
                   docker stop backendapp || true
