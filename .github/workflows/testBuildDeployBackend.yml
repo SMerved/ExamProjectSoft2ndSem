@@ -37,7 +37,7 @@ jobs:
                 docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
 
             - name: Copy Docker image to remote server
-              uses: appleboy/scp-action@latests
+              uses: appleboy/scp-action@v0.1.0
               with:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
@@ -49,7 +49,7 @@ jobs:
                 debug: true
 
             - name: Deploy Docker image on remote server
-              uses: appleboy/ssh-action@latests
+              uses: appleboy/ssh-action@v0.1.5
               with:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
