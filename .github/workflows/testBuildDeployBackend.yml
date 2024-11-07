@@ -58,7 +58,7 @@ jobs:
                 script: |
                   cd ../app
 
-                  echo ls
+                  ls
 
                   docker build -t backendapp:${{ github.sha }}.tar
 
