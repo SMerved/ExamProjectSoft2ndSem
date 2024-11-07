@@ -26,7 +26,7 @@ jobs:
 
             - name: Build Docker image
               run: |
-                docker build -t backendapp:${{ github.sha }}  
+                docker build -t backendapp:${{ github.sha }} .  
 
             - name: List Docker Images
               run: docker images
@@ -35,7 +35,7 @@ jobs:
             - name: Save Docker image to tarball
               run: |
                 docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
-
+                
             - name: Copy Docker image to remote server
               uses: appleboy/scp-action@v0.1.0
               with:
@@ -57,14 +57,14 @@ jobs:
                 port: 22
                 script: |
                   cd ../app
-
-                  ls
-
-                  docker build -t backendapp:${{ github.sha }}.tar
+                  
+                  ls -lh backendapp-${{ github.sha }}.tar
 
                   # Load the Docker image from the tarball
                   docker load -i backendapp-${{ github.sha }}.tar
-            
+
+                  docker build -t backendapp:${{ github.sha }}.tar
+
                   # Stop and remove any running container (optional)
                   docker stop backendapp || true
                   docker rm backendapp || true
