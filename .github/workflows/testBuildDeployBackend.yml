@@ -44,7 +44,7 @@ jobs:
                 password: ${{ secrets.REMOTE_PASSWORD }}
                 port: 22
                 source: "backendapp-${{ github.sha }}.tar"
-                target: "/home/app/" 
+                target: "/home/app" 
                 debug: true 
 
             - name: Deploy Docker image on remote server
