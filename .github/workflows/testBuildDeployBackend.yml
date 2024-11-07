@@ -56,7 +56,7 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 script: |
-                  cd ../app
+                  cd ../app/github/workspace/Project/api
                   
                   ls -lh backendapp-${{ github.sha }}.tar
 
