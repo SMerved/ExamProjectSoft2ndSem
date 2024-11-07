@@ -44,8 +44,8 @@ jobs:
                 key: ${{ secrets.REMOTE_PASSWORD }}
                 passphrase: "ftu58fqs"
                 port: 22
-                source: "backendapp-${{ github.sha }}.tar"
-                target: "app"    
+                source: "/home/runner/backendapp-${{ github.sha }}.tar"
+                target: "/home/app"    
                 debug: true
 
             - name: Deploy Docker image on remote server
