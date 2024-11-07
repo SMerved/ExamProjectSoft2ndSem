@@ -70,4 +70,4 @@ jobs:
                   docker rm backendapp || true
 
                   # Run the new container
-                  docker run -d --name backendapp -p 3001:3001 backendapp:${{ github.sha }}    
+                  docker start -a -it -d --name backendapp -p 3001:3001 backendapp:${{ github.sha }}    
