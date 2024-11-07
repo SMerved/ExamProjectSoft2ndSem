@@ -26,11 +26,15 @@ jobs:
 
             - name: Build Docker image
               run: |
-                docker build -t backendapp:${{ github.sha }} .     
+                docker build -t backendapp:${{ github.sha }} .  
 
+            - name: List Docker Images
+              run: docker images
+              
             - name: Save Docker image to tarball
-              run: | 
+              run: |
                 docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
+                ls -lh backendapp-${{ github.sha }}.tar 
                 
             - name: Copy Docker image to remote server
               uses: appleboy/scp-action@v0.1.0
