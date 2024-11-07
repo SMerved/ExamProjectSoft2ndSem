@@ -26,8 +26,8 @@ jobs:
 
             - name: Build Docker image
               run: |
-                docker build -t backendApp:${{ github.sha }}
-            
+                docker build -t backendApp:${{ github.sha }} .     
+
             - name: Save Docker image to tarball
               run: | 
                 docker save backendApp:${{ github.sha }} -o backendApp-${{ github.sha }}.tar
