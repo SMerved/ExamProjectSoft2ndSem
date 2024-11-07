@@ -35,7 +35,8 @@ jobs:
               run: |
                 docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
                 ls -lh backendapp-${{ github.sha }}.tar 
-                
+                ls -al .
+
             - name: Copy Docker image to remote server
               uses: appleboy/scp-action@v0.1.0
               with:
