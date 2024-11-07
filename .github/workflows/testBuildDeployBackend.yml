@@ -44,8 +44,8 @@ jobs:
                 key: ${{ secrets.REMOTE_PASSWORD }}
                 passphrase: "ftu58fqs"
                 port: 22
-                source: "./*"
-                target: "/app/" 
+                source: "backendapp-${{ github.sha }}.tar"
+                target: "~/app/backendapp-${{ github.sha }}.tar"      
                 debug: true
 
             - name: Deploy Docker image on remote server
@@ -64,4 +64,4 @@ jobs:
                   docker rm backendapp || true
 
                   # Run the new container
-                  docker run -p 3001:3001 backendapp:${{ github.sha }}    
+                  docker run -d --name backendapp -p 3001:3001 backendapp:${{ github.sha }}    
