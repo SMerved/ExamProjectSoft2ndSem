@@ -45,6 +45,7 @@ jobs:
                 port: 22
                 source: "./*"
                 target: "/home/app" 
+                debug: true
 
             - name: Deploy Docker image on remote server
               uses: appleboy/ssh-action@v0.1.5
