@@ -41,7 +41,7 @@ jobs:
               with:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
-                key: ${{ secrets.REMOTE_PASSWORD }}
+                password: ${{ secrets.REMOTE_PASSWORD }}
                 port: 22
                 source: "./*"
                 target: "/home/app" 
