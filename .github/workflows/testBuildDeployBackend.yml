@@ -45,7 +45,7 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
-                target: "../app/backendapp-${{ github.sha }}.tar"    
+                target: "../app"    
 
             - name: Deploy Docker image on remote server
               uses: appleboy/ssh-action@v0.1.5
