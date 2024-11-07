@@ -26,7 +26,7 @@ jobs:
 
             - name: Build Docker image
               run: |
-                docker build -t backendapp:${{ github.sha }} .  
+                docker build -t backendapp:${{ github.sha }}  
 
             - name: List Docker Images
               run: docker images
