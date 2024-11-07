@@ -35,6 +35,7 @@ jobs:
               run: |
                 docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
                 ls -lh backendapp-${{ github.sha }}.tar 
+                ls -l
                 
             - name: Copy Docker image to remote server
               uses: appleboy/scp-action@v0.1.0
@@ -43,7 +44,7 @@ jobs:
                 username: ${{ secrets.REMOTE_USER }}
                 password: ${{ secrets.REMOTE_PASSWORD }}
                 port: 22
-                source: "./*/backendapp-${{ github.sha }}.tar"
+                source: "backendapp-${{ github.sha }}.tar"
                 target: "/home/app" 
                 debug: true 
 
