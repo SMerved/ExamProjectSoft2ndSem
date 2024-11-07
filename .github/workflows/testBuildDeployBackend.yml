@@ -45,8 +45,7 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
-                target: "~/app/"    
-                debug: true
+                target: "../app/backendapp-${{ github.sha }}.tar"    
 
             - name: Deploy Docker image on remote server
               uses: appleboy/ssh-action@v0.1.5
@@ -57,9 +56,9 @@ jobs:
                 passphrase: "ftu58fqs"
                 port: 22
                 script: |
-                  cd app
+                  cd ../app
 
-                  docker build -t backendapp:${{ github.sha }}
+                  docker build -t backendapp:${{ github.sha }}.tar
 
                   # Load the Docker image from the tarball
                   docker load -i backendapp-${{ github.sha }}.tar
