@@ -26,11 +26,11 @@ jobs:
 
             - name: Build Docker image
               run: |
-                docker build -t backendApp:${{ github.sha }} .     
+                docker build -t backendapp:${{ github.sha }} .     
 
             - name: Save Docker image to tarball
               run: | 
-                docker save backendApp:${{ github.sha }} -o backendApp-${{ github.sha }}.tar
+                docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
                 
             - name: Copy Docker image to remote server
               uses: appleboy/scp-action@v0.1.0
@@ -39,8 +39,8 @@ jobs:
                 username: ${{ secrets.REMOTE_USER }}
                 password: ${{ secrets.REMOTE_PASSWORD }}
                 port: 22
-                source: "backendApp-${{ github.sha }}.tar"
-                target: "/tmp/backendApp-${{ github.sha }}.tar"    
+                source: "backendapp-${{ github.sha }}.tar"
+                target: "/tmp/backendapp-${{ github.sha }}.tar"    
 
             - name: Deploy Docker image on remote server
               uses: appleboy/ssh-action@v0.1.5
@@ -51,11 +51,11 @@ jobs:
                 port: 22
                 script: |
                   # Load the Docker image from the tarball
-                  docker load -i /tmp/backendApp-${{ github.sha }}.tar
+                  docker load -i /tmp/backendapp-${{ github.sha }}.tar
             
                   # Stop and remove any running container (optional)
-                  docker stop backendApp || true
-                  docker rm backendApp || true
+                  docker stop backendapp || true
+                  docker rm backendapp || true
 
                   # Run the new container
-                  docker run -d --name backendApp -p 80:80 backendApp:${{ github.sha }}    
+                  docker run -d --name backendapp -p 80:80 backendapp:${{ github.sha }}    
