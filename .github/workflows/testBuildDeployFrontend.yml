@@ -40,8 +40,14 @@ jobs:
                 # Start the SSH agent
                 eval "$(ssh-agent -s)"
           
+                # Decode the base64-encoded private key and add it to the SSH agent
+                echo "${{ secrets.REMOTE_PASSWORD }}" | base64 -d > ~/.ssh/id_rsa
+          
+                # Set the correct permissions for the private key
+                chmod 600 ~/.ssh/id_rsa
+          
                 # Add the private key to the SSH agent using the passphrase
-                echo "${{ secrets.REMOTE_PASSWORD }}" | ssh-add - <<< "${{ secrets.SSH_PASSPHRASE }}"
+                echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add ~/.ssh/id_rsa
           
                 # Ensure the SSH agent is running
                 ssh-add -l
