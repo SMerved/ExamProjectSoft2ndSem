@@ -44,7 +44,7 @@ jobs:
                 key: ${{ secrets.REMOTE_PASSWORD }}  # Your private key stored in GitHub Secrets
                 passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22  # The SSH port (default is 22)
-                source: "./dist/*"  # Path to the build output (adjust if needed)
+                source: "./dist/"  # Path to the build output (adjust if needed)
                 target: "../tmp/frontend/ "  # Path where the build will be copied on the remote server
         
             - name: Deploy build to Dockerized Nginx
