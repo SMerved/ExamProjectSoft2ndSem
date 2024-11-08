@@ -30,6 +30,11 @@ jobs:
                 cache-dependency-path: Project/client/package-lock.json
             - run: npm test
 
+            - name: Build React app
+              run: | 
+                npm run build
+                ls -la build
+
             # Set up Docker
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
