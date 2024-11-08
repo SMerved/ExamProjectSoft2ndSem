@@ -33,26 +33,31 @@ jobs:
             - name: Build React app
               run: | 
                 npm run build
+                cd .
                 ls
 
-            - name: Set up SSH
-              run: | 
-                # Start the SSH agent
-                eval "$(ssh-agent -s)"
-          
-                # Add the private key to the SSH agent using the passphrase
-                echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add "${{ secrets.REMOTE_PASSWORD }}"
-          
-                # Ensure the SSH agent is running
-                ssh-add -l
-
-            - name: Copy build to remote server
-              run: |
-                rsync -avz --delete ./build/ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/frontend/  # Temporarily copy build to a staging directory
-
+            - name: Copy build to remote server using SCP
+              uses: appleboy/scp-action@v0.1.1
+              with:
+                host: ${{ secrets.REMOTE_HOST }}  # Your remote server IP
+                username: ${{ secrets.REMOTE_USER }}  # Your remote server username
+                key: ${{ secrets.REMOTE_PASSWORD }}  # Your private key stored in GitHub Secrets
+                passphrase: ${{ secrets.SSH_PASSPHRASE }}
+                port: 22  # The SSH port (default is 22)
+                source: "./build/*"  # Path to the build output (adjust if needed)
+                target: "../tmp/frontend/ "  # Path where the build will be copied on the remote server
+        
             - name: Deploy build to Dockerized Nginx
-              run: |
-                ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+              uses: appleboy/ssh-action@v0.1.5
+              with:
+                host: ${{ secrets.REMOTE_HOST }}
+                username: ${{ secrets.REMOTE_USER }}
+                key: ${{ secrets.REMOTE_PASSWORD }}
+                passphrase: ${{ secrets.SSH_PASSPHRASE }}
+                port: 22
+                script: |  
+                  cd ..
+
                   # Stop the running Nginx container
                   docker stop docker-nginx || true  # Prevent errors if the container is not running
 
@@ -64,4 +69,3 @@ jobs:
 
                   # Restart the Nginx container with the new build
                   docker run -d --name docker-nginx -p 80:80 -v /usr/share/nginx/html:/usr/share/nginx/html nginx
-                EOF
