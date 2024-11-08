@@ -45,7 +45,9 @@ jobs:
             passphrase: ${{ secrets.SSH_PASSPHRASE }}
             port: 22
             source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
-            target: "../app"    
+            target: "../app"
+            timeout: "300s"
+            proxy_timeout: "300s"    
 
         - name: Deploy Docker image on remote server
           uses: appleboy/ssh-action@v0.1.5
@@ -134,7 +136,9 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: 22
           source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/client/frontendapp-${{ github.sha }}.tar"
-          target: "../frontend"    
+          target: "../frontend"
+          timeout: "300s"
+          proxy_timeout: "300s"       
 
       - name: Deploy Docker image on remote server
         uses: appleboy/ssh-action@v0.1.5
