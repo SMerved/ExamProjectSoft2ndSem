@@ -14,12 +14,54 @@ jobs:
         steps:
             - name: checkout
               uses: actions/checkout@v2
-            
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: '20'  
+
+            - name: Install dependicies
+              run: npm install 
+
             - name: Use Node.js to test 
               uses: actions/setup-node@v4
               with:
-                node-version: '20.x'
                 cache: 'npm'
                 cache-dependency-path: Project/client/package-lock.json
-            - run: npm install
             - run: npm test
+
+            - name: Build React app
+              run: | 
+                npm run build
+                ls
+
+            - name: Set up SSH
+              run: | 
+                # Start the SSH agent
+                eval "$(ssh-agent -s)"
+          
+                # Add the private key to the SSH agent using the passphrase
+                echo "${{ secrets.REMOTE_PASSWORD }}" | ssh-add - <<< "${{ secrets.SSH_PASSPHRASE }}"
+          
+                # Ensure the SSH agent is running
+                ssh-add -l
+
+            - name: Copy build to remote server
+              run: |
+                rsync -avz --delete ./build/ ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/tmp/frontend/  # Temporarily copy build to a staging directory
+
+            - name: Deploy build to Dockerized Nginx
+              run: |
+                ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} << 'EOF'
+                  # Stop the running Nginx container
+                  docker stop docker-nginx || true  # Prevent errors if the container is not running
+
+                  # Remove the old container
+                  docker rm docker-nginx || true  # Prevent errors if the container doesn't exist
+
+                  # Remove the old frontend files from the Nginx container (assuming Nginx uses /usr/share/nginx/html)
+                  docker run --rm -v /tmp/frontend:/frontend -v /usr/share/nginx/html nginx cp -r /frontend/* /usr/share/nginx/html/
+
+                  # Restart the Nginx container with the new build
+                  docker run -d --name docker-nginx -p 80:80 -v /usr/share/nginx/html:/usr/share/nginx/html nginx
+                EOF
