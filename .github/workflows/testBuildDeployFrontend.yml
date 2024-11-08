@@ -33,7 +33,7 @@ jobs:
             - name: Build React app
               run: | 
                 npm run build
-                cd ..
+                cd ....
                 ls
 
             - name: Copy build to remote server using SCP
