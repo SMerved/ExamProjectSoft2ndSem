@@ -62,7 +62,7 @@ jobs:
                 key: ${{ secrets.REMOTE_PASSWORD }}
                 passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22
-                source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
+                source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/client/frontendapp.tar"
                 target: "../app"    
 
             - name: Deploy Docker image on remote server
@@ -74,20 +74,20 @@ jobs:
                 passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22
                 script: |
-                  cd ../app/github/workspace/Project/api
+                  cd ../app/github/workspace/Project/client
                   
-                  ls -lh backendapp-${{ github.sha }}.tar
+                  ls -lh frontendapp.tar
 
                   # Load the Docker image from the tarball
-                  docker load -i backendapp-${{ github.sha }}.tar
+                  docker load -i frontendapp.tar
 
-                  docker build -t backendapp:${{ github.sha }}
+                  docker build -t frontendapp
 
                   # Stop and remove any running container (optional)
-                  docker stop backendapp || true
-                  docker rm backendapp || true
+                  docker stop frontendapp || true
+                  docker rm frontendapp || true
 
                   # Run the new container
-                  docker run -it -d --name backendapp -p 3001:3001 backendapp:${{ github.sha }}    
+                  docker run -it -d --name frontendapp -p 3001:3001 frontendapp    
 
-                  docker start backendapp
+                  docker start frontendapp
