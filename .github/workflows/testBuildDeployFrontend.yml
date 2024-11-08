@@ -35,6 +35,7 @@ jobs:
         - name: Save Docker image to tarball
           run: |
             docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
+            chmod 664 backendapp-${{ github.sha }}.tar
             
         - name: Copy Docker image to remote server
           uses: appleboy/scp-action@v0.1.7
