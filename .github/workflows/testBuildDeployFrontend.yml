@@ -33,6 +33,7 @@ jobs:
             - name: Build React app
               run: | 
                 npm run build
+                ls
                 ls -la build
 
             # Set up Docker
