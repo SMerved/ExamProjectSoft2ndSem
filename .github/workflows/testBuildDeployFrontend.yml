@@ -4,14 +4,84 @@ on:
         branches:
             - deploy
 jobs:
-    Test_Build_and_Deploy:
-        runs-on: ubuntu-latest
+  Backend:
+    runs-on: ubuntu-latest
 
-        defaults:
-          run:
-            working-directory: Project/client        
+    defaults:
+      run:
+        working-directory: Project/api        
 
-        steps:
+    steps:
+        - name: checkout
+          uses: actions/checkout@v2
+        
+        - name: Use Node.js to test 
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20.x'
+            cache: 'npm'
+            cache-dependency-path: Project/api/package-lock.json
+        - run: npm install
+        - run: npm test
+
+        - name: Build Docker image
+          run: |
+            docker build -t backendapp:${{ github.sha }} .  
+
+        - name: List Docker Images
+          run: docker images
+          
+        # Save the Docker image as a tarball file
+        - name: Save Docker image to tarball
+          run: |
+            docker save backendapp:${{ github.sha }} -o backendapp-${{ github.sha }}.tar
+            
+        - name: Copy Docker image to remote server
+          uses: appleboy/scp-action@v0.1.0
+          with:
+            host: ${{ secrets.REMOTE_HOST }}
+            username: ${{ secrets.REMOTE_USER }}
+            key: ${{ secrets.REMOTE_PASSWORD }}
+            passphrase: ${{ secrets.SSH_PASSPHRASE }}
+            port: 22
+            source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
+            target: "../app"    
+
+        - name: Deploy Docker image on remote server
+          uses: appleboy/ssh-action@v0.1.5
+          with:
+            host: ${{ secrets.REMOTE_HOST }}
+            username: ${{ secrets.REMOTE_USER }}
+            key: ${{ secrets.REMOTE_PASSWORD }}
+            passphrase: ${{ secrets.SSH_PASSPHRASE }}
+            port: 22
+            script: |
+              cd ../app/github/workspace/Project/api
+              
+              ls -lh backendapp-${{ github.sha }}.tar
+
+              # Load the Docker image from the tarball
+              docker load -i backendapp-${{ github.sha }}.tar
+
+              docker build -t backendapp:${{ github.sha }}
+
+              # Stop and remove any running container (optional)
+              docker stop backendapp || true
+              docker rm backendapp || true
+
+              # Run the new container
+              docker run -it -d --name backendapp -p 3001:3001 backendapp:${{ github.sha }}    
+
+              docker start backendapp
+
+  Frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Project/client        
+
+    steps:
             - name: checkout
               uses: actions/checkout@v2
 
