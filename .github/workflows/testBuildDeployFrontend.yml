@@ -30,47 +30,45 @@ jobs:
                 cache-dependency-path: Project/client/package-lock.json
             - run: npm test
 
-            - name: Build React app
-              run: | 
-                npm run build
-                cd ./dist
-                ls
+            # Set up Docker
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v2
 
-            - name: Set up SSH
-              uses: webfactory/ssh-agent@v0.5.3
-              with:
-                ssh-private-key: ${{ secrets.REMOTE_PASSWORD }}
-                ssh-key-passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        
-            - name: Deploy to remote server
+            # Build Docker image for Nginx to serve the React app
+            - name: Build Docker image
               run: |
-                # Set variables for the remote server
-                REMOTE_USER="${{secrets.REMOTE_USER}}"
-                REMOTE_HOST="${{secrets.REMOTE_HOST}}"
-                REMOTE_DIR="../tmp/frontend"
+                docker build -t my-react-app ./ # Make sure you have a Dockerfile in the root
 
-                # Transfer the build directory to the remote server using rsync
-                rsync -avz --delete ./dist/ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR
+            # Copy the private key and passphrase for SSH access
+            - name: Set up SSH
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.REMOTE_PASSWORD }}" > ~/.ssh/id_rsa
+                chmod 600 ~/.ssh/id_rsa
+                echo "Host *" >> ~/.ssh/config
+                echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
-            - name: Deploy build to Dockerized Nginx
-              uses: appleboy/ssh-action@v0.1.5
-              with:
-                host: ${{ secrets.REMOTE_HOST }}
-                username: ${{ secrets.REMOTE_USER }}
-                key: ${{ secrets.REMOTE_PASSWORD }}
-                passphrase: ${{ secrets.SSH_PASSPHRASE }}
-                port: 22
-                script: |  
-                  cd ..
+            # Deploy Docker image to the remote server using SSH
+            - name: Deploy to remote server
+              env:
+                SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}  # The passphrase for your SSH private key
+              run: |
+                # Start SSH agent and add the private key
+                eval $(ssh-agent -s)
+                ssh-add ~/.ssh/id_rsa <<< "${SSH_PASSPHRASE}"
+  
+                # SSH command to deploy the Docker container
+                ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST}} << 'EOF'
+                  # Pull the latest Docker image (if using DockerHub)
+                  docker pull my-react-app:latest
 
-                  # Stop the running Nginx container
-                  docker stop docker-nginx || true  # Prevent errors if the container is not running
+                  # Stop and remove the old container if it's running
+                  docker stop react-app || true
+                  docker rm react-app || true
 
-                  # Remove the old container
-                  docker rm docker-nginx || true  # Prevent errors if the container doesn't exist
+                  # Run the new container
+                  docker run -d -p 80:80 --name react-app my-react-app:latest
 
-                  # Remove the old frontend files from the Nginx container (assuming Nginx uses /usr/share/nginx/html)
-                  docker run --rm -v /tmp/frontend:/frontend -v /usr/share/nginx/html nginx cp -r /frontend/* /usr/share/nginx/html/
-
-                  # Restart the Nginx container with the new build
-                  docker run -d --name docker-nginx -p 80:80 -v /usr/share/nginx/html:/usr/share/nginx/html nginx
+                  # Optionally: clean up unused Docker images
+                  docker image prune -af
+                EOF
