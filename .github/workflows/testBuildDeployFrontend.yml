@@ -63,7 +63,7 @@ jobs:
                 passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22
                 source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/client/frontendapp.tar"
-                target: "../app"    
+                target: "../frontend"    
 
             - name: Deploy Docker image on remote server
               uses: appleboy/ssh-action@v0.1.5
@@ -74,6 +74,10 @@ jobs:
                 passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22
                 script: |
+                  cd ..
+
+                  find ./ -name frontendapp.tar
+
                   cd ../app/github/workspace/Project/client
                   
                   ls -lh frontendapp.tar
