@@ -9,7 +9,6 @@ RUN npm run build
 # Step 2: Serve the app with Nginx
 FROM nginx:alpine
 
-RUN ls
 # Copy the build output from the previous stage to the Nginx HTML directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
