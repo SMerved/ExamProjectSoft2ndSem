@@ -33,6 +33,8 @@ jobs:
             - name: Build React app
               run: | 
                 npm run build
+                ls
+                cd ./dist
 
             - name: Copy build to remote server using SCP
               uses: appleboy/scp-action@v0.1.1
