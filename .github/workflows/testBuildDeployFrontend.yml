@@ -33,20 +33,25 @@ jobs:
             - name: Build React app
               run: | 
                 npm run build
-                ls
                 cd ./dist
+                ls
 
-            - name: Copy build to remote server using SCP
-              uses: appleboy/scp-action@v0.1.1
+            - name: Set up SSH
+              uses: webfactory/ssh-agent@v0.5.3
               with:
-                host: ${{ secrets.REMOTE_HOST }}  # Your remote server IP
-                username: ${{ secrets.REMOTE_USER }}  # Your remote server username
-                key: ${{ secrets.REMOTE_PASSWORD }}  # Your private key stored in GitHub Secrets
-                passphrase: ${{ secrets.SSH_PASSPHRASE }}
-                port: 22  # The SSH port (default is 22)
-                source: "./dist/"  # Path to the build output (adjust if needed)
-                target: "../tmp/frontend/ "  # Path where the build will be copied on the remote server
+                ssh-private-key: ${{ secrets.REMOTE_PASSWORD }}
+                ssh-key-passphrase: ${{ secrets.SSH_PASSPHRASE }}
         
+            - name: Deploy to remote server
+              run: |
+                # Set variables for the remote server
+                REMOTE_USER=${{secrets.REMOTE_USER}}
+                REMOTE_HOST=${{secrets.REMOTE_HOST}}
+                REMOTE_DIR="../tmp/frontend"
+
+                # Transfer the build directory to the remote server using rsync
+                rsync -avz --delete ./dist/ $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR
+
             - name: Deploy build to Dockerized Nginx
               uses: appleboy/ssh-action@v0.1.5
               with:
