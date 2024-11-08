@@ -33,8 +33,6 @@ jobs:
             - name: Build React app
               run: | 
                 npm run build
-                cd ....
-                ls
 
             - name: Copy build to remote server using SCP
               uses: appleboy/scp-action@v0.1.1
@@ -44,7 +42,7 @@ jobs:
                 key: ${{ secrets.REMOTE_PASSWORD }}  # Your private key stored in GitHub Secrets
                 passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22  # The SSH port (default is 22)
-                source: "./build/*"  # Path to the build output (adjust if needed)
+                source: "./dist/*"  # Path to the build output (adjust if needed)
                 target: "../tmp/frontend/ "  # Path where the build will be copied on the remote server
         
             - name: Deploy build to Dockerized Nginx
