@@ -45,8 +45,8 @@ jobs:
             - name: Deploy to remote server
               run: |
                 # Set variables for the remote server
-                REMOTE_USER=${{secrets.REMOTE_USER}}
-                REMOTE_HOST=${{secrets.REMOTE_HOST}}
+                REMOTE_USER="${{secrets.REMOTE_USER}}"
+                REMOTE_HOST="${{secrets.REMOTE_HOST}}"
                 REMOTE_DIR="../tmp/frontend"
 
                 # Transfer the build directory to the remote server using rsync
