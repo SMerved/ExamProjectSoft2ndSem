@@ -42,7 +42,7 @@ jobs:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
                 key: ${{ secrets.REMOTE_PASSWORD }}
-                passphrase: "ftu58fqs"
+                passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22
                 source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
                 target: "../app"    
@@ -53,7 +53,7 @@ jobs:
                 host: ${{ secrets.REMOTE_HOST }}
                 username: ${{ secrets.REMOTE_USER }}
                 key: ${{ secrets.REMOTE_PASSWORD }}
-                passphrase: "ftu58fqs"
+                passphrase: ${{ secrets.SSH_PASSPHRASE }}
                 port: 22
                 script: |
                   cd ../app/github/workspace/Project/api
