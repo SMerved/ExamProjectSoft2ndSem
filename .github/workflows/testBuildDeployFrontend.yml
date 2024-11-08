@@ -75,6 +75,7 @@ jobs:
               docker start backendapp
 
   Frontend:
+    needs: Backend
     runs-on: ubuntu-latest
 
     defaults:
