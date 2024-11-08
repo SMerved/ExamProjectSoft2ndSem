@@ -37,7 +37,8 @@ jobs:
             # Build Docker image for Nginx to serve the React app
             - name: Build Docker image
               run: |
-                docker build -t my-react-app ./ # Make sure you have a Dockerfile in the root
+                docker build -t frontendapp ./ # Make sure you have a Dockerfile in the root
+                ls
 
             # Copy the private key and passphrase for SSH access
             - name: Set up SSH
@@ -60,14 +61,14 @@ jobs:
                 # SSH command to deploy the Docker container
                 ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST}} << 'EOF'
                   # Pull the latest Docker image (if using DockerHub)
-                  docker pull my-react-app:latest
+                  docker pull frontendapp:latest
 
                   # Stop and remove the old container if it's running
                   docker stop react-app || true
                   docker rm react-app || true
 
                   # Run the new container
-                  docker run -d -p 80:80 --name react-app my-react-app:latest
+                  docker run -d -p 80:80 --name react-app frontendapp:latest
 
                   # Optionally: clean up unused Docker images
                   docker image prune -af
