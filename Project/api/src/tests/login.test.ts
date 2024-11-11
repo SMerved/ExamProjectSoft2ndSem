@@ -3,7 +3,7 @@ import app from '../index.ts';
 import * as userRepository from '../loginService/userRepository.ts';
 import {AppDataSource} from "../ormconfig.ts";
 
-jest.mock('../db_functions/userRepository');
+jest.mock('../loginService/userRepository');
 
 describe('POST /login', () => {
     const mockUser = { id: 1, username: 'testUser', role: 'user' };
@@ -17,15 +17,13 @@ describe('POST /login', () => {
     });
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        jest.resetAllMocks()
     });
 
     it('should return user object if login is successful', async () => {
         (userRepository.validateCredentials as jest.Mock).mockResolvedValue(mockUser);
 
-        const response = await request(app)
-            .post('/login')
-            .send({ username: 'testUser', password: 'validPassword' });
+        const response = await request(app).post('/login').send({ username: 'testUser', password: 'validPassword' });
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockUser);
