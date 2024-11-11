@@ -59,7 +59,7 @@ jobs:
             passphrase: ${{ secrets.SSH_PASSPHRASE }}
             port: 22
             script: |
-              cd ../app/github/workspace/Project/api
+              cd ../app/backend/github/workspace/Project/api
               
               ls -lh backendapp-${{ github.sha }}.tar
 
