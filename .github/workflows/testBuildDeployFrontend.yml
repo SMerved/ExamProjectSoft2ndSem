@@ -4,28 +4,7 @@ on:
         branches:
             - deploy
 jobs:
-  Clean:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clean frontend and backend folders on server
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.REMOTE_PASSWORD }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          port: 22
-          script: |
-            cd ..
-            cd app
-            rm -r frontend
-            rm -r backend
-            mkdir frontend
-            mkdir backend
-
   Frontend:
-    needs: Clean
     runs-on: ubuntu-latest
 
     defaults:
@@ -92,27 +71,24 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: 22
           script: |
-            cd ..
+              cd ..
+              cd app/frontend/github/workspace/Project/api
+              
+              ls -lh frontendapp-${{ github.sha }}.tar
 
-            find ./ -name frontendapp-${{ github.sha }}.tar
+              # Load the Docker image from the tarball
+              docker load -i frontendapp-${{ github.sha }}.tar
 
-            cd ../app/github/workspace/Project/client
-            
-            ls -lh frontendapp-${{ github.sha }}.tar
+              docker build -t frontendapp:${{ github.sha }}
 
-            # Load the Docker image from the tarball
-            docker load -i frontendapp-${{ github.sha }}.tar
+              # Stop and remove any running container (optional)
+              docker stop frontendapp || true
+              docker rm frontendapp || true
 
-            docker build -t frontendapp:${{ github.sha }}
+              # Run the new container
+              docker run -it -d --name frontendapp -p 8080:8080 frontendapp:${{ github.sha }}    
 
-            # Stop and remove any running container (optional)
-            docker stop frontendapp || true
-            docker rm frontendapp || true
-
-            # Run the new container
-            docker run -it -d --name frontendapp -p 3001:3001 frontendapp:${{ github.sha }}    
-
-            docker start frontendapp
+              docker start frontendapp
 
   Backend:
     needs: Frontend
@@ -170,7 +146,8 @@ jobs:
             passphrase: ${{ secrets.SSH_PASSPHRASE }}
             port: 22
             script: |
-              cd ../app/backend/github/workspace/Project/api
+              cd ..
+              cd app/backend/github/workspace/Project/api
               
               ls -lh backendapp-${{ github.sha }}.tar
 
