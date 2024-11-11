@@ -1,8 +1,8 @@
 import { Entity, ObjectId, ObjectIdColumn, Column } from "typeorm";
 import { USER_ROLES } from "./types/users.ts";
-import { ObjectId as MongoObjectId } from "mongodb"; // Ensure proper import of Mongo ObjectId
+import { ObjectId as MongoObjectId } from "mongodb";
 
-@Entity()
+@Entity('users')
 export class User {
   @ObjectIdColumn()
   id!: ObjectId;

@@ -14,6 +14,7 @@ AppDataSource.initialize()
         app.post("/login", async (req: Request, res: Response) => {
             try {
                 const { username, password } = req.body;
+                
                 const user = await validateCredentials(username, password);
                 
                 if (!user) {
@@ -24,7 +25,7 @@ AppDataSource.initialize()
                 res.json(user);
             } catch (error) {
                 console.error("Error finding user:", error); // eslint-disable-line no-console
-                res.status(500).json({ error: "Server error" });
+                res.status(500).json({ error: "Error finding user" });
             }
         });
         

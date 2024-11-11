@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
+import { User } from './loginService/User.ts';
 
 dotenv.config();
 
@@ -13,5 +14,5 @@ export const AppDataSource = new DataSource({
   useUnifiedTopology: true,
   synchronize: true,
   logging: true,
-  entities: [],
+  entities: [User],
 });
