@@ -4,7 +4,28 @@ on:
         branches:
             - deploy
 jobs:
+  Clean:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Docker image on remote server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PASSWORD }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          script: |
+            cd ..
+            cd app
+            rm -r frontend
+            rm -r backend
+            mkdir frontend
+            mkdir backend
+
   Backend:
+    needs: Clean
     runs-on: ubuntu-latest
 
     defaults:
@@ -110,16 +131,15 @@ jobs:
           ls
           ls -la dist
 
-      # Set up Docker
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
       # Build Docker image for Nginx to serve the React app
       - name: Build Docker image
         run: |
-          docker build -t frontendapp ./ # Make sure you have a Dockerfile in the root
+          docker build -t frontendapp 
           cd ./dist
           ls
+
+      - name: List Docker Images
+        run: docker images
 
       # Save the Docker image as a tarball file
       - name: Save Docker image to tarball
