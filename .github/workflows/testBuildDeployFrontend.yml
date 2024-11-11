@@ -58,7 +58,7 @@ jobs:
       # Build Docker image for Nginx to serve the React app
       - name: Build Docker image
         run: |
-          docker build -t frontend:${{ github.sha }} .  
+          docker build -t frontendapp:${{ github.sha }} .  
         
       - name: List Docker Images
         run: docker images
