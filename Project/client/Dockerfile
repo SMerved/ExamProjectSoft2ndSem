@@ -13,7 +13,7 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Expose port 80 to be accessible externally
-EXPOSE 80
+EXPOSE 8080
 
 # Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
