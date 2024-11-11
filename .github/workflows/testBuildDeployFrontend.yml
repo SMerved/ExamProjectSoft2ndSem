@@ -58,7 +58,6 @@ jobs:
       # Build Docker image for Nginx to serve the React app
       - name: Build Docker image
         run: |
-          ls
           docker build -t frontend:${{ github.sha }} .  
         
       - name: List Docker Images
@@ -68,10 +67,8 @@ jobs:
       - name: Save Docker image to tarball
         run: |
           docker save frontend:${{ github.sha }} -o frontend-${{ github.sha }}.tar
-          cd ..
-          cd ..
-          find ./ -name frontendapp-${{ github.sha }}.tar
           chmod 664 frontend-${{ github.sha }}.tar
+          pwd
           
       - name: Copy Docker image to remote server
         uses: appleboy/scp-action@v0.1.0
