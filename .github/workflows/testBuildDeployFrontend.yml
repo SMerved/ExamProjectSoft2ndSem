@@ -38,7 +38,7 @@ jobs:
             chmod 664 backendapp-${{ github.sha }}.tar
              
         - name: Copy Docker image to remote server
-          uses: appleboy/scp-action@v0.1.7
+          uses: appleboy/scp-action@v0.1.0
           with:
             host: ${{ secrets.REMOTE_HOST }}
             username: ${{ secrets.REMOTE_USER }}
@@ -46,7 +46,7 @@ jobs:
             passphrase: ${{ secrets.SSH_PASSPHRASE }}
             port: 22
             source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/api/backendapp-${{ github.sha }}.tar"
-            target: "../app"
+            target: "../app/backend"
             timeout: "300s"
             proxy_timeout: "300s"    
 
@@ -129,7 +129,7 @@ jobs:
           find ./ -name frontendapp-${{ github.sha }}.tar
           
       - name: Copy Docker image to remote server
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v0.1.0
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
@@ -137,7 +137,7 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           port: 22
           source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/client/frontendapp-${{ github.sha }}.tar"
-          target: "../frontend"
+          target: "../app/frontend"
           timeout: "300s"
           proxy_timeout: "300s"       
 
