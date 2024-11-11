@@ -61,9 +61,9 @@ jobs:
       - name: Build Docker image
         run: |
           cd dist
-          docker build -t frontendapp 
           ls
-
+          docker build -t frontend:${{ github.sha }} .  
+        
       - name: List Docker Images
         run: docker images
 
