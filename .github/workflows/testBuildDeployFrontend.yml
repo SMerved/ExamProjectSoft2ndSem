@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy Docker image on remote server
+      - name: Clean frontend and backend folders on server
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -24,8 +24,102 @@ jobs:
             mkdir frontend
             mkdir backend
 
-  Backend:
+  Frontend:
     needs: Clean
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Project/client        
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  
+
+      - name: Install dependicies
+        run: npm install 
+
+      - name: Use Node.js to test 
+        uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          cache-dependency-path: Project/client/package-lock.json
+      - run: npm test
+
+      - name: Build React app
+        run: | 
+          npm run build
+          ls
+          ls -la dist
+
+      # Build Docker image for Nginx to serve the React app
+      - name: Build Docker image
+        run: |
+          cd dist
+          docker build -t frontendapp 
+          ls
+
+      - name: List Docker Images
+        run: docker images
+
+      # Save the Docker image as a tarball file
+      - name: Save Docker image to tarball
+        run: |
+          docker save frontendapp:${{ github.sha }} -o frontendapp-${{ github.sha }}.tar
+          cd ..
+          find ./ -name frontendapp-${{ github.sha }}.tar
+          
+      - name: Copy Docker image to remote server
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PASSWORD }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/client/frontendapp-${{ github.sha }}.tar"
+          target: "../app/frontend"
+          timeout: "300s"
+          proxy_timeout: "300s"       
+
+      - name: Deploy Docker image on remote server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PASSWORD }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          script: |
+            cd ..
+
+            find ./ -name frontendapp-${{ github.sha }}.tar
+
+            cd ../app/github/workspace/Project/client
+            
+            ls -lh frontendapp-${{ github.sha }}.tar
+
+            # Load the Docker image from the tarball
+            docker load -i frontendapp-${{ github.sha }}.tar
+
+            docker build -t frontendapp:${{ github.sha }}
+
+            # Stop and remove any running container (optional)
+            docker stop frontendapp || true
+            docker rm frontendapp || true
+
+            # Run the new container
+            docker run -it -d --name frontendapp -p 3001:3001 frontendapp:${{ github.sha }}    
+
+            docker start frontendapp
+
+  Backend:
+    needs: Frontend
     runs-on: ubuntu-latest
 
     defaults:
@@ -97,97 +191,3 @@ jobs:
               docker run -it -d --name backendapp -p 3001:3001 backendapp:${{ github.sha }}    
 
               docker start backendapp
-
-  Frontend:
-    needs: Backend
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: Project/client        
-
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'  
-
-      - name: Install dependicies
-        run: npm install 
-
-      - name: Use Node.js to test 
-        uses: actions/setup-node@v4
-        with:
-          cache: 'npm'
-          cache-dependency-path: Project/client/package-lock.json
-      - run: npm test
-
-      - name: Build React app
-        run: | 
-          npm run build
-          ls
-          ls -la dist
-
-      # Build Docker image for Nginx to serve the React app
-      - name: Build Docker image
-        run: |
-          docker build -t frontendapp 
-          cd ./dist
-          ls
-
-      - name: List Docker Images
-        run: docker images
-
-      # Save the Docker image as a tarball file
-      - name: Save Docker image to tarball
-        run: |
-          docker save frontendapp:${{ github.sha }} -o frontendapp-${{ github.sha }}.tar
-          cd ..
-          find ./ -name frontendapp-${{ github.sha }}.tar
-          
-      - name: Copy Docker image to remote server
-        uses: appleboy/scp-action@v0.1.0
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.REMOTE_PASSWORD }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          port: 22
-          source: "/home/runner/work/ExamProjectSoft2ndSem/ExamProjectSoft2ndSem/Project/client/frontendapp-${{ github.sha }}.tar"
-          target: "../app/frontend"
-          timeout: "300s"
-          proxy_timeout: "300s"       
-
-      - name: Deploy Docker image on remote server
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.REMOTE_PASSWORD }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          port: 22
-          script: |
-            cd ..
-
-            find ./ -name frontendapp-${{ github.sha }}.tar
-
-            cd ../app/github/workspace/Project/client
-            
-            ls -lh frontendapp-${{ github.sha }}.tar
-
-            # Load the Docker image from the tarball
-            docker load -i frontendapp-${{ github.sha }}.tar
-
-            docker build -t frontendapp:${{ github.sha }}
-
-            # Stop and remove any running container (optional)
-            docker stop frontendapp || true
-            docker rm frontendapp || true
-
-            # Run the new container
-            docker run -it -d --name frontendapp -p 3001:3001 frontendapp:${{ github.sha }}    
-
-            docker start frontendapp
