@@ -66,8 +66,8 @@ jobs:
       # Save the Docker image as a tarball file
       - name: Save Docker image to tarball
         run: |
-          docker save frontend:${{ github.sha }} -o frontend-${{ github.sha }}.tar
-          chmod 664 frontend-${{ github.sha }}.tar
+          docker save frontendapp:${{ github.sha }} -o frontendapp-${{ github.sha }}.tar
+          chmod 664 frontendapp-${{ github.sha }}.tar
           pwd
           
       - name: Copy Docker image to remote server
