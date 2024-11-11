@@ -60,7 +60,6 @@ jobs:
       # Build Docker image for Nginx to serve the React app
       - name: Build Docker image
         run: |
-          cd dist
           ls
           docker build -t frontend:${{ github.sha }} .  
         
