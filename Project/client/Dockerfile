@@ -26,7 +26,7 @@ WORKDIR /app
 RUN npm install -g http-server
 
 # Copy the built files from the build stage
-COPY --from=build /app/dist /app
+COPY --from=build /app/dist /app/dist
 
 # Run http-server to serve the static files on the chosen port
 CMD ["http-server", "dist", "-p", "8080", "--host", "0.0.0.0"]
