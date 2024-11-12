@@ -75,8 +75,8 @@ jobs:
               cd app/frontend/github/workspace/Project/client 
               
               mkdir shared
-              chmod -R 755 ~/docker-share/html
-
+              chmod -R 755 shared
+              
               ls -lh frontendapp-${{ github.sha }}.tar
 
               # Load the Docker image from the tarball
