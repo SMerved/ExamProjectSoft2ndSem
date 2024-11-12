@@ -1,19 +1,32 @@
-﻿# Step 1: Use Node.js to build the React app
-FROM node:18 AS build
+﻿# Build stage: Build the Vite app
+FROM node:16 AS build
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock) first to take advantage of Docker cache
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json (or yarn.lock)
+COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --frozen-lockfile
 
-# Copy the rest of the application code
+# Copy the entire project to the container
 COPY . .
 
-# Build the React app for production
+# Build the Vite app (production build)
 RUN npm run build
 
-# The output will be stored in the /app/build folder
+# Production stage: Use a lightweight server to serve the static files
+FROM node:16-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install http-server globally to serve the static files
+RUN npm install -g http-server
+
+# Copy the built files from the build stage
+COPY --from=build /app/dist /app
+
+# Run http-server to serve the static files on the chosen port
+CMD ["http-server", "dist", "-p", "8080", "--host", "0.0.0.0"]
