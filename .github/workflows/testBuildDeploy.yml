@@ -86,7 +86,7 @@ jobs:
               docker rm frontendapp || true
 
               # Run the new container
-              docker run -it -d --name frontendapp -p 5173:5173 frontendapp:${{ github.sha }}    
+              docker run -it -d --name frontendapp -p 4173:4173 frontendapp:${{ github.sha }}    
 
               docker start frontendapp
 
