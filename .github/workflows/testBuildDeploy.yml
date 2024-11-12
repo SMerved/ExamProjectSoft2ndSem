@@ -74,19 +74,24 @@ jobs:
               cd ..
               cd app/frontend/github/workspace/Project/client 
               
+              mkdir shared
+
               ls -lh frontendapp-${{ github.sha }}.tar
 
               # Load the Docker image from the tarball
               docker load -i frontendapp-${{ github.sha }}.tar
 
-              docker build -t frontendapp:${{ github.sha }}
-
               # Stop and remove any running container (optional)
               docker stop frontendapp || true
               docker rm frontendapp || true
 
+              docker stop docker-nginx || true
+              docker rm docker-nginx || true
+
               # Run the new container
-              docker run -it -d --name frontendapp -p 80:8080 frontendapp:${{ github.sha }}    
+              docker run --name frontendapp -v /shared:/app/dist frontendapp:${{ github.sha }}    
+
+              docker run --name docker-nginx -v /shared:/usr/share/nginx/html -p 80:80 -d nginx 
 
               docker start frontendapp
 
