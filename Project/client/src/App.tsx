@@ -5,7 +5,7 @@ import { Login } from './api/login';
 function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  console.log(import.meta.env)
+  
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     Login(username, password)

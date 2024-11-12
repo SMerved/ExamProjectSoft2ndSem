@@ -1,11 +1,9 @@
+import { BASE_URL } from '../constants';
 import { User } from '../types/users';
 
-const baseUrl = import.meta.env.VITE_BASE_URL
-
-console.log(baseUrl)
+const baseUrl = BASE_URL
 
 export const Login = async (username: string, password: string): Promise<User> => {
-  console.log(baseUrl)
     const response = await fetch(`${baseUrl}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

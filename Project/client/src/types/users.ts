@@ -13,3 +13,8 @@ export interface User {
     address?: string;
     restaurant?: string;
   }
+
+export interface Credentials {
+    username: string;
+    password: string;
+  }
