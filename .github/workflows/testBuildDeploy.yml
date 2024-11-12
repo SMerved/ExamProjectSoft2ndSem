@@ -91,11 +91,12 @@ jobs:
 
               # Run the new container
 
-              docker run --name frontendapp -d frontendapp:${{ github.sha }}    
-
+              docker run --name frontendapp -d -v ~/../app/frontend/github/workspace/Project/client/shared:/app/shared frontendapp:${{ github.sha }}    
               docker start frontendapp
+              docker exec -t -i frontendapp mv /dist/* /shared/
 
-
+              docker run --name docker-nginx -d -v ~/../app/frontend/github/workspace/Project/client/shared:/usr/share/nginx/html -p 80:80 nginx 
+              docker start docker-nginx
             
   Backend:
     needs: Frontend
