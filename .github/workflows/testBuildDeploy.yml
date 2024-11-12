@@ -76,7 +76,7 @@ jobs:
               
               mkdir shared
               chmod -R 755 shared
-              
+
               ls -lh frontendapp-${{ github.sha }}.tar
 
               # Load the Docker image from the tarball
@@ -90,7 +90,7 @@ jobs:
               docker rm docker-nginx || true
 
               # Run the new container
-              docker run --name frontendapp -d -v /shared:/app frontendapp:${{ github.sha }}    
+              docker run --name frontendapp -d -v /shared:/app/dist frontendapp:${{ github.sha }}    
 
               docker run --name docker-nginx -d -v /shared:/usr/share/nginx/html -p 80:80 nginx 
 
