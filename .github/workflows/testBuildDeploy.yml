@@ -93,8 +93,10 @@ jobs:
 
               docker run --name docker-nginx -d -v /shared:/usr/share/nginx/html -p 80:80 nginx 
 
+              docker start docker-nginx
+              
               docker start frontendapp
-
+            
   Backend:
     needs: Frontend
     runs-on: ubuntu-latest
