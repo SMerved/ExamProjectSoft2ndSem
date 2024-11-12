@@ -90,13 +90,12 @@ jobs:
               docker rm docker-nginx || true
 
               # Run the new container
-              docker run --name docker-nginx -d -v ~/../app/frontend/github/workspace/Project/client/shared:/usr/share/nginx/html -p 80:80 nginx 
 
               docker run --name frontendapp -d -v ~/../app/frontend/github/workspace/Project/client/shared:/app frontendapp:${{ github.sha }}    
 
-              docker start docker-nginx
-
               docker start frontendapp
+
+
             
   Backend:
     needs: Frontend
