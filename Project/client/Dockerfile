@@ -5,7 +5,6 @@ WORKDIR /app
 COPY . .
 RUN npm install
 RUN npm run build
-RUN npm run preview
 
 # Step 2: Serve the app with Nginx
 FROM nginx:alpine
@@ -17,4 +16,4 @@ COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 5173
 
 # Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["http-server", "dist", "-p", "5173", "--host", "0.0.0.0"]
