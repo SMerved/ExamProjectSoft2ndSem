@@ -5,6 +5,7 @@ WORKDIR /app
 COPY . .
 RUN npm install
 RUN npm run build
+RUN npm run preview
 
 # Step 2: Serve the app with Nginx
 FROM nginx:alpine
@@ -13,7 +14,7 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Expose port 80 to be accessible externally
-EXPOSE 4173
+EXPOSE 5173
 
 # Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]
