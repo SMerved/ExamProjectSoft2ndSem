@@ -1,7 +1,7 @@
 const {
-    BASE_URL,
+    VITE_BASE_URL,
   } = import.meta.env;
   
   export {
-    BASE_URL
+    VITE_BASE_URL
   };

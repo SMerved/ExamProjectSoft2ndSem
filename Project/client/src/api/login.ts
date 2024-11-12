@@ -1,7 +1,7 @@
-import { BASE_URL } from '../constants';
+import { VITE_BASE_URL } from '../constants';
 import { User } from '../types/users';
 
-const baseUrl = BASE_URL
+const baseUrl = VITE_BASE_URL
 
 export const Login = async (username: string, password: string): Promise<User> => {
     const response = await fetch(`${baseUrl}/login`, {

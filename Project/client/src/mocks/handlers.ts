@@ -1,9 +1,9 @@
 import { http } from 'msw';
 import { Credentials } from '../types/users';
-import { BASE_URL } from '../constants';
+import { VITE_BASE_URL } from '../constants';
 
 export const handlers = [
-  http.post<never, Credentials>(`${BASE_URL}/login`, async ({ request }) => {
+  http.post<never, Credentials>(`${VITE_BASE_URL}/login`, async ({ request }) => {
     const credentials = await request.json();
     const {username, password} = credentials
 
