@@ -1,12 +1,37 @@
 import { AppDataSource } from '../ormconfig.ts';
-import { Restaurant } from '../entities/restaurant.ts';
+import { MenuItem, Restaurant } from './restaurant.ts';
 // import { ObjectId } from 'mongodb';
 
 const restaurantRepository = AppDataSource.getMongoRepository(Restaurant);
+const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
 
-async function getAllRestaurants() {
-    const bookings = await restaurantRepository.find();
-    return bookings;
+async function getMenuItems(restaurant: Restaurant) {
+    const menuItems = await menuItemRepository.find({
+        where: {
+            _id: { $in: restaurant.menu },
+        },
+    });
+
+    return menuItems;
 }
 
-export { getAllRestaurants, restaurantRepository };
+async function getAllRestaurants() {
+    const restaurants = await restaurantRepository.find();
+
+    const restaurantList = [];
+
+    for (const restaurant of restaurants) {
+        const menuItems = await getMenuItems(restaurant);
+
+        const restaurantTemp = {
+            ...restaurant,
+            menu: menuItems,
+        };
+
+        restaurantList.push(restaurantTemp);
+    }
+
+    return restaurantList;
+}
+
+export { getMenuItems, getAllRestaurants, restaurantRepository };
