@@ -89,9 +89,9 @@ jobs:
               docker rm docker-nginx || true
 
               # Run the new container
-              docker run --name frontendapp -v /shared:/app/dist frontendapp:${{ github.sha }}    
+              docker run --name frontendapp -d -v /shared:/app/dist frontendapp:${{ github.sha }}    
 
-              docker run --name docker-nginx -v /shared:/usr/share/nginx/html -p 80:80 -d nginx 
+              docker run --name docker-nginx -d -v /shared:/usr/share/nginx/html -p 80:80 nginx 
 
               docker start frontendapp
 
