@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
       - name: Clean remote server
         uses: appleboy/ssh-action@v0.1.5
         with:
@@ -20,9 +23,9 @@ jobs:
             docker system prune -f
 
             cd ../app/frontend
-            rm -r github
+            rm -r github || true
             cd ../backend
-            rm -r github   
+            rm -r github || true  
 
   Frontend:
     needs: Clean
