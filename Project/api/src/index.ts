@@ -3,6 +3,8 @@ import { AppDataSource } from './ormconfig.ts';
 import cors from 'cors';
 import { validateCredentials } from './loginService/userRepository.ts';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
+import { OrderAndFeedbackService } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+
 const app = express();
 
 app.use(cors());
@@ -22,6 +24,7 @@ AppDataSource.initialize()
                     res.status(401).json({
                         error: 'Invalid username or password',
                     });
+
                     return;
                 }
 
@@ -42,6 +45,31 @@ AppDataSource.initialize()
                 res.status(500).json({
                     error: 'An error occurred while fetching restaurants',
                 });
+            }
+        });
+
+        app.post('createOrder', async (req: Request, res: Response) => {
+            try {
+                const { userID, restaurantID, menuItems, address } = req.body;
+
+                const orderAndFeedbackService: OrderAndFeedbackService =
+                    new OrderAndFeedbackService();
+                const order = await orderAndFeedbackService.createOrder(
+                    userID,
+                    restaurantID,
+                    menuItems,
+                    address
+                );
+
+                if (!order) {
+                    res.status(401).json({ error: 'Invalid body' });
+                    return;
+                }
+
+                res.json(order);
+            } catch (error) {
+                console.error('Error creating order:', error); // eslint-disable-line no-console
+                res.status(500).json({ error: 'Server error' });
             }
         });
     })
