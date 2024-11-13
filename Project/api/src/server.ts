@@ -1,4 +1,5 @@
 import app from "./index.ts";
+import 'reflect-metadata';
 
 const port = 3001;
 
