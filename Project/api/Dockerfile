@@ -7,20 +7,17 @@ WORKDIR /app
 # Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
 
-# Install dependencies (npm install)
+# Install dependencies
 RUN npm install
 
-#Install TypeScript globally
-RUN npm install -g typescript
-
-#Copy the rest of the application files
+# Copy the rest of the application files
 COPY . .
 
-#Compile TypeScript files
-RUN tsc
+# Compile TypeScript files to JavaScript
+RUN npx tsc
 
-# Expose the port the app will run on (optional, based on your app's config)
+# Expose the port the app will run on
 EXPOSE 3001
 
-# Command to run your app (this assumes you have a start script in package.json)
-CMD ["node", "dist/index.js"]
+# Command to run your app
+CMD ["node", "dist/server.js"]
