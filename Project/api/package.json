@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "ts-node src/server.ts",
-    "build": "echo 'No build step needed'", 
+    "build": "node esbuild.config.js",
     "dev": "nodemon src/server.ts",
     "test": "jest",
     "lint": "eslint ."
@@ -31,6 +31,9 @@
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.13.0",
     "@typescript-eslint/parser": "^8.13.0",
+    "esbuild": "^0.24.0",
+    "esbuild-node-externals": "^1.15.0",
+    "esbuild-plugin-tsc": "^0.4.0",
     "eslint": "^9.14.0",
     "eslint-plugin-import": "^2.31.0",
     "globals": "^15.12.0",
