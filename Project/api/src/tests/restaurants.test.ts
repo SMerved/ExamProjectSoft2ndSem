@@ -1,17 +1,13 @@
 import request from 'supertest';
 import app from '../index.ts';
 import * as restaurantRepository from '../RestaurantService/dbFunctions.ts';
-import { AppDataSource } from '../ormconfig.ts';
 
 jest.mock('../RestaurantService/dbFunctions.ts');
 
 describe('GET /restaurants', () => {
-    beforeAll(async () => {
-        await AppDataSource.initialize();
-    });
 
-    afterAll(async () => {
-        await AppDataSource.destroy();
+    beforeAll(async () => {
+        await new Promise(resolve => setTimeout(resolve, 4000));
     });
 
     beforeEach(() => {
