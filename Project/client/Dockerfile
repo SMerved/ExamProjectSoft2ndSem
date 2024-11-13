@@ -32,5 +32,5 @@ RUN npm install -g http-server
 COPY --from=build /app/dist /app/build
 
 # Run http-server to serve the static files on the chosen port
-CMD mv /build/* /shared/
+CMD mv build/* shared
 CMD ["http-server", "dist", "-p", "8080", "--host", "0.0.0.0"]
