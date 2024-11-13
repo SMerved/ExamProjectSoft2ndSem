@@ -4,7 +4,31 @@ on:
         branches:
             - deploy
 jobs:
+  Clean:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Clean remote server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PASSWORD }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          script: |
+            docker image prune --all --force
+
+            cd ../app/frontend
+            rm -r github || true
+            cd ../backend
+            rm -r github || true  
+
   Frontend:
+    needs: Clean
     runs-on: ubuntu-latest
 
     defaults:
@@ -74,22 +98,29 @@ jobs:
               cd ..
               cd app/frontend/github/workspace/Project/client 
               
+              mkdir shared
+              chmod -R 755 shared
+
               ls -lh frontendapp-${{ github.sha }}.tar
 
               # Load the Docker image from the tarball
               docker load -i frontendapp-${{ github.sha }}.tar
 
-              docker build -t frontendapp:${{ github.sha }}
-
               # Stop and remove any running container (optional)
               docker stop frontendapp || true
               docker rm frontendapp || true
 
-              # Run the new container
-              docker run -it -d --name frontendapp -p 8080:8080 frontendapp:${{ github.sha }}    
+              docker stop docker-nginx || true
+              docker rm docker-nginx || true
 
+              # Run the new container
+
+              docker run -it --name frontendapp -d -v ~/../app/frontend/github/workspace/Project/client/shared:/app/shared frontendapp:${{ github.sha }}    
               docker start frontendapp
 
+              docker run --name docker-nginx -d -v ~/../app/frontend/github/workspace/Project/client/shared:/usr/share/nginx/html -p 80:80 nginx 
+              docker start docker-nginx
+            
   Backend:
     needs: Frontend
     runs-on: ubuntu-latest

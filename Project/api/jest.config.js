@@ -4,7 +4,7 @@ export default {
   transform: {
     "^.+.(ts|tsx)$": "ts-jest",
   },
-  //forceExit: true,
+  forceExit: true,
   extensionsToTreatAsEsm: ['.ts'],
   moduleFileExtensions: ["ts", "tsx", "js", "json"],
 };

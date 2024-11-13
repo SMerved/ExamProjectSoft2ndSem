@@ -1,19 +1,35 @@
-﻿# Step 1: Build the React app
+﻿# Build stage: Build the Vite app
 FROM node:16 AS build
 
+# Set the working directory inside the container
 WORKDIR /app
+
+# Copy package.json and package-lock.json (or yarn.lock)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install --frozen-lockfile
+
+# Copy the entire project to the container
 COPY . .
-RUN npm install
+
+# Build the Vite app (production build)
 RUN npm run build
 
-# Step 2: Serve the app with Nginx
-FROM nginx:alpine
+# Production stage: Use a lightweight server to serve the static files
+FROM node:16-slim
 
-# Copy the build output from the previous stage to the Nginx HTML directory
-COPY --from=build /app/dist /usr/share/nginx/html
+# Set the working directory
+WORKDIR /app
 
-# Expose port 80 to be accessible externally
-EXPOSE 8080
+RUN mkdir "shared"
+RUN mkdir "build"
 
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Install http-server globally to serve the static files
+RUN npm install -g http-server
+
+# Copy the built files from the build stage
+COPY --from=build /app/dist /app/build
+
+# Run http-server to serve the static files on the chosen port
+CMD mv build/* shared; http-server build -p 8080 --host 0.0.0.0
