@@ -3,7 +3,7 @@ import { AppDataSource } from './ormconfig.ts';
 import cors from 'cors';
 import { validateCredentials } from './loginService/userRepository.ts';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
-import { OrderAndFeedbackService } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+import { createOrder } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 
 const app = express();
 
@@ -24,7 +24,6 @@ AppDataSource.initialize()
                     res.status(401).json({
                         error: 'Invalid username or password',
                     });
-
                     return;
                 }
 
@@ -48,13 +47,11 @@ AppDataSource.initialize()
             }
         });
 
-        app.post('createOrder', async (req: Request, res: Response) => {
+        app.post('/createOrder', async (req: Request, res: Response) => {
             try {
                 const { userID, restaurantID, menuItems, address } = req.body;
 
-                const orderAndFeedbackService: OrderAndFeedbackService =
-                    new OrderAndFeedbackService();
-                const order = await orderAndFeedbackService.createOrder(
+                const order = await createOrder(
                     userID,
                     restaurantID,
                     menuItems,
