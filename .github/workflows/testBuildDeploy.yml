@@ -4,7 +4,28 @@ on:
         branches:
             - deploy
 jobs:
+  Clean:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clean remote server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PASSWORD }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          script: |
+            docker system prune -f
+
+            cd ../app/frontend
+            rm -r github
+            cd ../backend
+            rm -r github   
+
   Frontend:
+    needs: Clean
     runs-on: ubuntu-latest
 
     defaults:
