@@ -7,6 +7,8 @@ import {
     getAllOrders,
 } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import { createFeedbackAndLinkOrder } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
+import { messagingRoutes } from './messagingService/messaging.ts';
+import { sendEvent } from './messagingService/kafkaAdapter';
 
 const app = express();
 
