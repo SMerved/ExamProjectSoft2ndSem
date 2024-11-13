@@ -1,5 +1,5 @@
 import { AppDataSource } from '../ormconfig.ts';
-import { MenuItem, Restaurant } from './restaurant.ts';
+import { MenuItem, Restaurant } from './Restaurant.ts';
 // import { ObjectId } from 'mongodb';
 
 const restaurantRepository = AppDataSource.getMongoRepository(Restaurant);

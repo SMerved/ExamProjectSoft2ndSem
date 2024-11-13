@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
 import { User } from './loginService/User.ts';
-import { MenuItem, Restaurant } from './RestaurantService/restaurant.ts';
+import { MenuItem, Restaurant } from './RestaurantService/Restaurant.ts';
 
 dotenv.config();
 
