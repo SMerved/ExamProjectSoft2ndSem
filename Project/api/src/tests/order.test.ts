@@ -62,6 +62,6 @@ describe('Post /create', () => {
             });
 
         expect(response.status).toBe(401);
-        expect(response.body).toEqual(mockOrder);
+        expect(response.body).toEqual({ error: 'Invalid body' });
     });
 });
