@@ -1,6 +1,7 @@
 import { Order } from './Order.ts';
 import { OrderFactory } from './OrderFactory.ts';
 import { ObjectId } from 'mongodb';
+import { GetAllOrders } from './OrderAndFeedbackRepository.ts';
 
 async function createOrder(
     customerID: ObjectId,
@@ -20,4 +21,8 @@ async function createOrder(
     return order;
 }
 
-export { createOrder };
+async function getAllOrders(): Promise<Order[] | null> {
+    return GetAllOrders();
+}
+
+export { createOrder, getAllOrders };

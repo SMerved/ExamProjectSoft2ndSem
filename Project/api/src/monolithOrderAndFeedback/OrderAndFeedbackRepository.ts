@@ -9,4 +9,12 @@ async function AddOrder(order: Order): Promise<Order | null> {
     return orderRepository.create(order);
 }
 
-export { AddOrder };
+async function GetAllOrders(): Promise<Order[] | null> {
+    try {
+        return orderRepository.find();
+    } catch (error) {
+        return null;
+    }
+}
+
+export { AddOrder, GetAllOrders };
