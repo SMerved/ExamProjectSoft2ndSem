@@ -13,20 +13,8 @@ describe('Post /create', () => {
         address: 11,
     };
 
-    beforeAll(async () => {
-        await AppDataSource.initialize();
-    });
-
-    afterAll(async () => {
-        await AppDataSource.destroy();
-    });
-
     beforeEach(() => {
-        jest.restoreAllMocks();
-    });
-
-    afterEach(async () => {
-        jest.resetAllMocks();
+        jest.resetAllMocks()
     });
 
     it('should return order object if order creation is successful', async () => {
