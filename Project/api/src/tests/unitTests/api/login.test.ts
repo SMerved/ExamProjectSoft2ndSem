@@ -1,8 +1,8 @@
 import request from 'supertest';
-import app from '../index.ts';
-import * as userRepository from '../loginService/userRepository.ts';
+import app from '../../../index.ts';
+import * as userRepository from '../../../loginService/userRepository.ts';
 
-jest.mock('../loginService/userRepository');
+jest.mock('../../../loginService/userRepository.ts');
 
 describe('POST /login', () => {
     const mockUser = { id: 1, username: 'testUser', role: 'user' };

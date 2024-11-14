@@ -1,21 +1,23 @@
 import { Order } from './Order.ts';
-import { OrderFactory } from './OrderFactory.ts';
+import { OrderFactory } from './orderFactory.ts';
 import { ObjectId } from 'mongodb';
 import { GetAllOrders } from './OrderAndFeedbackRepository.ts';
 
 async function createOrder(
     customerID: ObjectId,
     restaurantID: ObjectId,
-    items: ObjectId[],
-    address: ObjectId
+    address: ObjectId,
+    totalPrice: number,
+    menuItemIDList: ObjectId[]
 ): Promise<Order | null> {
     const orderFactory: OrderFactory = new OrderFactory();
 
     const order = await orderFactory.CreateOrder(
         customerID,
         restaurantID,
-        items,
-        address
+        address,
+        totalPrice,
+        menuItemIDList
     );
 
     return order;

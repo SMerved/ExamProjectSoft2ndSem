@@ -1,30 +1,33 @@
-import { OrderStatusEnum } from './OrderStatusEnum.ts';
+import { OrderStatusEnum } from './types/orderStatusEnum.ts';
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
-import { ObjectId } from "mongodb"; // Ensure proper import of Mongo ObjectId
+import { ObjectId } from "mongodb";
 
-@Entity()
-export class Order{
+@Entity('orders')
+export class Order {
     @ObjectIdColumn()
-    orderID!: ObjectId
+    _id!: ObjectId;
 
     @Column()
-    customerID!: ObjectId
+    customerID!: ObjectId;
 
     @Column()
-    restaurantID!: ObjectId
+    restaurantID!: ObjectId;
+
+    @Column({ nullable: true })
+    employeeID?: ObjectId;
+
+    @Column({ type: 'enum', enum: OrderStatusEnum, default: OrderStatusEnum.Created })
+    status!: OrderStatusEnum;
 
     @Column()
-    employeeID!: ObjectId
+    address!: ObjectId;
 
     @Column()
-    status!: OrderStatusEnum
+    totalPrice!: number;
 
-    @Column()
-    address!: ObjectId
+    @Column("array")
+    menuItemIDList!: ObjectId[];
 
-    @Column()
-    totalPrice!: number
-
-    @Column()
-    menuItemIDList!: ObjectId[]
+    @Column({ nullable: true })
+    feedbackID?: ObjectId;
 }

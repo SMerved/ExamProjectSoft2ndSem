@@ -6,6 +6,7 @@ import {
     createOrder,
     getAllOrders,
 } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+import { createFeedbackAndLinkOrder } from './monolithOrderAndFeedback/orderAndFeedbackRepository.ts';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.post('/login', async (req: Request, res: Response) => {
             });
             return;
         }
+        
 
         res.json(user);
     } catch (error) {
@@ -47,24 +49,25 @@ app.get('/restaurants', async (req: Request, res: Response) => {
 
 app.post('/createOrder', async (req: Request, res: Response) => {
     try {
-        const { userID, restaurantID, menuItems, address } = req.body;
+        const { userID, restaurantID, menuItems, address, totalPrice } = req.body;
 
         const order = await createOrder(
             userID,
             restaurantID,
             menuItems,
-            address
+            address,
+            totalPrice
         );
 
         if (!order) {
-            res.status(401).json({ error: 'Invalid body' });
+            res.status(401).json({ error: 'Invalid order data' });
             return;
         }
 
         res.json(order);
     } catch (error) {
-        console.error('Error creating order:', error); // eslint-disable-line no-console
-        res.status(500).json({ error: 'Server error' });
+        console.error('Error creating order:', error);
+        res.status(500).json({ error: 'Error creating order' });
     }
 });
 
@@ -84,8 +87,29 @@ app.get('/orders', async (req: Request, res: Response) => {
         console.error('Error creating order:', error); // eslint-disable-line no-console
         res.status(500).json({
             error: 'An error occurred while fetching orders',
-        });
-    }
-});
+        })
+    }})
+
+    app.post('/createFeedback', async (req: Request, res: Response) => {
+        try {
+            const { foodRating, overallRating, deliveryRating, orderId } = req.body;
+
+            const feedback = await createFeedbackAndLinkOrder({
+                foodRating,
+                overallRating,
+                deliveryRating,
+                orderId
+            });
+
+            if (!feedback) {
+                res.status(401).json({ error: 'Invalid feedback data' });
+                return;
+            }
+
+            res.json(feedback);
+        } catch (error) {
+            console.error('Error creating feedback:', error);
+            res.status(500).json({ error: 'Error creating feedback' });
+        }})
 
 export default app;

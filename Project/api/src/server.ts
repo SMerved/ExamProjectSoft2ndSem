@@ -12,5 +12,5 @@ AppDataSource.initialize()
         });
     })
     .catch((err) => {
-        console.error('Error during Data Source initialization:', err); // eslint-disable-line no-console
+        console.error('Error during Data Source initialization:', err);
     });
