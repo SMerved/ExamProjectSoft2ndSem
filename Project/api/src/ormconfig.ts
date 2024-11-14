@@ -7,7 +7,8 @@ import { Feedback } from './monolithOrderAndFeedback/Feedback.ts';
 
 dotenv.config();
 
-const databaseName = 'SoftExam';
+const isTestEnv = process.env.NODE_ENV === 'test';
+const databaseName = isTestEnv ? 'SoftExamTest' : 'SoftExam';
 
 export const AppDataSource = new DataSource({
     type: 'mongodb',
