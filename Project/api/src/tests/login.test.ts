@@ -7,10 +7,6 @@ jest.mock('../loginService/userRepository');
 describe('POST /login', () => {
     const mockUser = { id: 1, username: 'testUser', role: 'user' };
 
-    beforeAll(async () => {
-        await new Promise(resolve => setTimeout(resolve, 4000));
-    });
-
     beforeEach(() => {
         jest.resetAllMocks()
     });

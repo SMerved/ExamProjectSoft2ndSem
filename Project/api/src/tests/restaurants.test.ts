@@ -6,10 +6,6 @@ jest.mock('../RestaurantService/dbFunctions.ts');
 
 describe('GET /restaurants', () => {
 
-    beforeAll(async () => {
-        await new Promise(resolve => setTimeout(resolve, 4000));
-    });
-
     beforeEach(() => {
         jest.resetAllMocks();
     });

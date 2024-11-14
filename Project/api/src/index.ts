@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import { AppDataSource } from './ormconfig.ts';
 import cors from 'cors';
 import { validateCredentials } from './loginService/userRepository.ts';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
@@ -7,10 +6,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-AppDataSource.initialize()
-    .then(() => {
-        console.log('Data Source has been initialized!'); // eslint-disable-line no-console
 
         app.post('/login', async (req: Request, res: Response) => {
             try {
@@ -44,9 +39,5 @@ AppDataSource.initialize()
                 });
             }
         });
-    })
-    .catch((err) => {
-        console.error('Error during Data Source initialization:', err); // eslint-disable-line no-console
-    });
 
 export default app;
