@@ -3,6 +3,7 @@ import cors from 'cors';
 import { validateCredentials } from './loginService/userRepository.ts';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
 import { createOrder } from './monolithOrderAndFeedback/orderAndFeedbackService.ts';
+import { createFeedbackAndLinkOrder } from './monolithOrderAndFeedback/orderAndFeedbackRepository.ts';
 
 const app = express();
 
@@ -24,7 +25,7 @@ app.use(express.json());
 
                 res.json(user);
             } catch (error) {
-                console.error('Error finding user:', error); // eslint-disable-line no-console
+                console.error('Error finding user:', error);
                 res.status(500).json({ error: 'Error finding user' });
             }
         });
@@ -35,7 +36,7 @@ app.use(express.json());
 
                 res.json(restaurants);
             } catch (error) {
-                console.error('Error fetching restaurants:', error); // eslint-disable-line no-console
+                console.error('Error fetching restaurants:', error);
                 res.status(500).json({
                     error: 'An error occurred while fetching restaurants',
                 });
@@ -43,24 +44,48 @@ app.use(express.json());
         });
         app.post('/createOrder', async (req: Request, res: Response) => {
             try {
-                const { userID, restaurantID, menuItems, address } = req.body;
+                const { userID, restaurantID, menuItems, address, totalPrice } = req.body;
 
                 const order = await createOrder(
                     userID,
                     restaurantID,
                     menuItems,
-                    address
+                    address,
+                    totalPrice
                 );
 
                 if (!order) {
-                    res.status(401).json({ error: 'Invalid body' });
+                    res.status(401).json({ error: 'Invalid order data' });
                     return;
                 }
 
                 res.json(order);
             } catch (error) {
-                console.error('Error creating order:', error); // eslint-disable-line no-console
-                res.status(500).json({ error: 'Server error' });
+                console.error('Error creating order:', error);
+                res.status(500).json({ error: 'Error creating order' });
+            }
+        });
+
+        app.post('/createFeedback', async (req: Request, res: Response) => {
+            try {
+                const { foodRating, overallRating, deliveryRating, orderId } = req.body;
+
+                const feedback = await createFeedbackAndLinkOrder({
+                    foodRating,
+                    overallRating,
+                    deliveryRating,
+                    orderId
+                });
+
+                if (!feedback) {
+                    res.status(401).json({ error: 'Invalid feedback data' });
+                    return;
+                }
+
+                res.json(feedback);
+            } catch (error) {
+                console.error('Error creating feedback:', error);
+                res.status(500).json({ error: 'Error creating feedback' });
             }
         });
 

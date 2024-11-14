@@ -1,16 +1,17 @@
-import { AppDataSource } from '../ormconfig.ts';
-import * as orderAndFeedbackService from '../monolithOrderAndFeedback/orderAndFeedbackService.ts';
+import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/orderAndFeedbackService.ts';
 import request from 'supertest';
-import app from '../index.ts';
+import app from '../../../index.ts';
 
-jest.mock('../monolithOrderAndFeedback/OrderAndFeedbackService.ts');
+jest.mock('../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts');
 
 describe('Post /create', () => {
     const mockOrder = {
+        _id: 'someObjectId',
         userID: 1,
         restaurantID: 2324,
         menuItems: [1, 23, 24],
         address: 11,
+        totalPrice: 50
     };
 
     beforeEach(() => {
@@ -29,6 +30,7 @@ describe('Post /create', () => {
                 restaurantID: 2324,
                 menuItems: [1, 23, 24],
                 address: 11,
+                totalPrice: 50
             });
 
         expect(response.status).toBe(200);
@@ -47,9 +49,10 @@ describe('Post /create', () => {
                 restaurantID: 2324,
                 menuItems: [1, 23, 24],
                 address: 11,
+                totalPrice: 50
             });
 
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({ error: 'Invalid body' });
+        expect(response.body).toEqual({ error: 'Invalid order data' });
     });
 });

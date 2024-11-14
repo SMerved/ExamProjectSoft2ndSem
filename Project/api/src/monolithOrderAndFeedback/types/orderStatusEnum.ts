@@ -1,5 +1,4 @@
 export enum OrderStatusEnum {
-    Null,
     Created,
     Rejected,
     Accepted,

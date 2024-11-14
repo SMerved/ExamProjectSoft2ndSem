@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 @Entity()
 export class Feedback{
     @ObjectIdColumn()
-    feedbackID!: ObjectId
+    _id!: ObjectId
 
     @Column()
     foodRating!: number

@@ -6,15 +6,17 @@ export class OrderFactory {
     public async CreateOrder(
         customerID: ObjectId,
         restaurantID: ObjectId,
-        items: ObjectId[],
-        address: ObjectId
+        address: ObjectId,
+        totalPrice: number,
+        menuItemIDList: ObjectId[]
     ): Promise<Order | null> {
-        const order = new Order();
-
-        order.customerID = customerID;
-        order.restaurantID = restaurantID;
-        order.menuItemIDList = items;
-        order.address = address;
+        const order = {
+            customerID,
+            restaurantID,
+            address,
+            totalPrice,
+            menuItemIDList,
+        };
 
         return await AddOrder(order);
     }
