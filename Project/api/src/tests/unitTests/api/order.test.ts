@@ -2,7 +2,7 @@ import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/orde
 import request from 'supertest';
 import app from '../../../index.ts';
 
-jest.mock('../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts');
+jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService.ts');
 
 describe('Post /create', () => {
     const mockOrder = {

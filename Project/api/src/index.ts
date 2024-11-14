@@ -5,7 +5,7 @@ import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
 import {
     createOrder,
     getAllOrders,
-} from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+} from './monolithOrderAndFeedback/orderAndFeedbackService.ts';
 import { createFeedbackAndLinkOrder } from './monolithOrderAndFeedback/orderAndFeedbackRepository.ts';
 
 const app = express();
