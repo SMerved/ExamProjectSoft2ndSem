@@ -1,6 +1,6 @@
 import { Order } from './Order.ts';
 import { ObjectId } from 'mongodb';
-import { AddOrder } from './OrderAndFeedbackRepository.ts';
+import { AddOrder } from './orderAndFeedbackRepository.ts';
 
 export class OrderFactory {
     public async CreateOrder(

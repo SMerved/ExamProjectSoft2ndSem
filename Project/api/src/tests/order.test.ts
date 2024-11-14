@@ -1,5 +1,5 @@
 import { AppDataSource } from '../ormconfig.ts';
-import * as orderAndFeedbackService from '../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+import * as orderAndFeedbackService from '../monolithOrderAndFeedback/orderAndFeedbackService.ts';
 import request from 'supertest';
 import app from '../index.ts';
 

@@ -1,5 +1,5 @@
 import { Order } from './Order.ts';
-import { OrderFactory } from './OrderFactory.ts';
+import { OrderFactory } from './orderFactory.ts';
 import { ObjectId } from 'mongodb';
 
 async function createOrder(

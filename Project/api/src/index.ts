@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { validateCredentials } from './loginService/userRepository.ts';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
-import { createOrder } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+import { createOrder } from './monolithOrderAndFeedback/orderAndFeedbackService.ts';
 
 const app = express();
 

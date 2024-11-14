@@ -1,4 +1,4 @@
-import { OrderStatusEnum } from './OrderStatusEnum.ts';
+import { OrderStatusEnum } from './orderStatusEnum.ts';
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { ObjectId } from "mongodb"; // Ensure proper import of Mongo ObjectId
 
