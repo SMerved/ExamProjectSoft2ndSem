@@ -18,10 +18,18 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
             restaurantID: new ObjectId(),
             address: new ObjectId(),
             totalPrice: 50,
-            menuItems: [new ObjectId(), new ObjectId(), new ObjectId()]
+            menuItems: [new ObjectId(), new ObjectId(), new ObjectId()],
+            timestamp: new Date()
         };
 
-        const order = await orderAndFeedbackService.createOrder(mockOrder.customerID, mockOrder.restaurantID, mockOrder.address, mockOrder.totalPrice, mockOrder.menuItems);
+        const order = await orderAndFeedbackService.createOrder(
+            mockOrder.customerID, 
+            mockOrder.restaurantID, 
+            mockOrder.address, 
+            mockOrder.totalPrice, 
+            mockOrder.menuItems, 
+            mockOrder.timestamp
+        );
 
         if (!order) {
             throw new Error('Order creation failed, cannot proceed with feedback creation');

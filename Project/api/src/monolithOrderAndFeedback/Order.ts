@@ -30,4 +30,7 @@ export class Order {
 
     @Column({ nullable: true })
     feedbackID?: ObjectId;
+
+    @Column()
+    timestamp!: Date;
 }

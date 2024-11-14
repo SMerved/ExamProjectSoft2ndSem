@@ -8,7 +8,8 @@ async function createOrder(
     restaurantID: ObjectId,
     address: ObjectId,
     totalPrice: number,
-    menuItemIDList: ObjectId[]
+    menuItemIDList: ObjectId[],
+    timestamp: Date
 ): Promise<Order | null> {
     const orderFactory: OrderFactory = new OrderFactory();
 
@@ -17,7 +18,8 @@ async function createOrder(
         restaurantID,
         address,
         totalPrice,
-        menuItemIDList
+        menuItemIDList,
+        timestamp
     );
 
     return order;

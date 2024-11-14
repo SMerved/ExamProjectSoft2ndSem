@@ -49,14 +49,15 @@ app.get('/restaurants', async (req: Request, res: Response) => {
 
 app.post('/createOrder', async (req: Request, res: Response) => {
     try {
-        const { userID, restaurantID, menuItems, address, totalPrice } = req.body;
+        const { userID, restaurantID, menuItems, address, totalPrice, timestamp } = req.body;
 
         const order = await createOrder(
             userID,
             restaurantID,
             menuItems,
             address,
-            totalPrice
+            totalPrice,
+            timestamp
         );
 
         if (!order) {

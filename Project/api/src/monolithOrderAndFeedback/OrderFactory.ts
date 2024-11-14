@@ -8,7 +8,8 @@ export class OrderFactory {
         restaurantID: ObjectId,
         address: ObjectId,
         totalPrice: number,
-        menuItemIDList: ObjectId[]
+        menuItemIDList: ObjectId[],
+        timestamp: Date
     ): Promise<Order | null> {
         const order = {
             customerID,
@@ -16,6 +17,7 @@ export class OrderFactory {
             address,
             totalPrice,
             menuItemIDList,
+            timestamp
         };
 
         return await AddOrder(order);

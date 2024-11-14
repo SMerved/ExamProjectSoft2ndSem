@@ -7,4 +7,5 @@ export interface OrderData {
     address: ObjectId;
     totalPrice: number;
     menuItemIDList: ObjectId[];
+    timestamp: Date;
 }
