@@ -1,6 +1,8 @@
-import app from "./index.ts";
+import app from './index.ts';
+
 import 'reflect-metadata';
-import { AppDataSource } from "./ormconfig.ts";
+import { AppDataSource } from './ormconfig.ts';
+import { runConsumer } from './messagingService/kafkaAdapter';
 
 const port = 3001;
 
@@ -10,6 +12,9 @@ AppDataSource.initialize()
         app.listen(port, () => {
             console.log(`Server is running at http://localhost:${port}`); // eslint-disable-line no-console
         });
+
+        //Kafka listener for events
+        runConsumer().catch(console.error);
     })
     .catch((err) => {
         console.error('Error during Data Source initialization:', err);

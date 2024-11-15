@@ -9,6 +9,7 @@ import {
 import { createFeedbackAndLinkOrder } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { messagingRoutes } from './messagingService/messaging.ts';
 import { sendEvent } from './messagingService/kafkaAdapter';
+import { runConsumer } from './messagingService/kafkaAdapter.ts';
 
 const app = express();
 
@@ -122,5 +123,6 @@ app.post('/createFeedback', async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error creating feedback' });
     }
 });
+messagingRoutes(app); // Ev
 
 export default app;
