@@ -1,11 +1,11 @@
-import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/orderAndFeedbackService.ts';
+import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import request from 'supertest';
 import app from '../../../index.ts';
 
 jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService.ts');
 
 describe('Post /create', () => {
-    const timestamp = new Date()
+    const timestamp = new Date();
     const mockOrder = {
         _id: 'someObjectId',
         userID: 1,
@@ -13,7 +13,7 @@ describe('Post /create', () => {
         menuItems: [1, 23, 24],
         address: 11,
         totalPrice: 50,
-        timestamp: timestamp.toISOString()
+        timestamp: timestamp.toISOString(),
     };
     const mockOrderList = [
         {
@@ -22,7 +22,7 @@ describe('Post /create', () => {
             menuItems: [1, 24],
             address: 11,
             totalPrice: 50,
-            timestamp: timestamp.toISOString()
+            timestamp: timestamp.toISOString(),
         },
         {
             userID: 1,
@@ -30,7 +30,7 @@ describe('Post /create', () => {
             menuItems: [1, 23, 24, 25],
             address: 11,
             totalPrice: 50,
-            timestamp: timestamp.toISOString()
+            timestamp: timestamp.toISOString(),
         },
     ];
 
@@ -52,7 +52,7 @@ describe('Post /create', () => {
                 menuItems: [1, 23, 24],
                 address: 11,
                 totalPrice: 50,
-                timestamp: timestamp
+                timestamp: timestamp,
             });
 
         expect(response.status).toBe(200);
@@ -72,7 +72,7 @@ describe('Post /create', () => {
                 menuItems: [1, 23, 24],
                 address: 11,
                 totalPrice: 50,
-                timestamp: timestamp
+                timestamp: timestamp,
             });
 
         expect(response.status).toBe(401);

@@ -1,7 +1,7 @@
 import { Order } from './Order.ts';
-import { OrderFactory } from './orderFactory.ts';
+import { OrderFactory } from './OrderFactory.ts';
 import { ObjectId } from 'mongodb';
-import { GetAllOrders } from './orderAndFeedbackRepository.ts';
+import { GetAllOrders } from './OrderAndFeedbackRepository.ts';
 
 async function createOrder(
     customerID: ObjectId,

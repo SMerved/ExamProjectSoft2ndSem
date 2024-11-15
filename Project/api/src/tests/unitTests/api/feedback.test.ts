@@ -1,4 +1,4 @@
-import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/orderAndFeedbackRepository.ts';
+import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import request from 'supertest';
 import app from '../../../index.ts';
 
@@ -17,32 +17,32 @@ describe('POST /createFeedback', () => {
     });
 
     it('should return feedback object if feedback creation is successful', async () => {
-        (orderAndFeedbackRepository.createFeedbackAndLinkOrder as jest.Mock).mockResolvedValue(mockFeedback);
+        (
+            orderAndFeedbackRepository.createFeedbackAndLinkOrder as jest.Mock
+        ).mockResolvedValue(mockFeedback);
 
-        const response = await request(app)
-            .post('/createFeedback')
-            .send({
-                foodRating: 5,
-                overallRating: 4,
-                deliveryRating: 3,
-                orderId: 'someObjectId',
-            });
+        const response = await request(app).post('/createFeedback').send({
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: 'someObjectId',
+        });
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockFeedback);
     });
 
     it('should return 401 error if feedback creation is unsuccessful', async () => {
-        (orderAndFeedbackRepository.createFeedbackAndLinkOrder as jest.Mock).mockResolvedValue(null);
+        (
+            orderAndFeedbackRepository.createFeedbackAndLinkOrder as jest.Mock
+        ).mockResolvedValue(null);
 
-        const response = await request(app)
-            .post('/createFeedback')
-            .send({
-                foodRating: 5,
-                overallRating: 4,
-                deliveryRating: 3,
-                orderId: 'someObjectId',
-            });
+        const response = await request(app).post('/createFeedback').send({
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: 'someObjectId',
+        });
 
         expect(response.status).toBe(401);
         expect(response.body).toEqual({ error: 'Invalid feedback data' });

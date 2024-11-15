@@ -1,7 +1,10 @@
 import { AppDataSource } from '../../../ormconfig.ts';
-import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/orderAndFeedbackService.ts';
+import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import { ObjectId } from 'mongodb';
-import { createFeedbackAndLinkOrder, orderRepository } from '../../../monolithOrderAndFeedback/orderAndFeedbackRepository.ts';
+import {
+    createFeedbackAndLinkOrder,
+    orderRepository,
+} from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     beforeAll(async () => {
@@ -19,20 +22,22 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
             address: new ObjectId(),
             totalPrice: 50,
             menuItems: [new ObjectId(), new ObjectId(), new ObjectId()],
-            timestamp: new Date()
+            timestamp: new Date(),
         };
 
         const order = await orderAndFeedbackService.createOrder(
-            mockOrder.customerID, 
-            mockOrder.restaurantID, 
-            mockOrder.address, 
-            mockOrder.totalPrice, 
-            mockOrder.menuItems, 
+            mockOrder.customerID,
+            mockOrder.restaurantID,
+            mockOrder.address,
+            mockOrder.totalPrice,
+            mockOrder.menuItems,
             mockOrder.timestamp
         );
 
         if (!order) {
-            throw new Error('Order creation failed, cannot proceed with feedback creation');
+            throw new Error(
+                'Order creation failed, cannot proceed with feedback creation'
+            );
         }
 
         const feedbackData = {
@@ -49,7 +54,9 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         expect(feedback.overallRating).toBe(feedbackData.overallRating);
         expect(feedback.deliveryRating).toBe(feedbackData.deliveryRating);
 
-        const updatedOrder = await orderRepository.findOneBy({ _id: order._id });
+        const updatedOrder = await orderRepository.findOneBy({
+            _id: order._id,
+        });
         expect(updatedOrder?.feedbackID).toStrictEqual(feedback._id);
     });
 });
