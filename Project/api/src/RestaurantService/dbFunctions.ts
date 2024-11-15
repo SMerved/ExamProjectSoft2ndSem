@@ -23,7 +23,7 @@ async function getAddress(restaurant: Restaurant) {
         },
     });
 
-    return address; // Returns the object directly
+    return address;
 }
 
 async function getAllRestaurants() {
