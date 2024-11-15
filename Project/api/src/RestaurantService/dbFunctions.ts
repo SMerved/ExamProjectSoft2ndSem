@@ -1,9 +1,10 @@
 import { AppDataSource } from '../ormconfig.ts';
-import { MenuItem, Restaurant } from './Restaurant.ts';
+import { Address, MenuItem, Restaurant } from './Restaurant.ts';
 // import { ObjectId } from 'mongodb';
 
 const restaurantRepository = AppDataSource.getMongoRepository(Restaurant);
 const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
+const addressRepository = AppDataSource.getMongoRepository(Address);
 
 async function getMenuItems(restaurant: Restaurant) {
     const menuItems = await menuItemRepository.find({
@@ -15,6 +16,16 @@ async function getMenuItems(restaurant: Restaurant) {
     return menuItems;
 }
 
+async function getAddress(restaurant: Restaurant) {
+    const address = await addressRepository.findOne({
+        where: {
+            _id: restaurant.address,
+        },
+    });
+
+    return address;
+}
+
 async function getAllRestaurants() {
     const restaurants = await restaurantRepository.find();
 
@@ -22,10 +33,15 @@ async function getAllRestaurants() {
 
     for (const restaurant of restaurants) {
         const menuItems = await getMenuItems(restaurant);
+        const address = await getAddress(restaurant);
+
+        console.log(menuItems);
+        console.log(address);
 
         const restaurantTemp = {
             ...restaurant,
             menu: menuItems,
+            address: address,
         };
 
         restaurantList.push(restaurantTemp);
