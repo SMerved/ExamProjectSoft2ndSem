@@ -2,7 +2,7 @@ import app from './index.ts';
 
 import 'reflect-metadata';
 import { AppDataSource } from './ormconfig.ts';
-import { runConsumer } from './messagingService/kafkaAdapter';
+import { runConsumer } from './messagingService/kafkaAdapter.ts';
 
 const port = 3001;
 

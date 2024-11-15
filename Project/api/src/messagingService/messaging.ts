@@ -1,5 +1,4 @@
 import { Express, Request, Response } from 'express';
-import { Kafka, KafkaConfig } from 'kafkajs';
 import { sendEvent } from './kafkaAdapter.ts';
 
 export function messagingRoutes(app: Express) {
