@@ -29,7 +29,7 @@ app.post('/login', async (req: Request, res: Response) => {
 
         res.json(user);
     } catch (error) {
-        console.error('Error finding user:', error); // eslint-disable-line no-console
+        console.error('Error finding user:', error);
         res.status(500).json({ error: 'Error finding user' });
     }
 });
@@ -40,7 +40,7 @@ app.get('/restaurants', async (req: Request, res: Response) => {
 
         res.json(restaurants);
     } catch (error) {
-        console.error('Error fetching restaurants:', error); // eslint-disable-line no-console
+        console.error('Error fetching restaurants:', error);
         res.status(500).json({
             error: 'An error occurred while fetching restaurants',
         });
@@ -92,7 +92,7 @@ app.get('/orders', async (req: Request, res: Response) => {
 
         res.json(orders);
     } catch (error) {
-        console.error('Error creating order:', error); // eslint-disable-line no-console
+        console.error('Error creating order:', error);
         res.status(500).json({
             error: 'An error occurred while fetching orders',
         });

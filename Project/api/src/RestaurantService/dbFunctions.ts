@@ -35,9 +35,6 @@ async function getAllRestaurants() {
         const menuItems = await getMenuItems(restaurant);
         const address = await getAddress(restaurant);
 
-        console.log(menuItems);
-        console.log(address);
-
         const restaurantTemp = {
             ...restaurant,
             menu: menuItems,

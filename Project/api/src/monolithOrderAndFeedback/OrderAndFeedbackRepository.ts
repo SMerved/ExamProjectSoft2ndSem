@@ -46,5 +46,32 @@ async function createFeedbackAndLinkOrder({ foodRating, overallRating, deliveryR
     });
 }
 
+/*async function GetAllOrders(): Promise<Order[] | null> {
+    try {
+        const orders = await orderRepository.find();
+
+        const menuItemIds = orders.flatMap(order => order.orderItemList.map(item => item.menuItemId));
+
+        const menuItems = await menuItemRepository.find({
+            where: {
+                _id: { $in: menuItemIds.map(id => id) }
+            }
+        });
+
+        const menuItemMap = new Map(menuItems.map(item => [item._id.toHexString(), item]));
+
+        for (const order of orders) {
+            order.orderItemList = order.orderItemList.map(item => ({
+                ...item,
+                menuItem: menuItemMap.get(item.menuItemId.toHexString()),
+            }));
+        }
+
+        return orders;
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        return null;
+    }
+}*/
 
 export { AddOrder, createFeedbackAndLinkOrder, feedbackRepository, orderRepository, GetAllOrders };

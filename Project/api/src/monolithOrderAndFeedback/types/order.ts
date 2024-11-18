@@ -6,6 +6,11 @@ export interface OrderData {
     restaurantID: ObjectId;
     address: ObjectId;
     totalPrice: number;
-    menuItemIDList: ObjectId[];
+    orderItemList: OrderItem[];
     timestamp: Date;
+}
+
+export interface OrderItem {
+    menuItemId: ObjectId;
+    quantity: number;
 }

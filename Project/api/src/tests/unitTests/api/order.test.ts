@@ -5,12 +5,13 @@ import app from '../../../index.ts';
 jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService.ts');
 
 describe('Post /create', () => {
+    const mockOrderItemList = [{menuItemId:'someObjectId', quantity: 2}, {menuItemId:'someObjectId', quantity: 3}, {menuItemId:'someObjectId', quantity: 1}]
     const timestamp = new Date();
     const mockOrder = {
         _id: 'someObjectId',
         userID: 1,
         restaurantID: 2324,
-        menuItems: [1, 23, 24],
+        menuItems: mockOrderItemList,
         address: 11,
         totalPrice: 50,
         timestamp: timestamp.toISOString(),
@@ -19,7 +20,7 @@ describe('Post /create', () => {
         {
             userID: 1,
             restaurantID: 2324,
-            menuItems: [1, 24],
+            menuItems: mockOrderItemList,
             address: 11,
             totalPrice: 50,
             timestamp: timestamp.toISOString(),
@@ -27,7 +28,7 @@ describe('Post /create', () => {
         {
             userID: 1,
             restaurantID: 2324,
-            menuItems: [1, 23, 24, 25],
+            menuItems: mockOrderItemList,
             address: 11,
             totalPrice: 50,
             timestamp: timestamp.toISOString(),
@@ -49,7 +50,7 @@ describe('Post /create', () => {
             .send({
                 userID: 1,
                 restaurantID: 2324,
-                menuItems: [1, 23, 24],
+                menuItems: mockOrderItemList,
                 address: 11,
                 totalPrice: 50,
                 timestamp: timestamp,
@@ -69,7 +70,7 @@ describe('Post /create', () => {
             .send({
                 userID: 1,
                 restaurantID: 2324,
-                menuItems: [1, 23, 24],
+                menuItems: mockOrderItemList,
                 address: 11,
                 totalPrice: 50,
                 timestamp: timestamp,

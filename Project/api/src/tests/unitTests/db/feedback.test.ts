@@ -16,12 +16,13 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     it('should create feedback and link it to the correct order', async () => {
+        const mockOrderItemList = [{menuItemId: new ObjectId(), quantity: 2}, {menuItemId: new ObjectId(), quantity: 3}, {menuItemId: new ObjectId(), quantity: 1}]
         const mockOrder = {
             customerID: new ObjectId(),
             restaurantID: new ObjectId(),
             address: new ObjectId(),
             totalPrice: 50,
-            menuItems: [new ObjectId(), new ObjectId(), new ObjectId()],
+            menuItems: mockOrderItemList,
             timestamp: new Date(),
         };
 

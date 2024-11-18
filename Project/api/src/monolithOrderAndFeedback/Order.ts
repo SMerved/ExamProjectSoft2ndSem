@@ -1,6 +1,7 @@
 import { OrderStatusEnum } from './types/orderStatusEnum.ts';
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { ObjectId } from "mongodb";
+import { OrderItem } from './types/order.ts';
 
 @Entity('orders')
 export class Order {
@@ -26,7 +27,7 @@ export class Order {
     totalPrice!: number;
 
     @Column("array")
-    menuItemIDList!: ObjectId[];
+    orderItemList!: OrderItem[];
 
     @Column({ nullable: true })
     feedbackID?: ObjectId;

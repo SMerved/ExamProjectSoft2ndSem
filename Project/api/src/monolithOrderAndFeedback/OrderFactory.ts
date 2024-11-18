@@ -1,6 +1,7 @@
 import { Order } from './Order.ts';
 import { ObjectId } from 'mongodb';
 import { AddOrder } from './OrderAndFeedbackRepository.ts';
+import { OrderItem } from './types/order.ts';
 
 export class OrderFactory {
     public async CreateOrder(
@@ -8,7 +9,7 @@ export class OrderFactory {
         restaurantID: ObjectId,
         address: ObjectId,
         totalPrice: number,
-        menuItemIDList: ObjectId[],
+        orderItemList: OrderItem[],
         timestamp: Date
     ): Promise<Order | null> {
         const order = {
@@ -16,7 +17,7 @@ export class OrderFactory {
             restaurantID,
             address,
             totalPrice,
-            menuItemIDList,
+            orderItemList,
             timestamp,
         };
 
