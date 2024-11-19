@@ -2,7 +2,8 @@ import { OrderStatusEnum } from './types/orderStatusEnum.ts';
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { ObjectId } from 'mongodb';
 import { OrderItem } from './types/order.ts';
-import { Address } from '../RestaurantService/Restaurant.ts';
+import { Address, MenuItem } from '../RestaurantService/Restaurant.ts';
+import { User } from '../loginService/User.ts';
 
 @Entity('orders')
 export class Order {
@@ -10,7 +11,7 @@ export class Order {
     _id!: ObjectId;
 
     @Column()
-    customerID!: ObjectId;
+    customerID!: ObjectId | User;
 
     @Column()
     restaurantID!: ObjectId;

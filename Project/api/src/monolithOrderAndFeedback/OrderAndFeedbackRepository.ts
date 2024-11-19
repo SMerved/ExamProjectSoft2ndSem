@@ -1,12 +1,14 @@
 import { AppDataSource } from '../ormconfig.ts';
-import { getAddress } from '../RestaurantService/dbFunctions.ts';
+import { getAddress, getCustomer } from '../RestaurantService/dbFunctions.ts';
+import { MenuItem } from '../RestaurantService/Restaurant.ts';
 import { Feedback } from './Feedback.ts';
 import { Order } from './Order.ts';
 import { FeedbackData } from './types/feedback.ts';
 import { OrderData } from './types/order.ts';
+import { ObjectId } from 'mongodb';
 
 const orderRepository = AppDataSource.getMongoRepository(Order);
-
+const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
 const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
 
 async function AddOrder(order: OrderData): Promise<Order | null> {
@@ -20,11 +22,39 @@ async function AddOrder(order: OrderData): Promise<Order | null> {
 async function GetAllOrders(): Promise<Order[] | null> {
     try {
         const orders = await orderRepository.find();
-        return orders;
+
+        const ordersList: Order[] = [];
+
+        for (const order of orders) {
+            const address = await getAddress(order);
+            const customer = await getCustomer(order);
+
+            const ordersTemp: Order = {
+                ...order,
+                address: address || order.address,
+                customerID: customer || order.customerID,
+            };
+
+            ordersList.push(ordersTemp);
+        }
+
+        return ordersList;
     } catch (error) {
         console.error('Error fetching orders:', error);
         return null;
     }
+}
+
+async function getMenuItemsFromIDs(objectIds: string[]) {
+    const objectIdArray = objectIds.map((id) => new ObjectId(id));
+
+    const menuItems = await menuItemRepository.find({
+        where: {
+            _id: { $in: objectIdArray },
+        },
+    });
+
+    return menuItems;
 }
 
 async function GetAllAcceptedOrders(): Promise<Order[] | null> {
@@ -115,4 +145,5 @@ export {
     feedbackRepository,
     orderRepository,
     GetAllOrders,
+    getMenuItemsFromIDs,
 };

@@ -7,7 +7,10 @@ import {
     getAllAcceptedOrders,
     getAllOrders,
 } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
-import { createFeedbackAndLinkOrder } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
+import {
+    createFeedbackAndLinkOrder,
+    getMenuItemsFromIDs,
+} from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { messagingRoutes } from './messagingService/messaging.ts';
 
 const app = express();
@@ -96,6 +99,26 @@ app.get('/orders', async (req: Request, res: Response) => {
         console.error('Error creating order:', error);
         res.status(500).json({
             error: 'An error occurred while fetching orders',
+        });
+    }
+});
+
+app.post('/menuItemsFromIds', async (req: Request, res: Response) => {
+    try {
+        const menutItems = await getMenuItemsFromIDs(req.body);
+
+        if (!menutItems) {
+            res.status(401).json({
+                error: 'No menutItems found',
+            });
+            return;
+        }
+
+        res.json(menutItems);
+    } catch (error) {
+        console.error('Error creating order:', error);
+        res.status(500).json({
+            error: 'An error occurred while fetching menutItems',
         });
     }
 });
