@@ -1,3 +1,4 @@
+import { Order } from '../monolithOrderAndFeedback/Order.ts';
 import { AppDataSource } from '../ormconfig.ts';
 import { Address, MenuItem, Restaurant } from './Restaurant.ts';
 // import { ObjectId } from 'mongodb';
@@ -16,10 +17,10 @@ async function getMenuItems(restaurant: Restaurant) {
     return menuItems;
 }
 
-async function getAddress(restaurant: Restaurant) {
+async function getAddress(object: Restaurant | Order) {
     const address = await addressRepository.findOne({
         where: {
-            _id: restaurant.address,
+            _id: object.address,
         },
     });
 
@@ -47,4 +48,4 @@ async function getAllRestaurants() {
     return restaurantList;
 }
 
-export { getMenuItems, getAllRestaurants, restaurantRepository };
+export { getMenuItems, getAllRestaurants, getAddress, restaurantRepository };

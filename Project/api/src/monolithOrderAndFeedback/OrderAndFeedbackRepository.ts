@@ -1,4 +1,5 @@
 import { AppDataSource } from '../ormconfig.ts';
+import { getAddress } from '../RestaurantService/dbFunctions.ts';
 import { Feedback } from './Feedback.ts';
 import { Order } from './Order.ts';
 import { FeedbackData } from './types/feedback.ts';
@@ -32,7 +33,24 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
             where: { status: 2 },
         });
 
-        return acceptedOrders;
+        const acceptedOrderList: Order[] = [];
+
+        for (const acceptedOrder of acceptedOrders) {
+            console.log('1. ', acceptedOrder);
+
+            const address = await getAddress(acceptedOrder);
+
+            console.log(address);
+
+            const acceptedOrderTemp = {
+                ...acceptedOrder,
+                address: address || acceptedOrder.address,
+            };
+
+            acceptedOrderList.push(acceptedOrderTemp);
+        }
+
+        return acceptedOrderList;
     } catch (error) {
         console.error('Error fetching orders:', error);
         return null;
