@@ -8,13 +8,11 @@ function DeliveryPage() {
     const fetchOrders = async () => {
         try {
             const orders = await GetAcceptedOrdersAPI();
-            console.log('Orders:', orders);
             setOrders(orders);
         } catch (error) {
             console.error('Error fetching Orders:', error);
         }
     };
-    console.log(orders);
 
     useEffect(() => {
         fetchOrders();

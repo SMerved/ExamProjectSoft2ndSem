@@ -2,8 +2,8 @@ import { GetAcceptedOrdersAPI } from '../api/orders';
 
 describe('getAcceptedOrders function', () => {
     it('should return list of accepted Orders', async () => {
-        const restaurants = await GetAcceptedOrdersAPI();
-        expect(restaurants).toEqual(
+        const orders = await GetAcceptedOrdersAPI();
+        expect(orders).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
                     _id: '67360b71cad44b305eb918a2',
