@@ -21,29 +21,49 @@ async function GetAllOrders(): Promise<Order[] | null> {
         const orders = await orderRepository.find();
         return orders;
     } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error('Error fetching orders:', error);
         return null;
     }
 }
 
-async function createFeedbackAndLinkOrder({ foodRating, overallRating, deliveryRating, orderId }: FeedbackData) {
-    return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
-        const feedback = transactionalEntityManager.create(Feedback, {
-            foodRating,
-            overallRating,
-            deliveryRating,
+async function GetAllAcceptedOrders(): Promise<Order[] | null> {
+    try {
+        const acceptedOrders = await orderRepository.find({
+            where: { status: 2 },
         });
 
-        await transactionalEntityManager.save(feedback);
+        return acceptedOrders;
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        return null;
+    }
+}
 
-        await transactionalEntityManager.update(
-            Order,
-            { _id: orderId },
-            { feedbackID: feedback._id }
-        );
+async function createFeedbackAndLinkOrder({
+    foodRating,
+    overallRating,
+    deliveryRating,
+    orderId,
+}: FeedbackData) {
+    return await AppDataSource.manager.transaction(
+        async (transactionalEntityManager) => {
+            const feedback = transactionalEntityManager.create(Feedback, {
+                foodRating,
+                overallRating,
+                deliveryRating,
+            });
 
-        return feedback;
-    });
+            await transactionalEntityManager.save(feedback);
+
+            await transactionalEntityManager.update(
+                Order,
+                { _id: orderId },
+                { feedbackID: feedback._id }
+            );
+
+            return feedback;
+        }
+    );
 }
 
 /*async function GetAllOrders(): Promise<Order[] | null> {
@@ -74,4 +94,11 @@ async function createFeedbackAndLinkOrder({ foodRating, overallRating, deliveryR
     }
 }*/
 
-export { AddOrder, createFeedbackAndLinkOrder, feedbackRepository, orderRepository, GetAllOrders };
+export {
+    AddOrder,
+    GetAllAcceptedOrders,
+    createFeedbackAndLinkOrder,
+    feedbackRepository,
+    orderRepository,
+    GetAllOrders,
+};

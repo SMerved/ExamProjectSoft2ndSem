@@ -1,7 +1,10 @@
 import { Order } from './Order.ts';
 import { OrderFactory } from './OrderFactory.ts';
 import { ObjectId } from 'mongodb';
-import { GetAllOrders } from './OrderAndFeedbackRepository.ts';
+import {
+    GetAllOrders,
+    GetAllAcceptedOrders,
+} from './OrderAndFeedbackRepository.ts';
 import { OrderItem } from './types/order.ts';
 
 async function createOrder(
@@ -30,4 +33,8 @@ async function getAllOrders(): Promise<Order[] | null> {
     return GetAllOrders();
 }
 
-export { createOrder, getAllOrders };
+async function getAllAcceptedOrders(): Promise<Order[] | null> {
+    return GetAllAcceptedOrders();
+}
+
+export { createOrder, getAllAcceptedOrders, getAllOrders };

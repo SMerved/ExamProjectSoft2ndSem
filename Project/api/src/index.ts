@@ -4,6 +4,7 @@ import { validateCredentials } from './loginService/userRepository.ts';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
 import {
     createOrder,
+    getAllAcceptedOrders,
     getAllOrders,
 } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import { createFeedbackAndLinkOrder } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
@@ -82,6 +83,26 @@ app.post('/createOrder', async (req: Request, res: Response) => {
 app.get('/orders', async (req: Request, res: Response) => {
     try {
         const orders = await getAllOrders();
+
+        if (!orders) {
+            res.status(401).json({
+                error: 'No orders found',
+            });
+            return;
+        }
+
+        res.json(orders);
+    } catch (error) {
+        console.error('Error creating order:', error);
+        res.status(500).json({
+            error: 'An error occurred while fetching orders',
+        });
+    }
+});
+
+app.get('/acceptedOrders', async (req: Request, res: Response) => {
+    try {
+        const orders = await getAllAcceptedOrders();
 
         if (!orders) {
             res.status(401).json({

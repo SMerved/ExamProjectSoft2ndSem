@@ -5,7 +5,11 @@ import app from '../../../index.ts';
 jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService.ts');
 
 describe('Post /create', () => {
-    const mockOrderItemList = [{menuItemId:'someObjectId', quantity: 2}, {menuItemId:'someObjectId', quantity: 3}, {menuItemId:'someObjectId', quantity: 1}]
+    const mockOrderItemList = [
+        { menuItemId: 'someObjectId', quantity: 2 },
+        { menuItemId: 'someObjectId', quantity: 3 },
+        { menuItemId: 'someObjectId', quantity: 1 },
+    ];
     const timestamp = new Date();
     const mockOrder = {
         _id: 'someObjectId',
@@ -24,6 +28,7 @@ describe('Post /create', () => {
             address: 11,
             totalPrice: 50,
             timestamp: timestamp.toISOString(),
+            status: 2,
         },
         {
             userID: 1,
@@ -32,6 +37,7 @@ describe('Post /create', () => {
             address: 11,
             totalPrice: 50,
             timestamp: timestamp.toISOString(),
+            status: 3,
         },
     ];
 
@@ -45,16 +51,14 @@ describe('Post /create', () => {
             mockOrder
         );
 
-        const response = await request(app)
-            .post('/createOrder')
-            .send({
-                userID: 1,
-                restaurantID: 2324,
-                menuItems: mockOrderItemList,
-                address: 11,
-                totalPrice: 50,
-                timestamp: timestamp,
-            });
+        const response = await request(app).post('/createOrder').send({
+            userID: 1,
+            restaurantID: 2324,
+            menuItems: mockOrderItemList,
+            address: 11,
+            totalPrice: 50,
+            timestamp: timestamp,
+        });
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockOrder);
@@ -65,16 +69,14 @@ describe('Post /create', () => {
             null
         );
 
-        const response = await request(app)
-            .post('/createOrder')
-            .send({
-                userID: 1,
-                restaurantID: 2324,
-                menuItems: mockOrderItemList,
-                address: 11,
-                totalPrice: 50,
-                timestamp: timestamp,
-            });
+        const response = await request(app).post('/createOrder').send({
+            userID: 1,
+            restaurantID: 2324,
+            menuItems: mockOrderItemList,
+            address: 11,
+            totalPrice: 50,
+            timestamp: timestamp,
+        });
 
         expect(response.status).toBe(401);
         expect(response.body).toEqual({ error: 'Invalid order data' });
@@ -91,6 +93,21 @@ describe('Post /create', () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockOrderList);
     });
+
+    //Get all accepted orders
+    it('should return orders array if orders where found successfully', async () => {
+        (
+            orderAndFeedbackService.getAllAcceptedOrders as jest.Mock
+        ).mockResolvedValue(mockOrderList);
+
+        const response = await request(app).get('/acceptedOrders').send();
+
+        expect(response.status).toBe(200);
+        expect(response.body).toContainEqual(mockOrderList[0]);
+        expect(response.body).not.toContainEqual(mockOrderList[1]);
+        console.log(response.body);
+    });
+
     it('should return 401 if orders where not found successfully', async () => {
         (orderAndFeedbackService.getAllOrders as jest.Mock).mockResolvedValue(
             null
