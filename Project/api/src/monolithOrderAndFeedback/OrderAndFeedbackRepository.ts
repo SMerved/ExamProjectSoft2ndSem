@@ -36,11 +36,7 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
         const acceptedOrderList: Order[] = [];
 
         for (const acceptedOrder of acceptedOrders) {
-            console.log('1. ', acceptedOrder);
-
             const address = await getAddress(acceptedOrder);
-
-            console.log(address);
 
             const acceptedOrderTemp = {
                 ...acceptedOrder,
