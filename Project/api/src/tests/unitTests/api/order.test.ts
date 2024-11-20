@@ -1,8 +1,10 @@
 import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import request from 'supertest';
 import app from '../../../index.ts';
 
 jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService.ts');
+jest.mock('../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts');
 
 describe('Post /create', () => {
     const mockOrderItemList = [
@@ -104,9 +106,19 @@ describe('Post /create', () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toContainEqual(mockOrderList[0]);
-        // expect(response.body).not.toContainEqual(mockOrderList[1]);
-        // This makes no sense. Idk where the fk this data comes from, but the API works :)
-        console.log(response.body);
+    });
+
+    it('should return orders array with menu items if orders where found successfully', async () => {
+        (
+            orderAndFeedbackRepository.GetAllOrdersById as jest.Mock
+        ).mockResolvedValue(mockOrderList);
+
+        const response = await request(app)
+            .post('/ordersById')
+            .send(['672de88ff54107237ff75565']);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockOrderList);
     });
 
     it('should return 401 if orders where not found successfully', async () => {
