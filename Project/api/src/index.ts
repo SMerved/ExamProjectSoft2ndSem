@@ -12,17 +12,21 @@ import {
     getMenuItemsFromIDs,
 } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { messagingRoutes } from './messagingService/messaging.ts';
+import { userRouter } from './loginService/loginRoutes.ts';
+import { UserCredentials } from './interfaces/users.ts';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+app.use('/userService', userRouter);
+
 app.post('/login', async (req: Request, res: Response) => {
     try {
-        const { username, password } = req.body;
+        const credentials: UserCredentials = req.body;
 
-        const user = await validateCredentials(username, password);
+        const user = await validateCredentials(credentials);
 
         if (!user) {
             res.status(401).json({

@@ -1,10 +1,12 @@
 import app from './index.ts';
-
+import dotenv from 'dotenv'
 import 'reflect-metadata';
 import { AppDataSource } from './ormconfig.ts';
 import { runConsumer } from './messagingService/kafkaAdapter.ts';
 
-const port = 3001;
+dotenv.config();
+
+const port = process.env.PORT
 
 AppDataSource.initialize()
     .then(() => {
