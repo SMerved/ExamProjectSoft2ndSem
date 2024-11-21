@@ -1,3 +1,5 @@
+import { Address } from './orders.ts';
+
 export interface MenuItem {
     _id: string;
     name: string;
@@ -12,9 +14,3 @@ export interface Restaurant {
     menu: MenuItem[];
 }
 
-export interface Address {
-    _id: string;
-    street: string;
-    city: string;
-    postalCode: string;
-}
