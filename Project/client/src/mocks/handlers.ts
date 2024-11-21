@@ -49,7 +49,7 @@ export const handlers = [
         });
     }),
 
-    http.get<never, Order[]>(`${VITE_BASE_URL}/ordersById`, async () => {
+    http.post<never, Order[]>(`${VITE_BASE_URL}/ordersById`, async () => {
         return new Response(JSON.stringify(ordersMockDataList), {
             status: 200,
             headers: {
