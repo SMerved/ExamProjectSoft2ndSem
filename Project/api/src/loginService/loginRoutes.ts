@@ -2,9 +2,9 @@ import express from 'express';
 import { validateCredentials } from './userRepository.ts';
 import { UserCredentials } from '../interfaces/users.ts';
 
-const userRouter = express.Router();
+const loginRouter = express.Router();
 
-userRouter.post('/validateCredentials', async (req, res) => {
+loginRouter.post('/validateCredentials', async (req, res) => {
     try {
         const credentials: UserCredentials = req.body;
         const user = await validateCredentials(credentials);
@@ -19,4 +19,4 @@ userRouter.post('/validateCredentials', async (req, res) => {
     }
 });
 
-export { userRouter };
+export { loginRouter };

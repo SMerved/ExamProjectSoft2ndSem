@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { validateCredentials } from './loginService/userRepository.ts';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
 import {
     createOrder,
@@ -12,21 +11,23 @@ import {
     getMenuItemsFromIDs,
 } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { messagingRoutes } from './messagingService/messaging.ts';
-import { userRouter } from './loginService/loginRoutes.ts';
+import { loginRouter } from './loginService/loginRoutes.ts';
 import { UserCredentials } from './interfaces/users.ts';
+import { loginServiceValidateCredentials } from './adapters/loginServiceAdapter.ts';
+import { CustomError } from './types/generic.ts';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use('/userService', userRouter);
+app.use('/loginService', loginRouter);
 
 app.post('/login', async (req: Request, res: Response) => {
     try {
         const credentials: UserCredentials = req.body;
 
-        const user = await validateCredentials(credentials);
+        const user = await loginServiceValidateCredentials(credentials);
 
         if (!user) {
             res.status(401).json({
@@ -36,9 +37,18 @@ app.post('/login', async (req: Request, res: Response) => {
         }
 
         res.json(user);
-    } catch (error) {
-        console.error('Error finding user:', error);
-        res.status(500).json({ error: 'Error finding user' });
+    } catch (error: unknown) {
+        if ((error as CustomError).response?.status === 401) {
+            console.error('Error:', (error as CustomError).response.data.error);
+            throw { response: {
+                status: 401,
+                data: { error: 'Invalid username or password' },
+            }, };
+        }
+        throw { response: {
+            status: 500,
+            data: { error: 'LoginService is unavailable' },
+        }, };
     }
 });
 
