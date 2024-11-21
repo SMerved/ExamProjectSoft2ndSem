@@ -1,11 +1,21 @@
-import { GetAcceptedOrdersAPI } from '../api/orders';
-import { ordersMockData } from '../mocks/orders';
+import { GetAcceptedOrdersAPI, GetOrdersAPI } from '../api/orders';
+import { acceptedOrdersMock, ordersByIdMock } from '../mocks/orders';
 
 describe('getAcceptedOrders function', () => {
     it('should return list of accepted Orders', async () => {
         const orders = await GetAcceptedOrdersAPI();
         expect(orders).toEqual(
-            expect.arrayContaining([expect.objectContaining(ordersMockData)])
+            expect.arrayContaining([
+                expect.objectContaining(acceptedOrdersMock),
+            ])
+        );
+    });
+
+    it('should return list of orders', async () => {
+        const orders = await GetOrdersAPI('672de88ff54107237ff75565');
+
+        expect(orders).toEqual(
+            expect.arrayContaining([expect.objectContaining(ordersByIdMock)])
         );
     });
 });

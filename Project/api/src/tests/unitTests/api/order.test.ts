@@ -121,6 +121,17 @@ describe('Post /create', () => {
         expect(response.body).toEqual(mockOrderList);
     });
 
+    it('should return orders array with menu items if orders where found successfully', async () => {
+        (
+            orderAndFeedbackRepository.GetAllOrdersById as jest.Mock
+        ).mockResolvedValue(null);
+
+        const response = await request(app).post('/ordersById').send('wrongID');
+
+        expect(response.status).toBe(401);
+        expect(response.body).toEqual({ error: 'No orders found' });
+    });
+
     it('should return 401 if orders where not found successfully', async () => {
         (orderAndFeedbackService.getAllOrders as jest.Mock).mockResolvedValue(
             null
