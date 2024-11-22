@@ -161,8 +161,8 @@ app.get('/acceptedOrders', async (req: Request, res: Response) => {
 
 app.post('/acceptRejectOrder', async (req: Request, res: Response) => {
     try {
-        const { id, newStatus } = req.body;
-        const order = await acceptRejectOrder(id, newStatus);
+        const { id, newStatus, reason } = req.body;
+        const order = await acceptRejectOrder(id, newStatus, reason);
 
         if (!order) {
             res.status(401).json({

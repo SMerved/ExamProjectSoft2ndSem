@@ -66,7 +66,11 @@ async function getMenuItems(orders: Order[]) {
     return orders;
 }
 
-async function acceptRejectOrder(orderId: string, newStatus: number) {
+async function acceptRejectOrder(
+    orderId: string,
+    newStatus: number,
+    reason: string
+) {
     if (newStatus < 0 || newStatus > 4) {
         throw new Error('Status must be between inclusive 0 and 4, inclusive');
     }
@@ -83,6 +87,7 @@ async function acceptRejectOrder(orderId: string, newStatus: number) {
     const orderTemp: Order = {
         ...order,
         status: newStatus,
+        rejectReason: reason,
     };
 
     const updatedOrder = await orderRepository.save(orderTemp);

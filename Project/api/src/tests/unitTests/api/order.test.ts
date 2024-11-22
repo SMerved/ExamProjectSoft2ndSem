@@ -23,6 +23,17 @@ describe('Post /create', () => {
         timestamp: timestamp.toISOString(),
         status: 1,
     };
+    const mockOrderReject = {
+        _id: 'someObjectId',
+        userID: 1,
+        restaurantID: 2324,
+        menuItems: mockOrderItemList,
+        address: 11,
+        totalPrice: 50,
+        timestamp: timestamp.toISOString(),
+        status: 1,
+        rejectReason: "Manden bor i indien, der leverer vi skam ik' til",
+    };
     const mockOrderList = [
         {
             userID: 1,
@@ -112,20 +123,44 @@ describe('Post /create', () => {
     it('should change the status of the order with the id provided to the status provided', async () => {
         (
             orderAndFeedbackRepository.acceptRejectOrder as jest.Mock
-        ).mockResolvedValue(mockOrder);
+        ).mockResolvedValue(mockOrderReject);
 
         const payload = {
             orderId: 'someObjectId',
             newStatus: 1,
+            rejectReason: "Manden bor i indien, der leverer vi skam ik' til",
         };
 
         const response = await request(app)
             .post('/acceptRejectOrder')
             .send(payload);
 
+        console.log(response.status);
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(mockOrder);
+        expect(response.body).toEqual(mockOrderReject);
     });
+
+    // it('should fail to accept/reject because status is too high a number', async () => {
+    //     (
+    //         orderAndFeedbackRepository.acceptRejectOrder as jest.Mock
+    //     ).mockResolvedValue(mockOrderReject);
+
+    //     const payload = {
+    //         // orderId: 'someObjectId',
+    //         newStatus: 9,
+    //         rejectReason: "Manden bor i indien, der leverer vi skam ik' til",
+    //     };
+
+    //     const response = await request(app)
+    //         .post('/acceptRejectOrder')
+    //         .send(payload);
+
+    //     console.log('response.body');
+    //     console.log(response.body);
+
+    //     expect(response.status).toBe(401);
+    //     expect(response.body).toEqual(mockOrderReject);
+    // });
 
     it('should return orders array with menu items if orders where found successfully', async () => {
         (
