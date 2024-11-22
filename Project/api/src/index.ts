@@ -40,15 +40,14 @@ app.post('/login', async (req: Request, res: Response) => {
     } catch (error: unknown) {
         if ((error as CustomError).response?.status === 401) {
             console.error('Error:', (error as CustomError).response.data.error);
-            throw { response: {
-                status: 401,
-                data: { error: 'Invalid username or password' },
-            }, };
+            res.status(401).json({
+                error: 'Invalid username or password',
+            });
+            return;
         }
-        throw { response: {
-            status: 500,
-            data: { error: 'LoginService is unavailable' },
-        }, };
+        res.status(500).json({
+            error: 'Error finding user',
+        });
     }
 });
 

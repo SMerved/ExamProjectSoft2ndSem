@@ -1,7 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import { UserCredentials } from '../interfaces/users.ts';
-import { CustomError } from '../types/generic.ts';
 
 dotenv.config();
 
@@ -12,8 +11,8 @@ async function loginServiceValidateCredentials(credentials: UserCredentials) {
     const { username, password } = credentials;
     
         const response = await axios.post(`${BASE_URL}/validateCredentials`, { username, password });
-        return response.data;
-    
+
+        return response.data; //Potential errors get thrown to caller and handled.
 }
 
 
