@@ -1,42 +1,35 @@
 import { useEffect, useState } from 'react';
 import { Order } from '../types/orders';
-import { getMenuItemsFromIDsAPI, GetOrdersAPI } from '../api/orders';
+import { GetOrdersAPI } from '../api/orders';
 import { OrderStatusTextEnum } from '../utilities';
-import { MenuItem } from '../types/restaurants';
+import { useLocation } from 'react-router-dom';
+import { User } from '../types/users';
 
 function RestuarantPage() {
+    const location = useLocation();
+    const user: User = location.state?.user;
+
     const [orders, setOrders] = useState<Order[]>([]);
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
     const fetchOrders = async () => {
         try {
-            const orders = await GetOrdersAPI();
+            if (!user.restaurant) return;
+            const orders = await GetOrdersAPI(user.restaurant);
             setOrders(orders);
         } catch (error) {
             console.error('Error fetching Orders:', error);
         }
     };
 
-    const FetchGetMenuItemsFromIDs = async (iDs: string[]) => {
-        try {
-            const menuItems = await getMenuItemsFromIDsAPI(iDs);
-
-            setMenuItems(menuItems);
-        } catch (error) {
-            console.error('Error fetching menuItems:', error);
-        }
-    };
-
     useEffect(() => {
         fetchOrders();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     async function handleOrderClick(order: Order) {
         try {
             setSelectedOrder(order);
-
-            FetchGetMenuItemsFromIDs(order.orderItemList);
         } catch (error) {
             console.error('Failed to fetch menu items:', error);
         }
@@ -181,48 +174,67 @@ function RestuarantPage() {
                                                 padding: '1rem',
                                             }}
                                         >
-                                            {menuItems.map((menuItem) => (
-                                                <div
-                                                    key={menuItem._id}
-                                                    style={{
-                                                        border: '1px solid #ccc',
-                                                        borderRadius: '8px',
-                                                        padding: '1rem',
-                                                    }}
-                                                >
-                                                    <p
+                                            {selectedOrder.orderItemList.map(
+                                                (orderItem) => (
+                                                    <div
+                                                        key={
+                                                            orderItem.menuItem
+                                                                ._id
+                                                        }
                                                         style={{
-                                                            margin: '0.5rem 0',
-                                                            fontWeight: 'bold',
-                                                            fontSize: '1.2rem',
+                                                            border: '1px solid #ccc',
+                                                            borderRadius: '8px',
+                                                            padding: '1rem',
                                                         }}
                                                     >
-                                                        {menuItem.name}
-                                                    </p>
-                                                    <p
-                                                        style={{
-                                                            margin: '0.25rem 0',
-                                                            color: '#555',
-                                                        }}
-                                                    >
-                                                        <strong>
-                                                            Available:
-                                                        </strong>{' '}
-                                                        {menuItem.availability
-                                                            ? 'Yes'
-                                                            : 'No'}
-                                                    </p>
-                                                    <p
-                                                        style={{
-                                                            margin: '0.25rem 0',
-                                                            color: '#555',
-                                                        }}
-                                                    >
-                                                        <strong>Price:</strong>{' '}
-                                                        ${menuItem.price}
-                                                    </p>
-                                                </div>
-                                            ))}
+                                                        <p
+                                                            style={{
+                                                                margin: '0.5rem 0',
+                                                                fontWeight:
+                                                                    'bold',
+                                                                fontSize:
+                                                                    '1.2rem',
+                                                            }}
+                                                        >
+                                                            {
+                                                                orderItem
+                                                                    .menuItem
+                                                                    .name
+                                                            }
+                                                        </p>
+                                                        <p
+                                                            style={{
+                                                                margin: '0.25rem 0',
+                                                                color: '#555',
+                                                            }}
+                                                        >
+                                                            <strong>
+                                                                Available:
+                                                            </strong>{' '}
+                                                            {orderItem.menuItem
+                                                                .availability
+                                                                ? 'Yes'
+                                                                : 'No'}
+                                                        </p>
+                                                        <p
+                                                            style={{
+                                                                margin: '0.25rem 0',
+                                                                color: '#555',
+                                                            }}
+                                                        >
+                                                            <strong>
+                                                                Price:
+                                                            </strong>{' '}
+                                                            $
+                                                            {
+                                                                orderItem
+                                                                    .menuItem
+                                                                    .price
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
                                     </div>
                                 </div>

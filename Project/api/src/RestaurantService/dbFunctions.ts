@@ -1,4 +1,3 @@
-import { User } from '../loginService/User.ts';
 import { Order } from '../monolithOrderAndFeedback/Order.ts';
 import { AppDataSource } from '../ormconfig.ts';
 import { Address, MenuItem, Restaurant } from './Restaurant.ts';
@@ -7,17 +6,6 @@ import { Address, MenuItem, Restaurant } from './Restaurant.ts';
 const restaurantRepository = AppDataSource.getMongoRepository(Restaurant);
 const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
 const addressRepository = AppDataSource.getMongoRepository(Address);
-const userRepository = AppDataSource.getMongoRepository(User);
-
-async function getMenuItems(object: any) {
-    const menuItems = await menuItemRepository.find({
-        where: {
-            _id: { $in: object.menu },
-        },
-    });
-
-    return menuItems;
-}
 
 async function getAddress(object: Restaurant | Order) {
     const address = await addressRepository.findOne({
@@ -29,14 +17,14 @@ async function getAddress(object: Restaurant | Order) {
     return address;
 }
 
-async function getCustomer(object: any) {
-    const customer = await userRepository.findOne({
+async function getMenuItems(object: Restaurant) {
+    const menuItems = await menuItemRepository.find({
         where: {
-            _id: object.customerID,
+            _id: { $in: object.menu },
         },
     });
 
-    return customer;
+    return menuItems;
 }
 
 async function getAllRestaurants() {
@@ -60,10 +48,4 @@ async function getAllRestaurants() {
     return restaurantList;
 }
 
-export {
-    getMenuItems,
-    getCustomer,
-    getAllRestaurants,
-    getAddress,
-    restaurantRepository,
-};
+export { getMenuItems, getAllRestaurants, getAddress, restaurantRepository };

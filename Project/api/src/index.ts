@@ -8,7 +8,7 @@ import {
 } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import {
     createFeedbackAndLinkOrder,
-    getMenuItemsFromIDs,
+    GetAllOrdersById,
 } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { messagingRoutes } from './messagingService/messaging.ts';
 import { loginRouter } from './loginService/loginRoutes.ts';
@@ -116,22 +116,24 @@ app.get('/orders', async (req: Request, res: Response) => {
     }
 });
 
-app.post('/menuItemsFromIds', async (req: Request, res: Response) => {
+app.post('/ordersById', async (req: Request, res: Response) => {
     try {
-        const menutItems = await getMenuItemsFromIDs(req.body);
+        const { restaurantID } = req.body;
 
-        if (!menutItems) {
+        const orders = await GetAllOrdersById(restaurantID);
+
+        if (!orders) {
             res.status(401).json({
-                error: 'No menutItems found',
+                error: 'No orders found',
             });
             return;
         }
 
-        res.json(menutItems);
+        res.json(orders);
     } catch (error) {
         console.error('Error creating order:', error);
         res.status(500).json({
-            error: 'An error occurred while fetching menutItems',
+            error: 'An error occurred while fetching orders',
         });
     }
 });

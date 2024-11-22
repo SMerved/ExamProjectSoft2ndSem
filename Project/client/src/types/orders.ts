@@ -7,7 +7,7 @@ export interface Order {
     totalPrice: number;
     feedbackID: string;
     timestamp: string;
-    orderItemList: string[];
+    orderItemList: OrderItem[];
 }
 
 export interface Address {
@@ -24,4 +24,16 @@ export interface Customer {
     role: string;
     address: string;
     phoneNumber?: number;
+}
+
+export interface OrderItem {
+    menuItem: MenuItem;
+    quantity: number;
+}
+
+export interface MenuItem {
+    _id: string;
+    name: string;
+    price: number;
+    availability: boolean;
 }

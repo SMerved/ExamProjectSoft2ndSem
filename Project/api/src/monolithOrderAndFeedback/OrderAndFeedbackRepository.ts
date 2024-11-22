@@ -1,15 +1,17 @@
+import { ObjectId } from 'mongodb';
+import { User } from '../loginService/User.ts';
 import { AppDataSource } from '../ormconfig.ts';
-import { getAddress, getCustomer } from '../RestaurantService/dbFunctions.ts';
-import { MenuItem } from '../RestaurantService/Restaurant.ts';
+import { Address, MenuItem } from '../RestaurantService/Restaurant.ts';
 import { Feedback } from './Feedback.ts';
 import { Order } from './Order.ts';
 import { FeedbackData } from './types/feedback.ts';
 import { OrderData } from './types/order.ts';
-import { ObjectId } from 'mongodb';
 
 const orderRepository = AppDataSource.getMongoRepository(Order);
 const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
 const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
+const addressRepository = AppDataSource.getMongoRepository(Address);
+const userRepository = AppDataSource.getMongoRepository(User);
 
 async function AddOrder(order: OrderData): Promise<Order | null> {
     if (!order) return null;
@@ -19,13 +21,63 @@ async function AddOrder(order: OrderData): Promise<Order | null> {
     return orderRepository.save(orderPersist);
 }
 
-async function GetAllOrders(): Promise<Order[] | null> {
+async function getAddress(object: Order) {
+    const address = await addressRepository.findOne({
+        where: {
+            _id: object.address,
+        },
+    });
+
+    return address;
+}
+
+async function getCustomer(object: Order) {
+    const customer = await userRepository.findOne({
+        where: {
+            _id: object.customerID,
+        },
+    });
+
+    return customer;
+}
+
+async function getMenuItems(orders: Order[]) {
+    const menuItemIds = orders.flatMap((order) =>
+        order.orderItemList.map((item) => item.menuItemId)
+    );
+
+    const menuItems = await menuItemRepository.find({
+        where: {
+            _id: { $in: menuItemIds.map((id) => id) },
+        },
+    });
+
+    const menuItemMap = new Map(
+        menuItems.map((item) => [item._id.toHexString(), item])
+    );
+
+    for (const order of orders) {
+        order.orderItemList = order.orderItemList.map((item) => ({
+            ...item,
+            menuItem: menuItemMap.get(item.menuItemId.toHexString()),
+        }));
+    }
+
+    return orders;
+}
+
+async function GetAllOrdersById(restaurantID: string): Promise<Order[] | null> {
     try {
-        const orders = await orderRepository.find();
+        const restaurantObjectID = new ObjectId(restaurantID);
+        const orders = await orderRepository.find({
+            where: { restaurantID: restaurantObjectID },
+        });
 
         const ordersList: Order[] = [];
 
-        for (const order of orders) {
+        const orderWithMenuItems = await getMenuItems(orders);
+
+        for (const order of orderWithMenuItems) {
             const address = await getAddress(order);
             const customer = await getCustomer(order);
 
@@ -45,16 +97,15 @@ async function GetAllOrders(): Promise<Order[] | null> {
     }
 }
 
-async function getMenuItemsFromIDs(objectIds: string[]) {
-    const objectIdArray = objectIds.map((id) => new ObjectId(id));
+async function GetAllOrders(): Promise<Order[] | null> {
+    try {
+        const orders = await orderRepository.find();
 
-    const menuItems = await menuItemRepository.find({
-        where: {
-            _id: { $in: objectIdArray },
-        },
-    });
-
-    return menuItems;
+        return orders;
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        return null;
+    }
 }
 
 async function GetAllAcceptedOrders(): Promise<Order[] | null> {
@@ -110,34 +161,6 @@ async function createFeedbackAndLinkOrder({
     );
 }
 
-/*async function GetAllOrders(): Promise<Order[] | null> {
-    try {
-        const orders = await orderRepository.find();
-
-        const menuItemIds = orders.flatMap(order => order.orderItemList.map(item => item.menuItemId));
-
-        const menuItems = await menuItemRepository.find({
-            where: {
-                _id: { $in: menuItemIds.map(id => id) }
-            }
-        });
-
-        const menuItemMap = new Map(menuItems.map(item => [item._id.toHexString(), item]));
-
-        for (const order of orders) {
-            order.orderItemList = order.orderItemList.map(item => ({
-                ...item,
-                menuItem: menuItemMap.get(item.menuItemId.toHexString()),
-            }));
-        }
-
-        return orders;
-    } catch (error) {
-        console.error("Error fetching orders:", error);
-        return null;
-    }
-}*/
-
 export {
     AddOrder,
     GetAllAcceptedOrders,
@@ -145,5 +168,5 @@ export {
     feedbackRepository,
     orderRepository,
     GetAllOrders,
-    getMenuItemsFromIDs,
+    GetAllOrdersById,
 };

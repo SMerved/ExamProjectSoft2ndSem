@@ -2,7 +2,7 @@ import { OrderStatusEnum } from './types/orderStatusEnum.ts';
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { ObjectId } from 'mongodb';
 import { OrderItem } from './types/order.ts';
-import { Address, MenuItem } from '../RestaurantService/Restaurant.ts';
+import { Address } from '../RestaurantService/Restaurant.ts';
 import { User } from '../loginService/User.ts';
 
 @Entity('orders')
