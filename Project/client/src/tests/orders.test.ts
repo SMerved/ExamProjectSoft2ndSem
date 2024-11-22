@@ -1,4 +1,4 @@
-import { GetAcceptedOrdersAPI, GetOrdersAPI } from '../api/orders';
+import { GetAcceptedOrdersAPI, GetOrdersAPIByRestaurantID } from '../api/orders';
 import { acceptedOrdersMock, ordersByIdMock } from '../mocks/orders';
 
 describe('getAcceptedOrders function', () => {
@@ -12,7 +12,7 @@ describe('getAcceptedOrders function', () => {
     });
 
     it('should return list of orders', async () => {
-        const orders = await GetOrdersAPI('672de88ff54107237ff75565');
+        const orders = await GetOrdersAPIByRestaurantID('672de88ff54107237ff75565');
 
         expect(orders).toEqual(
             expect.arrayContaining([expect.objectContaining(ordersByIdMock)])
