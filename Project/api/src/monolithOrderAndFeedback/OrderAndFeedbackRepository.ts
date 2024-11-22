@@ -66,6 +66,30 @@ async function getMenuItems(orders: Order[]) {
     return orders;
 }
 
+async function acceptRejectOrder(orderId: string, newStatus: number) {
+    if (newStatus < 0 || newStatus > 4) {
+        throw new Error('Status must be between inclusive 0 and 4, inclusive');
+    }
+
+    const orderObjectId = new ObjectId(orderId);
+    const order = await orderRepository.findOne({
+        where: { _id: orderObjectId },
+    });
+
+    if (!order) {
+        throw new Error(`Order with ID ${orderId} not found`);
+    }
+
+    const orderTemp: Order = {
+        ...order,
+        status: newStatus,
+    };
+
+    const updatedOrder = await orderRepository.save(orderTemp);
+
+    return updatedOrder;
+}
+
 async function GetAllOrdersById(restaurantID: string): Promise<Order[] | null> {
     try {
         const restaurantObjectID = new ObjectId(restaurantID);
@@ -173,4 +197,5 @@ export {
     orderRepository,
     GetAllOrders,
     GetAllOrdersById,
+    acceptRejectOrder,
 };

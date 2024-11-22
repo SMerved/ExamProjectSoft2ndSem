@@ -21,6 +21,7 @@ describe('Post /create', () => {
         address: 11,
         totalPrice: 50,
         timestamp: timestamp.toISOString(),
+        status: 1,
     };
     const mockOrderList = [
         {
@@ -39,7 +40,7 @@ describe('Post /create', () => {
             address: 11,
             totalPrice: 50,
             timestamp: timestamp.toISOString(),
-            status: 3,
+            status: 1,
         },
     ];
 
@@ -108,6 +109,24 @@ describe('Post /create', () => {
         expect(response.body).toContainEqual(mockOrderList[0]);
     });
 
+    it('should change the status of the order with the id provided to the status provided', async () => {
+        (
+            orderAndFeedbackRepository.acceptRejectOrder as jest.Mock
+        ).mockResolvedValue(mockOrder);
+
+        const payload = {
+            orderId: 'someObjectId',
+            newStatus: 1,
+        };
+
+        const response = await request(app)
+            .post('/acceptRejectOrder')
+            .send(payload);
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockOrder);
+    });
+
     it('should return orders array with menu items if orders where found successfully', async () => {
         (
             orderAndFeedbackRepository.GetAllOrdersById as jest.Mock
@@ -121,7 +140,7 @@ describe('Post /create', () => {
         expect(response.body).toEqual(mockOrderList);
     });
 
-    it('should return orders array with menu items if orders where found successfully', async () => {
+    it('should return 401 if orders where not found successfully', async () => {
         (
             orderAndFeedbackRepository.GetAllOrdersById as jest.Mock
         ).mockResolvedValue(null);
