@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Order } from '../types/orders';
-import { GetOrdersAPI } from '../api/orders';
+import { GetOrdersAPIByRestaurantID } from '../api/orders';
 import { OrderStatusTextEnum } from '../utilities';
 import { useLocation } from 'react-router-dom';
 import { User } from '../types/users';
+import { LineChart } from '@mui/x-charts';
+import { orderCountToLineChartSeries, orderIncomeToLineChartSeries } from '../chartFunctions/linechart.ts';
 
 function RestuarantPage() {
     const location = useLocation();
@@ -12,11 +14,31 @@ function RestuarantPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+    const [yData, setYData] = useState<number[]>([]);
+    const [labels, setLabels] = useState<string[]>([]);
+    const [labelType, setLabelType] = useState<string>('Income');
+
     const fetchOrders = async () => {
         try {
             if (!user.restaurant) return;
-            const orders = await GetOrdersAPI(user.restaurant);
+            const orders = await GetOrdersAPIByRestaurantID(user.restaurant);
             setOrders(orders);
+
+            if (labels.length == 0 && yData.length == 0) {
+                setLabelType('Income');
+                setLabelType('Order count');
+                const series = orderCountToLineChartSeries(orders);
+                const y = [];
+                const labels = [];
+
+                series.forEach(l => {
+                    y.push(l.y);
+                    labels.push(l.label);
+                });
+
+                setYData(y);
+                setLabels(labels);
+            }
         } catch (error) {
             console.error('Error fetching Orders:', error);
         }
@@ -37,6 +59,52 @@ function RestuarantPage() {
 
     return (
         <div>
+            <div>
+                <button onClick={() => {
+                    if (labelType == 'Income') {
+                        setLabelType('Order count');
+                        const series = orderCountToLineChartSeries(orders);
+                        const y = [];
+                        const labels = [];
+
+                        series.forEach(l => {
+                            y.push(l.y);
+                            labels.push(l.label);
+                        });
+
+                        setYData(y);
+                        setLabels(labels);
+
+                    } else if (labelType == 'Order count') {
+                        setLabelType('Income');
+                        const series = orderIncomeToLineChartSeries(orders);
+                        const y = [];
+                        const labels = [];
+
+                        series.forEach(l => {
+                            y.push(l.y);
+                            labels.push(l.label);
+                        });
+
+                        setYData(y);
+                        setLabels(labels);
+                    }
+                }}>{labelType == 'Income' ? 'Show Order count' : 'Show Income'}</button>
+                <LineChart
+                    xAxis={[{
+                        scaleType: 'point',
+                        data: labels,
+                        label: labelType,
+                    }]}
+                    series={[
+                        {
+                            data: yData,
+                            area: true,
+                        },
+                    ]}
+                    height={400}
+                />
+            </div>
             {orders.length > 0 ? (
                 <>
                     <div
@@ -91,7 +159,7 @@ function RestuarantPage() {
                                         <strong>Timestamp:</strong>
 
                                         {new Date(
-                                            order.timestamp
+                                            order.timestamp,
                                         ).toLocaleString()}
                                     </div>
                                 </div>
@@ -152,7 +220,7 @@ function RestuarantPage() {
                                         <p>
                                             $
                                             {selectedOrder.totalPrice.toFixed(
-                                                2
+                                                2,
                                             )}
                                         </p>
                                     </div>
@@ -161,7 +229,7 @@ function RestuarantPage() {
                                         <strong>Timestamp:</strong>
                                         <p>
                                             {new Date(
-                                                selectedOrder.timestamp
+                                                selectedOrder.timestamp,
                                             ).toLocaleString()}
                                         </p>
                                     </div>
@@ -233,7 +301,7 @@ function RestuarantPage() {
                                                             }
                                                         </p>
                                                     </div>
-                                                )
+                                                ),
                                             )}
                                         </div>
                                     </div>

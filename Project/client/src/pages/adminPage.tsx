@@ -5,7 +5,7 @@ import { LineData, PerRestaurantsData } from '../types/chartSerieData.ts';
 import { GetRestaurantsAPI } from '../api/restaurants.ts';
 import {
     ordersToCountChartSeries,
-    ordersToIncomeChartSeries,
+    ordersToIncomeChartSeriesPerRestaurant,
 } from '../chartFunctions/piechart.ts';
 import { updateLineChartCount, updateLineChartIncome } from '../chartFunctions/linechart.ts';
 import { Order } from '../types/orders.ts';
@@ -24,7 +24,7 @@ function AdminPage() {
             const restaurants = await GetRestaurantsAPI();
             setOrders(orders);
             setOrderCount(ordersToCountChartSeries(orders, restaurants));
-            setIncomeCount(ordersToIncomeChartSeries(orders, restaurants));
+            setIncomeCount(ordersToIncomeChartSeriesPerRestaurant(orders, restaurants));
         } catch (error) {
             console.log(error);
         }
