@@ -7,21 +7,21 @@ import {
     ordersToCountChartSeries,
     ordersToIncomeChartSeries,
 } from '../chartFunctions/piechart.ts';
-import { updateLineChart } from '../chartFunctions/linechart.ts';
+import { updateLineChartCount, updateLineChartIncome } from '../chartFunctions/linechart.ts';
 import { Order } from '../types/orders.ts';
 
 function AdminPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [orderCount, setOrderCount] = useState<PerRestaurantsData[]>([]);
     const [incomeCount, setIncomeCount] = useState<PerRestaurantsData[]>([]);
-    const [lineSeries, setLineSeries] = useState<LineData[]>();
+    const [yData, setYData] = useState<number[]>([]);
+    const [labels, setLabels] = useState<string[]>([]);
+    const [labelType, setLabelType] = useState<string>();
 
     const fetch = async () => {
         try {
             const orders = await GetOrdersAPI();
             const restaurants = await GetRestaurantsAPI();
-            console.log(restaurants);
-            console.log(orders);
             setOrders(orders);
             setOrderCount(ordersToCountChartSeries(orders, restaurants));
             setIncomeCount(ordersToIncomeChartSeries(orders, restaurants));
@@ -47,9 +47,20 @@ function AdminPage() {
                     ]}
                     width={400}
                     height={400}
-                    onItemClick={(event, d) =>
-                        setLineSeries(updateLineChart(d, orderCount, orders))
-                    }
+                    onItemClick={(event, d) => {
+                        const series = updateLineChartCount(d.dataIndex, incomeCount, orders);
+                        const x: number[] = [];
+                        const y: number[] = [];
+                        const label: string[] = [];
+                        series.forEach(line => {
+                            x.push(line.x);
+                            y.push(line.y);
+                            label.push(line.label);
+                        });
+                        setYData(y);
+                        setLabels(labels);
+                        setLabelType("Order count")
+                    }}
                 />
                 <PieChart
                     series={[
@@ -60,17 +71,32 @@ function AdminPage() {
                     ]}
                     width={400}
                     height={400}
-                    onItemClick={(event, d) =>
-                        setLineSeries(updateLineChart(d, incomeCount, orders))
-                    }
+                    onItemClick={(event, d) => {
+                        const series = updateLineChartIncome(d.dataIndex, incomeCount, orders);
+                        const x: number[] = [];
+                        const y: number[] = [];
+                        const label: string[] = [];
+                        series.forEach(line => {
+                            x.push(line.x);
+                            y.push(line.y);
+                            label.push(line.label);
+                        });
+                        setYData(y);
+                        setLabels(label);
+                        setLabelType("Income");
+                    }}
                 />
             </div>
             <div>
                 <LineChart
-                    xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+                    xAxis={[{
+                        scaleType: 'point',
+                        data: labels,
+                        label: labelType
+                    }]}
                     series={[
                         {
-                            data: [2, 5.5, 2, 8.5, 1.5, 5],
+                            data: yData,
                             area: true,
                         },
                     ]}
