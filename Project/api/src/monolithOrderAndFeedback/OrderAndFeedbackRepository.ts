@@ -116,12 +116,16 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
 
         const acceptedOrderList: Order[] = [];
 
-        for (const acceptedOrder of acceptedOrders) {
+        const ordersWithMenuItems = await getMenuItems(acceptedOrders);
+
+        for (const acceptedOrder of ordersWithMenuItems) {
             const address = await getAddress(acceptedOrder);
+            const customer = await getCustomer(acceptedOrder);
 
             const acceptedOrderTemp = {
                 ...acceptedOrder,
                 address: address || acceptedOrder.address,
+                customerID: customer || acceptedOrder.customerID,
             };
 
             acceptedOrderList.push(acceptedOrderTemp);
