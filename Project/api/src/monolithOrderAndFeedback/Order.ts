@@ -42,5 +42,5 @@ export class Order {
     timestamp!: Date;
 
     @Column()
-    rejectReason?: string;
+    rejectReason?: string | null;
 }

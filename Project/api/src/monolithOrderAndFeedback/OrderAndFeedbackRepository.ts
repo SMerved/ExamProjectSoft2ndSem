@@ -69,10 +69,14 @@ async function getMenuItems(orders: Order[]) {
 async function acceptRejectOrder(
     orderId: string,
     newStatus: number,
-    reason: string
+    rejectReason: string
 ) {
     if (newStatus < 0 || newStatus > 4) {
         throw new Error('Status must be between inclusive 0 and 4, inclusive');
+    } else if (newStatus !== 1 && rejectReason) {
+        throw new Error(
+            'There can only be a reason for rejecting, if status is set to 1, aka reject'
+        );
     }
 
     const orderObjectId = new ObjectId(orderId);
@@ -87,7 +91,7 @@ async function acceptRejectOrder(
     const orderTemp: Order = {
         ...order,
         status: newStatus,
-        rejectReason: reason,
+        rejectReason: rejectReason || null,
     };
 
     const updatedOrder = await orderRepository.save(orderTemp);
