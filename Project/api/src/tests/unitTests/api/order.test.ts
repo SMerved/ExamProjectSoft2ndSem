@@ -34,6 +34,29 @@ describe('Post /create', () => {
         status: 1,
         rejectReason: "Manden bor i indien, der leverer vi skam ik' til",
     };
+    const mockAcceptAsDelivery = {
+        _id: '67412feda778184dc774ecf7',
+        customerID: '672df427f54107237ff75565',
+        restaurantID: '672de88ff54107237ff75565',
+        status: 3,
+        address: '672df723f54107237ff75573',
+        totalPrice: 30,
+        orderItemList: [
+            {
+                menuItemId: '672de8c4f54107237ff75546',
+                quantity: 2,
+            },
+            {
+                menuItemId: '672de8c4f54107237ff75548',
+                quantity: 1,
+            },
+        ],
+        timestamp: '2024-11-20T12:00:00.000Z',
+        rejectReason: null,
+        employeeID: '672df427f54107237ff75569',
+        feedbackID: null,
+    };
+
     const mockOrderList = [
         {
             userID: 1,
@@ -138,6 +161,25 @@ describe('Post /create', () => {
         console.log(response.status);
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockOrderReject);
+    });
+
+    it('should change the status of the order with the id provided to the status provided', async () => {
+        (
+            orderAndFeedbackRepository.acceptOrderAsDelivery as jest.Mock
+        ).mockResolvedValue(mockAcceptAsDelivery);
+
+        const payload = {
+            orderID: '67412feda778184dc774ecf7',
+            employeeID: '672df427f54107237ff75569',
+        };
+
+        const response = await request(app)
+            .post('/acceptOrderAsDelivery')
+            .send(payload);
+
+        console.log(response.status);
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(mockAcceptAsDelivery);
     });
 
     // it('should fail to accept/reject because status is too high a number', async () => {

@@ -212,6 +212,30 @@ async function createFeedbackAndLinkOrder({
     );
 }
 
+async function acceptOrderAsDelivery(orderID: string, employeeID: string) {
+    const employeeIDObjectID = new ObjectId(employeeID);
+    const orderObjectID = new ObjectId(orderID);
+    const order = await orderRepository.findOne({
+        where: { _id: orderObjectID },
+    });
+
+    if (!order) {
+        throw new Error(`Order with ID ${orderID} not found`);
+    }
+
+    if (order?.status !== 2) throw new Error('Order is not at pick up stage');
+
+    const orderTemp: Order = {
+        ...order,
+        employeeID: employeeIDObjectID,
+        status: 3,
+    };
+
+    const updatedOrder = await orderRepository.save(orderTemp);
+
+    return updatedOrder;
+}
+
 export {
     AddOrder,
     GetAllAcceptedOrders,
@@ -221,4 +245,5 @@ export {
     GetAllOrders,
     GetAllOrdersById,
     acceptRejectOrder,
+    acceptOrderAsDelivery,
 };

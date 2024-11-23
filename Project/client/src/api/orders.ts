@@ -84,3 +84,25 @@ export const submitFeedback = async (
     }
     return response.json();
 };
+
+export const acceptOrderAsDelivery = async (
+    orderID: string,
+    employeeID: string
+): Promise<Order> => {
+    if (!orderID || !employeeID) {
+        throw new Error('Missing value');
+    }
+
+    const response = await fetch(`${baseUrl}/acceptOrderAsDelivery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderID,
+            employeeID,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('failed to change order' + response.body);
+    }
+    return response.json();
+};
