@@ -58,3 +58,29 @@ export const acceptRejectOrder = async (
     }
     return response.json();
 };
+
+export const submitFeedback = async (
+    orderId: string,
+    foodRating: number | null,
+    overallRating: number | null,
+    deliveryRating: number | null
+): Promise<Order> => {
+    if (!foodRating || !overallRating || !deliveryRating) {
+        throw new Error('Missing rating value');
+    }
+
+    const response = await fetch(`${baseUrl}/createFeedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderId,
+            foodRating,
+            overallRating,
+            deliveryRating,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('failed to change order' + response.body);
+    }
+    return response.json();
+};

@@ -76,7 +76,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
                     marginBottom: '10px',
                 }}
             >
-                <strong>Phone number</strong>
+                <strong>Phone Number:</strong>
                 {selectedOrder.customerID.phoneNumber}
             </div>
 
@@ -109,7 +109,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
                     marginBottom: '10px',
                 }}
             >
-                <strong>Timestamp:</strong>
+                <strong>Created:</strong>
                 <span>
                     {new Date(selectedOrder.timestamp).toLocaleString()}
                 </span>

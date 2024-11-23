@@ -179,6 +179,16 @@ async function createFeedbackAndLinkOrder({
 }: FeedbackData) {
     return await AppDataSource.manager.transaction(
         async (transactionalEntityManager) => {
+            const orderIdOjectID = new ObjectId(orderId);
+
+            const order = await transactionalEntityManager.findOne(Order, {
+                where: { _id: orderIdOjectID },
+            });
+
+            if (!order) {
+                throw new Error(`Order with id ${orderId} not found`);
+            }
+
             const feedback = transactionalEntityManager.create(Feedback, {
                 foodRating,
                 overallRating,
@@ -187,11 +197,15 @@ async function createFeedbackAndLinkOrder({
 
             await transactionalEntityManager.save(feedback);
 
-            await transactionalEntityManager.update(
+            const updateResult = await transactionalEntityManager.update(
                 Order,
-                { _id: orderId },
+                { _id: orderIdOjectID },
                 { feedbackID: feedback._id }
             );
+
+            if (updateResult.affected === 0) {
+                throw new Error('Failed to update order with feedback ID');
+            }
 
             return feedback;
         }

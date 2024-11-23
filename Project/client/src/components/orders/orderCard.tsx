@@ -99,7 +99,7 @@ const OrderCard: React.FC<Props> = ({ order, setSelectedOrder }) => {
                     marginBottom: '10px',
                 }}
             >
-                <strong>Timestamp:</strong>
+                <strong>Created:</strong>
                 <span>{new Date(order.timestamp).toLocaleString()}</span>
             </div>
         </div>

@@ -38,3 +38,9 @@ export interface MenuItem {
     price: number;
     availability: boolean;
 }
+
+export interface FeedbackCollection {
+    foodRating: number | null;
+    overallRating: number | null;
+    deliveryRating: number | null;
+}

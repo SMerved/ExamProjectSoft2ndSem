@@ -136,6 +136,8 @@ function RestuarantPage() {
                             <div
                                 style={{
                                     padding: '20px',
+                                    maxHeight: '100vh',
+                                    overflowY: 'auto',
                                 }}
                             >
                                 {filterOrders(orders, [
@@ -165,6 +167,8 @@ function RestuarantPage() {
                             <div
                                 style={{
                                     padding: '20px',
+                                    maxHeight: '100vh',
+                                    overflowY: 'auto',
                                 }}
                             >
                                 {filterOrders(orders, [
@@ -196,6 +200,8 @@ function RestuarantPage() {
                             <div
                                 style={{
                                     padding: '20px',
+                                    maxHeight: '100vh',
+                                    overflowY: 'auto',
                                 }}
                             >
                                 {filterOrders(orders, [
