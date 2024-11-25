@@ -2,59 +2,12 @@ import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/Orde
 import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import request from 'supertest';
 import app from '../../../index.ts';
+import { mockOrder, mockOrderList, mockOrderPayload, mockOrderReject } from '../../mocks/orderMocksAPI.ts;
 
 jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService.ts');
 jest.mock('../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts');
 
 describe('Post /create', () => {
-    const mockOrderItemList = [
-        { menuItemId: 'someObjectId', quantity: 2 },
-        { menuItemId: 'someObjectId', quantity: 3 },
-        { menuItemId: 'someObjectId', quantity: 1 },
-    ];
-    const timestamp = new Date();
-    const mockOrder = {
-        _id: 'someObjectId',
-        userID: 1,
-        restaurantID: 2324,
-        menuItems: mockOrderItemList,
-        address: 11,
-        totalPrice: 50,
-        timestamp: timestamp.toISOString(),
-        status: 1,
-    };
-    const mockOrderReject = {
-        _id: 'someObjectId',
-        userID: 1,
-        restaurantID: 2324,
-        menuItems: mockOrderItemList,
-        address: 11,
-        totalPrice: 50,
-        timestamp: timestamp.toISOString(),
-        status: 1,
-        rejectReason: "Manden bor i indien, der leverer vi skam ik' til",
-    };
-    const mockOrderList = [
-        {
-            userID: 1,
-            restaurantID: 2324,
-            menuItems: mockOrderItemList,
-            address: 11,
-            totalPrice: 50,
-            timestamp: timestamp.toISOString(),
-            status: 2,
-        },
-        {
-            userID: 1,
-            restaurantID: 2324,
-            menuItems: mockOrderItemList,
-            address: 11,
-            totalPrice: 50,
-            timestamp: timestamp.toISOString(),
-            status: 1,
-        },
-    ];
-
     beforeEach(() => {
         jest.resetAllMocks();
     });
@@ -65,14 +18,7 @@ describe('Post /create', () => {
             mockOrder
         );
 
-        const response = await request(app).post('/createOrder').send({
-            userID: 1,
-            restaurantID: 2324,
-            menuItems: mockOrderItemList,
-            address: 11,
-            totalPrice: 50,
-            timestamp: timestamp,
-        });
+        const response = await request(app).post('/createOrder').send(mockOrderPayload);
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockOrder);
@@ -83,14 +29,7 @@ describe('Post /create', () => {
             null
         );
 
-        const response = await request(app).post('/createOrder').send({
-            userID: 1,
-            restaurantID: 2324,
-            menuItems: mockOrderItemList,
-            address: 11,
-            totalPrice: 50,
-            timestamp: timestamp,
-        });
+        const response = await request(app).post('/createOrder').send(mockOrderPayload);
 
         expect(response.status).toBe(401);
         expect(response.body).toEqual({ error: 'Invalid order data' });
