@@ -6,7 +6,7 @@ const mockOrderItemList = [
     { menuItemId: 'someObjectId', quantity: 1 },
 ];
 
-export const mockOrder = {
+export const mockOrderAPI = {
     _id: 'someObjectId',
     userID: 1,
     restaurantID: 2324,
@@ -17,7 +17,7 @@ export const mockOrder = {
     status: 1,
 };
 
-export const mockOrderPayload = {
+export const mockOrderPayloadAPI = {
     userID: 1,
     restaurantID: 2324,
     menuItems: mockOrderItemList,
@@ -26,7 +26,7 @@ export const mockOrderPayload = {
     timestamp: timestamp,
 }
 
-export const mockOrderReject = {
+export const mockOrderRejectAPI = {
     _id: 'someObjectId',
     userID: 1,
     restaurantID: 2324,
@@ -38,7 +38,7 @@ export const mockOrderReject = {
     rejectReason: "Manden bor i indien, der leverer vi skam ik' til",
 };
 
-export const mockOrderList = [
+export const mockOrderListAPI = [
     {
         userID: 1,
         restaurantID: 2324,

@@ -1,7 +1,7 @@
 import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import request from 'supertest';
 import app from '../../../index.ts';
-import { incorrectMockFeedbackPayload, mockFeedback, mockFeedbackPayload } from '../../mocks/feedbackMocksAPI.ts';
+import { incorrectMockFeedbackPayloadAPI, mockFeedbackAPI, mockFeedbackPayloadAPI } from '../../mocks/feedbackMocksAPI.ts';
 
 jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackRepository.ts');
 
@@ -13,12 +13,12 @@ describe('POST /createFeedback', () => {
     it('should return feedback object if feedback creation is successful', async () => {
         (
             orderAndFeedbackRepository.createFeedbackAndLinkOrder as jest.Mock
-        ).mockResolvedValue(mockFeedback);
+        ).mockResolvedValue(mockFeedbackAPI);
 
-        const response = await request(app).post('/createFeedback').send(mockFeedbackPayload);
+        const response = await request(app).post('/createFeedback').send(mockFeedbackPayloadAPI);
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(mockFeedback);
+        expect(response.body).toEqual(mockFeedbackAPI);
     });
 
     it('should return 401 error if feedback creation is unsuccessful', async () => {
@@ -26,7 +26,7 @@ describe('POST /createFeedback', () => {
             orderAndFeedbackRepository.createFeedbackAndLinkOrder as jest.Mock
         ).mockResolvedValue(null);
 
-        const response = await request(app).post('/createFeedback').send(incorrectMockFeedbackPayload);
+        const response = await request(app).post('/createFeedback').send(incorrectMockFeedbackPayloadAPI);
 
         expect(response.status).toBe(401);
         expect(response.body).toEqual({ error: 'Invalid feedback data' });
@@ -37,7 +37,7 @@ describe('POST /createFeedback', () => {
 
         const response = await request(app)
             .post('/createFeedback')
-            .send(mockFeedbackPayload);
+            .send(mockFeedbackPayloadAPI);
 
         expect(response.status).toBe(500);
         expect(response.body).toEqual({ error: 'Error creating feedback' });

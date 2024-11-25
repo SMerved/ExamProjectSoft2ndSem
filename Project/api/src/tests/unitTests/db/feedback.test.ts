@@ -1,10 +1,10 @@
 import { AppDataSource } from '../../../ormconfig.ts';
 import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
-import { ObjectId } from 'mongodb';
 import {
     createFeedbackAndLinkOrder,
     orderRepository,
 } from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
+import { mockOrderDB } from '../../mocks/feedbackMocksDB.ts';
 
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     beforeAll(async () => {
@@ -16,23 +16,15 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     it('should create feedback and link it to the correct order', async () => {
-        const mockOrderItemList = [{menuItemId: new ObjectId(), quantity: 2}, {menuItemId: new ObjectId(), quantity: 3}, {menuItemId: new ObjectId(), quantity: 1}]
-        const mockOrder = {
-            customerID: new ObjectId(),
-            restaurantID: new ObjectId(),
-            address: new ObjectId(),
-            totalPrice: 50,
-            menuItems: mockOrderItemList,
-            timestamp: new Date(),
-        };
+        const { customerID, restaurantID, address, totalPrice, menuItems, timestamp } = mockOrderDB;
 
         const order = await orderAndFeedbackService.createOrder(
-            mockOrder.customerID,
-            mockOrder.restaurantID,
-            mockOrder.address,
-            mockOrder.totalPrice,
-            mockOrder.menuItems,
-            mockOrder.timestamp
+            customerID,
+            restaurantID,
+            address,
+            totalPrice,
+            menuItems,
+            timestamp
         );
 
         if (!order) {

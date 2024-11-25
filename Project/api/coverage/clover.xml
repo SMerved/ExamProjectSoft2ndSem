@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1732539265985" clover="3.2.0">
-  <project timestamp="1732539265985" name="All files">
-    <metrics statements="346" coveredstatements="225" conditionals="43" coveredconditionals="13" methods="41" coveredmethods="18" elements="430" coveredelements="256" complexity="0" loc="346" ncloc="346" packages="8" files="17" classes="17"/>
+<coverage generated="1732540785489" clover="3.2.0">
+  <project timestamp="1732540785489" name="All files">
+    <metrics statements="358" coveredstatements="237" conditionals="43" coveredconditionals="13" methods="41" coveredmethods="18" elements="442" coveredelements="268" complexity="0" loc="358" ncloc="358" packages="9" files="20" classes="20"/>
     <package name="src">
       <metrics statements="98" coveredstatements="82" conditionals="9" coveredconditionals="6" methods="8" coveredmethods="8"/>
       <file name="index.ts" path="C:\Users\Merved\Documents\GitHub\ExamProjectSoft2ndSem\Project\api\src\index.ts">
@@ -421,6 +421,30 @@
         <line num="4" count="10" type="stmt"/>
         <line num="5" count="10" type="stmt"/>
         <line num="6" count="10" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.tests.mocks">
+      <metrics statements="12" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="feedbackMocksAPI.ts" path="C:\Users\Merved\Documents\GitHub\ExamProjectSoft2ndSem\Project\api\src\tests\mocks\feedbackMocksAPI.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+      </file>
+      <file name="feedbackMocksDB.ts" path="C:\Users\Merved\Documents\GitHub\ExamProjectSoft2ndSem\Project\api\src\tests\mocks\feedbackMocksDB.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+      </file>
+      <file name="orderMocksAPI.ts" path="C:\Users\Merved\Documents\GitHub\ExamProjectSoft2ndSem\Project\api\src\tests\mocks\orderMocksAPI.ts">
+        <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="41" count="1" type="stmt"/>
       </file>
     </package>
   </project>
