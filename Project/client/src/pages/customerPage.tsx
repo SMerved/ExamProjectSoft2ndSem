@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GetRestaurantsAPI } from '../api/restaurants';
 import { Restaurant } from '../types/restaurants';
+import { useNavigate } from 'react-router-dom';
 
 function CustomerPage() {
+    const navigate = useNavigate();
+    const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-
     const fetchRestaurants = async () => {
         try {
             const restaurants = await GetRestaurantsAPI();
@@ -15,6 +17,14 @@ function CustomerPage() {
         }
     };
 
+    const handleRestaurantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedRestaurantId = event.target.value;
+        const selectedRestaurant = restaurants.find(restaurant => restaurant._id === selectedRestaurantId);
+        if (selectedRestaurant) {
+            setRestaurant(selectedRestaurant);
+        }
+    };
+
     useEffect(() => {
         fetchRestaurants();
     }, []);
@@ -22,7 +32,7 @@ function CustomerPage() {
     return (
         <div>
             {restaurants.length > 0 && (
-                <select>
+                <select onChange={handleRestaurantChange}>
                     {restaurants.map((restaurant) => (
                         <option key={restaurant._id} value={restaurant._id}>
                             {restaurant.name} - {restaurant.address.city}
@@ -30,6 +40,16 @@ function CustomerPage() {
                     ))}
                 </select>
             )}
+
+            {restaurant && (
+                <button
+                    onClick={() => {
+                        navigate('/restaurant', {
+                            state: { restaurant: restaurant },
+                        });
+                    }}
+                ></button>)
+            }
         </div>
     );
 }
