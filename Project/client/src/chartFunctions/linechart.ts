@@ -36,7 +36,7 @@ export const updateLineChartIncome = (
         }
     });
 
-    return result.sort(l => -l.x);
+    return result.sort(l => l.x);
 };
 
 export const updateLineChartCount = (
@@ -74,7 +74,7 @@ export const updateLineChartCount = (
         }
     });
 
-    return result.sort(l => -l.x);
+    return result.sort(l => l.x);
 };
 
 export const orderCountToLineChartSeries = (orders: Order[]) => {

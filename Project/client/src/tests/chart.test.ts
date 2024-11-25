@@ -466,8 +466,8 @@ describe('PieChart series to LineChart series', () => {
 
     it('Should return equal as expected result with income as y value', () => {
         const expectedResult = [
-            { x: 2862, y: 30, label: '2024 / 45' },
             { x: 2863, y: 130, label: '2024 / 47' },
+            { x: 2862, y: 30, label: '2024 / 45' },
         ];
 
         const result = updateLineChartIncome(0, series, orders);
@@ -483,8 +483,8 @@ describe('PieChart series to LineChart series', () => {
 
     it('Should return equal as expected result with order count as y value', () => {
         const expectedResult = [
-            { x: 2862, y: 1, label: '2024 / 45' },
             { x: 2863, y: 2, label: '2024 / 47' },
+            { x: 2862, y: 1, label: '2024 / 45' },
         ];
 
         const result = updateLineChartCount(0, series, orders);
