@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { GetRestaurantsAPI } from '../api/restaurants';
 import { Restaurant } from '../types/restaurants';
-import { useNavigate } from 'react-router-dom';
+import RestaurantComponent from "./components/restaurantComponent"
 
 function CustomerPage() {
-    const navigate = useNavigate();
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const fetchRestaurants = async () => {
@@ -18,11 +17,11 @@ function CustomerPage() {
     };
 
     const handleRestaurantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedRestaurantId = event.target.value;
-        const selectedRestaurant = restaurants.find(restaurant => restaurant._id === selectedRestaurantId);
-        if (selectedRestaurant) {
-            setRestaurant(selectedRestaurant);
+        const selectedRestaurant = restaurants.find((restaurant) => restaurant._id === event.target.value);
+        if (selectedRestaurant === undefined) {
+            return;
         }
+        setRestaurant(selectedRestaurant);
     };
 
     useEffect(() => {
@@ -42,13 +41,7 @@ function CustomerPage() {
             )}
 
             {restaurant && (
-                <button
-                    onClick={() => {
-                        navigate('/restaurant', {
-                            state: { restaurant: restaurant },
-                        });
-                    }}
-                ></button>)
+                <RestaurantComponent restaurant={restaurant} />)
             }
         </div>
     );
