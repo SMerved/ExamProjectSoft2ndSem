@@ -10,3 +10,9 @@ export const mockOrderDB = {
     menuItems: mockOrderItemListDB,
     timestamp: new Date(),
 };
+
+export const mockUpdateResultDB = {
+    affected: 0,
+    raw: {},
+    generatedMaps: [],
+};

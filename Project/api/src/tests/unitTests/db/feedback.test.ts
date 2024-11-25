@@ -4,21 +4,21 @@ import {
     createFeedbackAndLinkOrder,
     orderRepository,
 } from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
-import { mockOrderDB } from '../../mocks/feedbackMocksDB.ts';
+import { mockOrderDB, mockUpdateResultDB } from '../../mocks/feedbackMocksDB.ts';
+import { Order } from '../../../monolithOrderAndFeedback/Order.ts';
+import { ObjectId } from 'mongodb';
 
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
+    let order: Order | null;
+
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
 
-    afterAll(async () => {
-        await AppDataSource.destroy();
-    });
-
-    it('should create feedback and link it to the correct order', async () => {
+    beforeEach(async () => {
+        // Create a fresh order before each test if needed
         const { customerID, restaurantID, address, totalPrice, menuItems, timestamp } = mockOrderDB;
-
-        const order = await orderAndFeedbackService.createOrder(
+        order = await orderAndFeedbackService.createOrder(
             customerID,
             restaurantID,
             address,
@@ -26,13 +26,19 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
             menuItems,
             timestamp
         );
-
         if (!order) {
-            throw new Error(
-                'Order creation failed, cannot proceed with feedback creation'
-            );
+            throw new Error('Order creation failed, cannot proceed with feedback creation');
         }
+    });
 
+    afterAll(async () => {
+        await AppDataSource.destroy();
+    });
+
+    it('should create feedback and link it to the correct order', async () => {
+        if (!order) {
+            throw new Error('Order creation failed, cannot proceed with feedback creation');
+        }
         const feedbackData = {
             foodRating: 5,
             overallRating: 4,
@@ -51,5 +57,21 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
             _id: order._id,
         });
         expect(updatedOrder?.feedbackID).toStrictEqual(feedback._id);
+    });
+
+    it('should throw an error if the order is not found', async () => {
+        if (!order) {
+            throw new Error('Order creation failed, cannot proceed with feedback creation');
+        }
+        const feedbackData = {
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: new ObjectId(), //invalid ID
+        };
+
+        await expect(createFeedbackAndLinkOrder(feedbackData)).rejects.toThrow(
+            `Order with id ${feedbackData.orderId} not found`
+        );
     });
 });
