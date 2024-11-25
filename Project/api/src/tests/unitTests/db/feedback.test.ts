@@ -16,7 +16,7 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     beforeEach(async () => {
-        // Create a fresh order before each test if needed
+        // Create a fresh order before each test
         const { customerID, restaurantID, address, totalPrice, menuItems, timestamp } = mockOrderDB;
         order = await orderAndFeedbackService.createOrder(
             customerID,
