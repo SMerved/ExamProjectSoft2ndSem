@@ -2,10 +2,15 @@ import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/Orde
 import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import request from 'supertest';
 import app from '../../../index.ts';
-import { mockOrderAPI, mockOrderListAPI, mockOrderPayloadAPI, mockOrderRejectAPI } from '../../mocks/orderMocksAPI.ts'
+import {
+    mockOrderAPI,
+    mockOrderListAPI,
+    mockOrderPayloadAPI,
+    mockOrderRejectAPI,
+} from '../../mocks/orderMocksAPI.ts';
 
-jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService.ts');
-jest.mock('../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts');
+jest.mock('../../../monolithOrderAndFeedback/orderAndFeedbackService');
+jest.mock('../../../monolithOrderAndFeedback/OrderAndFeedbackRepository');
 
 describe('Post /create', () => {
     beforeEach(() => {
@@ -18,7 +23,9 @@ describe('Post /create', () => {
             mockOrderAPI
         );
 
-        const response = await request(app).post('/createOrder').send(mockOrderPayloadAPI);
+        const response = await request(app)
+            .post('/createOrder')
+            .send(mockOrderPayloadAPI);
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockOrderAPI);
@@ -29,7 +36,9 @@ describe('Post /create', () => {
             null
         );
 
-        const response = await request(app).post('/createOrder').send(mockOrderPayloadAPI);
+        const response = await request(app)
+            .post('/createOrder')
+            .send(mockOrderPayloadAPI);
 
         expect(response.status).toBe(401);
         expect(response.body).toEqual({ error: 'Invalid order data' });
