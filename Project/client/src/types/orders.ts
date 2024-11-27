@@ -11,6 +11,7 @@ export interface Order {
     pickUpDate?: string;
     completionDate?: string;
     rejectReason?: string;
+    pay?: number;
 }
 
 export interface Address {

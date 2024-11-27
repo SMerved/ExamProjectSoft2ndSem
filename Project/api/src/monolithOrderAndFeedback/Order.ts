@@ -48,5 +48,8 @@ export class Order {
     completionDate?: Date;
 
     @Column()
+    pay?: number;
+
+    @Column()
     rejectReason?: string | null;
 }

@@ -9,6 +9,7 @@ import {
 import {
     acceptOrderAsDelivery,
     acceptRejectOrder,
+    calculateAndUpdateOrderPay,
     completeOrderAsDelivery,
     createFeedbackAndLinkOrder,
     GetAllOrdersById,
@@ -229,7 +230,27 @@ app.post('/completeOrderAsDelivery', async (req: Request, res: Response) => {
     try {
         const { orderID } = req.body;
 
-        const order = await completeOrderAsDelivery(orderID);
+        const order1 = await completeOrderAsDelivery(orderID);
+
+        const order2 = await calculateAndUpdateOrderPay(orderID);
+
+        if (order1) {
+            res.status(401).json({ error: 'Invalid order data' });
+            return;
+        }
+
+        res.json(order2);
+    } catch (error) {
+        console.error('Error accepting order: ', error);
+        res.status(500).json({ error: 'Error accepting order' + error });
+    }
+});
+
+app.post('/calcAndUpdatePay', async (req: Request, res: Response) => {
+    try {
+        const { orderID } = req.body;
+
+        const order = await calculateAndUpdateOrderPay(orderID);
 
         if (!order) {
             res.status(401).json({ error: 'Invalid order data' });

@@ -300,6 +300,111 @@ async function completeOrderAsDelivery(orderID: string) {
     return updatedOrder;
 }
 
+async function getRatingAVG(orderID: ObjectId) {
+    const order = await orderRepository.findOne({
+        where: { _id: orderID },
+    });
+
+    if (!order) {
+        // throw new Error(`Order with ID ${orderID} not found`);
+        return null;
+    }
+
+    const feedback = await feedbackRepository.findOne({
+        where: {
+            _id: new ObjectId(order?.feedbackID),
+        },
+    });
+
+    if (!feedback)
+        // throw new Error(`Feedback with ID ${order.feedbackID} not found`);
+        return null;
+
+    if (
+        !feedback?.deliveryRating ||
+        !feedback?.foodRating ||
+        !feedback?.overallRating
+    )
+        // throw new Error('Feedback ratings are imcomplete for feedback #' + feedback?._id);
+        return null;
+
+    const avgRating =
+        (feedback?.deliveryRating +
+            feedback?.foodRating +
+            feedback?.overallRating) /
+        3;
+
+    return avgRating;
+}
+
+async function calculateAndUpdateOrderPay(orderID: string) {
+    const orderObjectID = new ObjectId(orderID);
+    const order = await orderRepository.findOne({
+        where: { _id: orderObjectID },
+    });
+
+    const allOrders = await orderRepository.find({
+        where: {
+            employeeID: order?.employeeID,
+        },
+    });
+
+    // const totalOrders = await orderRepository.count({
+    //     where: {
+    //         employeeID: order?.employeeID,
+    //     },
+    // });
+    // Commented out code above no work... count() works, the "where clause" on find() works , but count() with the same "where clause" returns 0...
+
+    if (!order) {
+        throw new Error(`Order with ID ${orderID} not found`);
+    }
+
+    let payAmount = 5; // Base pay
+
+    payAmount += order.totalPrice / 100; // Bonus depending on order price
+
+    const multiplicationFactor =
+        allOrders.length / 1000 > 0.2 ? 0.2 : allOrders.length / 1000;
+    payAmount *= 1 + multiplicationFactor; // Bonus for total amount of orders done. Bonus slowly increases and maxes out at 25% bonus
+
+    if (
+        new Date(order.timestamp).getHours() >= 22 ||
+        new Date(order.timestamp).getHours() < 5
+    ) {
+        payAmount += payAmount + 2.5; // Night bonus added if order is created between 10 pm and 5 am
+    }
+
+    if (order.pickUpDate && order.completionDate) {
+        const deliveryTimeInMinutes =
+            (Number(order.pickUpDate) - Number(order.completionDate)) /
+            1000 /
+            60;
+        let multiplier = 1;
+
+        if (deliveryTimeInMinutes <= 30) {
+            multiplier = 1.2; // 20% bonus for fast delivery
+        } else if (deliveryTimeInMinutes <= 45) {
+            multiplier = 1.1; // 10% bonus for moderate delivery
+        } else if (deliveryTimeInMinutes <= 60) {
+            multiplier = 1.05; // 5% bonus for slower delivery
+        }
+        payAmount *= multiplier; // Bonuns for delivery time
+    }
+
+    const avgRating = await getRatingAVG(order._id);
+    if (avgRating) payAmount *= 1 + avgRating / 100; // Bonus for rating
+
+    const orderTemp: Order = {
+        ...order,
+        pay: Number(payAmount.toFixed(2)),
+    };
+
+    const updatedOrder = await orderRepository.save(orderTemp);
+
+    return updatedOrder;
+}
+
 export {
     AddOrder,
     GetAllAcceptedOrders,
@@ -312,4 +417,5 @@ export {
     acceptOrderAsDelivery,
     GetOwnOrders,
     completeOrderAsDelivery,
+    calculateAndUpdateOrderPay,
 };

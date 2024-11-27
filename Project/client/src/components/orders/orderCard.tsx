@@ -88,9 +88,22 @@ const OrderCard: React.FC<Props> = ({ order, setSelectedOrder, children }) => {
                     marginBottom: '10px',
                 }}
             >
-                <strong>Total Price:</strong>
+                <strong>Order Price:</strong>
                 <span>${order.totalPrice.toFixed(2)}</span>
             </div>
+
+            {order.pay && (
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginBottom: '10px',
+                    }}
+                >
+                    <strong>Payout:</strong>
+                    <span>${order.pay}</span>
+                </div>
+            )}
 
             <div
                 style={{
