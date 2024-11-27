@@ -268,6 +268,7 @@ async function acceptOrderAsDelivery(orderID: string, employeeID: string) {
         ...order,
         employeeID: employeeIDObjectID,
         status: 3,
+        pickUpDate: new Date(),
     };
 
     const updatedOrder = await orderRepository.save(orderTemp);
@@ -291,6 +292,7 @@ async function completeOrderAsDelivery(orderID: string) {
     const orderTemp: Order = {
         ...order,
         status: 4,
+        completionDate: new Date(),
     };
 
     const updatedOrder = await orderRepository.save(orderTemp);

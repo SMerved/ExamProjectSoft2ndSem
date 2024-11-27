@@ -8,6 +8,8 @@ export interface Order {
     feedbackID: string;
     timestamp: string;
     orderItemList: OrderItem[];
+    pickUpDate?: string;
+    completionDate?: string;
     rejectReason?: string;
 }
 

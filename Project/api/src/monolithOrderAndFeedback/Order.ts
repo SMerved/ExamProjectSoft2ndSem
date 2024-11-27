@@ -42,5 +42,11 @@ export class Order {
     timestamp!: Date;
 
     @Column()
+    pickUpDate?: Date;
+
+    @Column()
+    completionDate?: Date;
+
+    @Column()
     rejectReason?: string | null;
 }
