@@ -1,6 +1,7 @@
 import { VITE_BASE_URL } from '../constants';
 import { Order } from '../types/orders';
-
+import { OrderItem } from '../types/orders';
+import { MenuItem } from '../types/orders';
 const baseUrl = VITE_BASE_URL;
 
 export const GetOrdersAPI = async (): Promise<Order[]> => {
@@ -67,7 +68,31 @@ export const acceptRejectOrder = async (id: string, newStatus: number, rejectRea
     }
     return response.json();
 };
-
+export const createOrder = async (
+    userID: string,
+    restaurantID: string,
+    menuItems: { menuItem: MenuItem; quantity: number }[] | OrderItem[],
+    address: string,
+    totalPrice: number,
+): Promise<Order> => {
+    const timestamp = new Date().toISOString();
+    const response = await fetch(`${baseUrl}/createOrder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            userID,
+            restaurantID,
+            menuItems,
+            address,
+            totalPrice,
+            timestamp,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create order');
+    }
+    return response.json();
+};
 export const submitFeedback = async (
     orderId: string,
     foodRating: number | null,
