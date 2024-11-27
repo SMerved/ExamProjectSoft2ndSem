@@ -2,6 +2,7 @@ import React from 'react';
 import { Order } from '../../types/orders';
 import { OrderStatusTextEnum } from '../../utilities/orders';
 import { getColorFromStatus } from '../../utilities/utilities';
+import PaymentInfo from './paymentInfo';
 
 interface Props {
     order: Order;
@@ -91,6 +92,8 @@ const OrderCard: React.FC<Props> = ({ order, setSelectedOrder, children }) => {
                 <strong>Order Price:</strong>
                 <span>${order.totalPrice.toFixed(2)}</span>
             </div>
+
+            <PaymentInfo pay={order.pay} />
 
             {order.pay && (
                 <div
