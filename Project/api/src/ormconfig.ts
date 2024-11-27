@@ -1,7 +1,11 @@
 import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
 import { User } from './loginService/User.ts';
-import { MenuItem, Restaurant } from './RestaurantService/Restaurant.ts';
+import {
+    MenuItem,
+    Restaurant,
+    Address,
+} from './RestaurantService/Restaurant.ts';
 import { Order } from './monolithOrderAndFeedback/Order.ts';
 import { Feedback } from './monolithOrderAndFeedback/Feedback.ts';
 
@@ -18,5 +22,5 @@ export const AppDataSource = new DataSource({
     useUnifiedTopology: true,
     synchronize: true,
     logging: true,
-    entities: [User, Restaurant, MenuItem, Order, Feedback],
+    entities: [User, Restaurant, MenuItem, Order, Feedback, Address],
 });

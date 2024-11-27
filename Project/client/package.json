@@ -8,10 +8,15 @@
     "build": "tsc && vite build",
     "buildProd": "tsc && vite build --mode production",
     "test": "jest",
+    "testCoverage": "jest --coverage",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/material": "^6.1.8",
+    "@mui/x-charts": "^7.22.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"

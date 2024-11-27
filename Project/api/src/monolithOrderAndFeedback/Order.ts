@@ -1,6 +1,9 @@
 import { OrderStatusEnum } from './types/orderStatusEnum.ts';
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
+import { DelivereePayment, OrderItem } from './types/order.ts';
+import { Address } from '../RestaurantService/Restaurant.ts';
+import { User } from '../loginService/User.ts';
 
 @Entity('orders')
 export class Order {
@@ -8,7 +11,7 @@ export class Order {
     _id!: ObjectId;
 
     @Column()
-    customerID!: ObjectId;
+    customerID!: ObjectId | User;
 
     @Column()
     restaurantID!: ObjectId;
@@ -16,21 +19,37 @@ export class Order {
     @Column({ nullable: true })
     employeeID?: ObjectId;
 
-    @Column({ type: 'enum', enum: OrderStatusEnum, default: OrderStatusEnum.Created })
+    @Column({
+        type: 'enum',
+        enum: OrderStatusEnum,
+        default: OrderStatusEnum.Created,
+    })
     status!: OrderStatusEnum;
 
     @Column()
-    address!: ObjectId;
+    address!: ObjectId | Address;
 
     @Column()
     totalPrice!: number;
 
-    @Column("array")
-    menuItemIDList!: ObjectId[];
+    @Column('array')
+    orderItemList!: OrderItem[];
 
     @Column({ nullable: true })
     feedbackID?: ObjectId;
 
     @Column()
     timestamp!: Date;
+
+    @Column()
+    pickUpDate?: Date;
+
+    @Column()
+    completionDate?: Date;
+
+    @Column()
+    pay?: DelivereePayment;
+
+    @Column()
+    rejectReason?: string | null;
 }

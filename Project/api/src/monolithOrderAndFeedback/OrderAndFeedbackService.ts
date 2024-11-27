@@ -1,14 +1,18 @@
 import { Order } from './Order.ts';
 import { OrderFactory } from './OrderFactory.ts';
 import { ObjectId } from 'mongodb';
-import { GetAllOrders } from './OrderAndFeedbackRepository.ts';
+import {
+    GetAllOrders,
+    GetAllAcceptedOrders,
+} from './OrderAndFeedbackRepository.ts';
+import { OrderItem } from './types/order.ts';
 
 async function createOrder(
     customerID: ObjectId,
     restaurantID: ObjectId,
     address: ObjectId,
     totalPrice: number,
-    menuItemIDList: ObjectId[],
+    orderItemList: OrderItem[],
     timestamp: Date
 ): Promise<Order | null> {
     const orderFactory: OrderFactory = new OrderFactory();
@@ -18,7 +22,7 @@ async function createOrder(
         restaurantID,
         address,
         totalPrice,
-        menuItemIDList,
+        orderItemList,
         timestamp
     );
 
@@ -29,4 +33,8 @@ async function getAllOrders(): Promise<Order[] | null> {
     return GetAllOrders();
 }
 
-export { createOrder, getAllOrders };
+async function getAllAcceptedOrders(): Promise<Order[] | null> {
+    return GetAllAcceptedOrders();
+}
+
+export { createOrder, getAllAcceptedOrders, getAllOrders };
