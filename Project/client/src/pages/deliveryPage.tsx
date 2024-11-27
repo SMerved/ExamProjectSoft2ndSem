@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Order } from '../types/orders';
-import {
-    acceptOrderAsDelivery,
-    GetAcceptedOrdersAPI,
-    GetOwnOrdersStatus,
-} from '../api/orders';
-import { Button } from '@mui/material';
+import { GetAcceptedOrdersAPI, GetOwnOrdersStatus } from '../api/orders';
 import { User } from '../types/users';
 import { useLocation } from 'react-router-dom';
 import OrderCard from '../components/orders/orderCard';
+import OrderCardDelivery from '../components/orders/orderCardDelivery';
+import SelectedOrder from '../components/orders/selectedOrder';
 
 function DeliveryPage() {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -31,17 +28,6 @@ function DeliveryPage() {
         }
     };
 
-    async function handleAcceptOrder(orderID: string, employeeID: string) {
-        try {
-            await acceptOrderAsDelivery(orderID, employeeID);
-
-            fetchOrders();
-            setSelectedOrder(null);
-        } catch (error) {
-            console.error('Failed to fetch menu items:', error);
-        }
-    }
-
     useEffect(() => {
         fetchOrders();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,73 +41,11 @@ function DeliveryPage() {
                     {orders.length > 0 ? (
                         <div>
                             {orders.map((order) => (
-                                <div
-                                    key={order._id}
-                                    style={{
-                                        border: '1px solid #ddd',
-                                        borderRadius: '8px',
-                                        padding: '8px',
-                                        marginBottom: '20px',
-                                        backgroundColor:
-                                            selectedOrder?._id === order._id
-                                                ? '#e0f7fa'
-                                                : '#f9f9f9',
-                                        boxShadow:
-                                            '0 4px 8px rgba(0, 0, 0, 0.1)',
-                                        maxWidth: '450px',
-                                        width: '100%',
-                                        fontFamily: 'Arial, sans-serif',
-                                        fontSize: '12px',
-                                        cursor: 'pointer',
-                                    }}
-                                    onClick={() => setSelectedOrder(order)}
-                                >
-                                    <div
-                                        style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: '1fr 1fr',
-                                            gap: '10px',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <div>
-                                            <strong>Order ID:</strong>
-                                            <p>{order._id}</p>
-                                        </div>
-                                        <div>
-                                            <strong>Customer ID:</strong>
-                                            <p>{order.customerID._id}</p>
-                                        </div>
-
-                                        <div>
-                                            <strong>Address:</strong>
-                                            <p>
-                                                {order.address.street},{' '}
-                                                {order.address.city},{' '}
-                                                {order.address.postalCode}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <strong>Total Price:</strong>
-                                            <p>
-                                                ${order.totalPrice.toFixed(2)}
-                                            </p>
-                                        </div>
-
-                                        <div>
-                                            <strong>Timestamp:</strong>
-                                            <p>
-                                                {new Date(
-                                                    order.timestamp
-                                                ).toLocaleString()}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <strong>Status:</strong>
-                                            <p>{order.status}</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                <OrderCardDelivery
+                                    order={order}
+                                    selectedOrderID={selectedOrder?._id}
+                                    setSelectedOrder={setSelectedOrder}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -142,67 +66,12 @@ function DeliveryPage() {
                     }}
                 >
                     {selectedOrder ? (
-                        <>
-                            <div>
-                                <h3>Order Details</h3>
-                                <p>
-                                    <strong>Customer Name:</strong>{' '}
-                                    {selectedOrder.customerID.username}
-                                </p>
-                                <p>
-                                    <strong>Contact:</strong>{' '}
-                                    {selectedOrder.customerID.phoneNumber ||
-                                        'N/A'}
-                                </p>
-                                <p>
-                                    <strong>Delivery Address:</strong>{' '}
-                                    {selectedOrder.address.street},{' '}
-                                    {selectedOrder.address.city},{' '}
-                                    {selectedOrder.address.postalCode}
-                                </p>
-                                <p>
-                                    <strong>Restaurant ID:</strong>{' '}
-                                    {selectedOrder.restaurantID}
-                                </p>
-                                <p>
-                                    <strong>Order Items:</strong>
-                                </p>
-                                <ul>
-                                    {selectedOrder.orderItemList.map(
-                                        (item, index) => (
-                                            <li key={index}>
-                                                {item.quantity}x{' '}
-                                                {item.menuItem.name} ($
-                                                {item.menuItem.price.toFixed(2)}
-                                                )
-                                            </li>
-                                        )
-                                    )}
-                                </ul>
-                                <div
-                                // style={{ textAlign: 'right' }}
-                                >
-                                    <Button
-                                        disabled={selectedOrder.status !== 2}
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: 'lightgreen',
-                                            color: 'black',
-                                            textTransform: 'none',
-                                            padding: '8px 20px',
-                                        }}
-                                        onClick={() =>
-                                            handleAcceptOrder(
-                                                selectedOrder._id,
-                                                user._id
-                                            )
-                                        }
-                                    >
-                                        Accept
-                                    </Button>{' '}
-                                </div>
-                            </div>
-                        </>
+                        <SelectedOrder
+                            selectedOrder={selectedOrder}
+                            fetchOrders={fetchOrders}
+                            userID={user._id}
+                            setSelectedOrder={setSelectedOrder}
+                        />
                     ) : (
                         <p>Select an order to view its details</p>
                     )}
@@ -216,25 +85,15 @@ function DeliveryPage() {
                 }}
             >
                 <div style={{ padding: '10px' }}>
-                    <h1 style={{ textAlign: 'center' }}>
-                        Your current orders:
-                    </h1>
+                    <h1 style={{ textAlign: 'center' }}>Your current orders:</h1>
                     {ownOrdersPickedUp.map((ownOrder) => (
-                        <OrderCard
-                            order={ownOrder}
-                            setSelectedOrder={setSelectedOrder}
-                        ></OrderCard>
+                        <OrderCard order={ownOrder} setSelectedOrder={setSelectedOrder}></OrderCard>
                     ))}
                 </div>
                 <div style={{ padding: '10px' }}>
-                    <h1 style={{ textAlign: 'center' }}>
-                        Your completed orders:
-                    </h1>
+                    <h1 style={{ textAlign: 'center' }}>Your completed orders:</h1>
                     {ownOrdersComplete.map((ownOrder) => (
-                        <OrderCard
-                            order={ownOrder}
-                            setSelectedOrder={setSelectedOrder}
-                        ></OrderCard>
+                        <OrderCard order={ownOrder} setSelectedOrder={setSelectedOrder}></OrderCard>
                     ))}
                 </div>
             </div>

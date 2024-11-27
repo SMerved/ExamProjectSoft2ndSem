@@ -16,8 +16,6 @@ const OrderCard: React.FC<Props> = ({ order, setSelectedOrder }) => {
         }
     }
 
-    console.log(order.status);
-
     return (
         <div
             key={order._id}
