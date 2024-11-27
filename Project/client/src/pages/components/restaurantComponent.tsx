@@ -1,6 +1,7 @@
 import { Restaurant } from '../../types/restaurants';
 import { MenuItem } from '../../types/restaurants';
 import { useState } from 'react';
+import ShoppingCart from "./ShoppingCart";
 
 interface RestaurantPageProps {
     restaurant: Restaurant;
@@ -58,7 +59,7 @@ function RestaurantComponent({ restaurant }: RestaurantPageProps) {
                     </tr>
                 ))}
             </table>
-
+            <ShoppingCart orderItemList={menuItems} />
             <a>
                 Proceed to payment
 
