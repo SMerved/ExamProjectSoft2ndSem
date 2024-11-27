@@ -39,6 +39,24 @@ export const GetAcceptedOrdersAPI = async (): Promise<Order[]> => {
     return response.json();
 };
 
+export const GetOwnOrdersStatus = async (
+    employeeID: string,
+    status: number
+): Promise<Order[]> => {
+    const response = await fetch(`${baseUrl}/getOwnOrders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            employeeID,
+            status,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to login');
+    }
+    return response.json();
+};
+
 export const acceptRejectOrder = async (
     id: string,
     newStatus: number,
@@ -77,6 +95,28 @@ export const submitFeedback = async (
             foodRating,
             overallRating,
             deliveryRating,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('failed to change order' + response.body);
+    }
+    return response.json();
+};
+
+export const acceptOrderAsDelivery = async (
+    orderID: string,
+    employeeID: string
+): Promise<Order> => {
+    if (!orderID || !employeeID) {
+        throw new Error('Missing value');
+    }
+
+    const response = await fetch(`${baseUrl}/acceptOrderAsDelivery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderID,
+            employeeID,
         }),
     });
     if (!response.ok) {
