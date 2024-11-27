@@ -275,6 +275,29 @@ async function acceptOrderAsDelivery(orderID: string, employeeID: string) {
     return updatedOrder;
 }
 
+async function completeOrderAsDelivery(orderID: string) {
+    const orderObjectID = new ObjectId(orderID);
+    const order = await orderRepository.findOne({
+        where: { _id: orderObjectID },
+    });
+
+    if (!order) {
+        throw new Error(`Order with ID ${orderID} not found`);
+    }
+
+    if (order?.status !== 3)
+        throw new Error('Order is not ready to be completed');
+
+    const orderTemp: Order = {
+        ...order,
+        status: 4,
+    };
+
+    const updatedOrder = await orderRepository.save(orderTemp);
+
+    return updatedOrder;
+}
+
 export {
     AddOrder,
     GetAllAcceptedOrders,
@@ -286,4 +309,5 @@ export {
     acceptRejectOrder,
     acceptOrderAsDelivery,
     GetOwnOrders,
+    completeOrderAsDelivery,
 };
