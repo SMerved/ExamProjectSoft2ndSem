@@ -6,6 +6,7 @@ import { Feedback } from './Feedback.ts';
 import { Order } from './Order.ts';
 import { FeedbackData } from './types/feedback.ts';
 import { OrderData } from './types/order.ts';
+import { calculateDeliveryPay } from '../utilities/order.ts';
 
 const orderRepository = AppDataSource.getMongoRepository(Order);
 const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
@@ -40,9 +41,7 @@ async function getCustomer(object: Order) {
 }
 
 async function getMenuItems(orders: Order[]) {
-    const menuItemIds = orders.flatMap((order) =>
-        order.orderItemList.map((item) => item.menuItemId)
-    );
+    const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemId));
 
     const menuItems = await menuItemRepository.find({
         where: {
@@ -50,9 +49,7 @@ async function getMenuItems(orders: Order[]) {
         },
     });
 
-    const menuItemMap = new Map(
-        menuItems.map((item) => [item._id.toHexString(), item])
-    );
+    const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
 
     for (const order of orders) {
         order.orderItemList = order.orderItemList.map((item) => ({
@@ -64,17 +61,11 @@ async function getMenuItems(orders: Order[]) {
     return orders;
 }
 
-async function acceptRejectOrder(
-    orderId: string,
-    newStatus: number,
-    rejectReason: string
-) {
+async function acceptRejectOrder(orderId: string, newStatus: number, rejectReason: string) {
     if (newStatus < 0 || newStatus > 4) {
         throw new Error('Status must be between inclusive 0 and 4, inclusive');
     } else if (newStatus !== 1 && rejectReason) {
-        throw new Error(
-            'There can only be a reason for rejecting, if status is set to 1, aka reject'
-        );
+        throw new Error('There can only be a reason for rejecting, if status is set to 1, aka reject');
     }
 
     const orderObjectId = new ObjectId(orderId);
@@ -168,10 +159,7 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
         return null;
     }
 }
-async function GetOwnOrders(
-    employeeID: string,
-    status: number
-): Promise<Order[] | null> {
+async function GetOwnOrders(employeeID: string, status: number): Promise<Order[] | null> {
     try {
         const employeeIDObjectID = new ObjectId(employeeID);
 
@@ -210,45 +198,38 @@ async function GetOwnOrders(
     }
 }
 
-async function createFeedbackAndLinkOrder({
-    foodRating,
-    overallRating,
-    deliveryRating,
-    orderId,
-}: FeedbackData) {
-    return await AppDataSource.manager.transaction(
-        async (transactionalEntityManager) => {
-            const orderIdOjectID = new ObjectId(orderId);
+async function createFeedbackAndLinkOrder({ foodRating, overallRating, deliveryRating, orderId }: FeedbackData) {
+    return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
+        const orderIdOjectID = new ObjectId(orderId);
 
-            const order = await transactionalEntityManager.findOne(Order, {
-                where: { _id: orderIdOjectID },
-            });
+        const order = await transactionalEntityManager.findOne(Order, {
+            where: { _id: orderIdOjectID },
+        });
 
-            if (!order) {
-                throw new Error(`Order with id ${orderId} not found`);
-            }
-
-            const feedback = transactionalEntityManager.create(Feedback, {
-                foodRating,
-                overallRating,
-                deliveryRating,
-            });
-
-            await transactionalEntityManager.save(feedback);
-
-            const updateResult = await transactionalEntityManager.update(
-                Order,
-                { _id: orderIdOjectID },
-                { feedbackID: feedback._id }
-            );
-
-            if (updateResult.affected === 0) {
-                throw new Error('Failed to update order with feedback ID');
-            }
-
-            return feedback;
+        if (!order) {
+            throw new Error(`Order with id ${orderId} not found`);
         }
-    );
+
+        const feedback = transactionalEntityManager.create(Feedback, {
+            foodRating,
+            overallRating,
+            deliveryRating,
+        });
+
+        await transactionalEntityManager.save(feedback);
+
+        const updateResult = await transactionalEntityManager.update(
+            Order,
+            { _id: orderIdOjectID },
+            { feedbackID: feedback._id }
+        );
+
+        if (updateResult.affected === 0) {
+            throw new Error('Failed to update order with feedback ID');
+        }
+
+        return feedback;
+    });
 }
 
 async function acceptOrderAsDelivery(orderID: string, employeeID: string) {
@@ -286,8 +267,7 @@ async function completeOrderAsDelivery(orderID: string) {
         throw new Error(`Order with ID ${orderID} not found`);
     }
 
-    if (order?.status !== 3)
-        throw new Error('Order is not ready to be completed');
+    if (order?.status !== 3) throw new Error('Order is not ready to be completed');
 
     const orderTemp: Order = {
         ...order,
@@ -320,19 +300,11 @@ async function getRatingAVG(orderID: ObjectId) {
         // throw new Error(`Feedback with ID ${order.feedbackID} not found`);
         return null;
 
-    if (
-        !feedback?.deliveryRating ||
-        !feedback?.foodRating ||
-        !feedback?.overallRating
-    )
+    if (!feedback?.deliveryRating || !feedback?.foodRating || !feedback?.overallRating)
         // throw new Error('Feedback ratings are imcomplete for feedback #' + feedback?._id);
         return null;
 
-    const avgRating =
-        (feedback?.deliveryRating +
-            feedback?.foodRating +
-            feedback?.overallRating) /
-        3;
+    const avgRating = (feedback?.deliveryRating + feedback?.foodRating + feedback?.overallRating) / 3;
 
     return avgRating;
 }
@@ -349,6 +321,8 @@ async function calculateAndUpdateOrderPay(orderID: string) {
         },
     });
 
+    const totalOrdersAmount = allOrders.length;
+
     // const totalOrders = await orderRepository.count({
     //     where: {
     //         employeeID: order?.employeeID,
@@ -360,26 +334,31 @@ async function calculateAndUpdateOrderPay(orderID: string) {
         throw new Error(`Order with ID ${orderID} not found`);
     }
 
-    let payAmount = 5; // Base pay
+    const pay = {
+        baseAmount: 0,
+        totalOrderQuantityMultiplier: 0,
+        deliverySpeedMultiplier: 0,
+        feedbackRatingMultiplier: 0,
+        orderPriceBonus: 0,
+        nightTimeBonus: 0,
+        totalPay: 0,
+    };
 
-    payAmount += order.totalPrice / 100; // Bonus depending on order price
+    order.pay = pay;
 
-    const multiplicationFactor =
-        allOrders.length / 1000 > 0.2 ? 0.2 : allOrders.length / 1000;
-    payAmount *= 1 + multiplicationFactor; // Bonus for total amount of orders done. Bonus slowly increases and maxes out at 25% bonus
+    pay.baseAmount = 5; // Base pay
 
-    if (
-        new Date(order.timestamp).getHours() >= 22 ||
-        new Date(order.timestamp).getHours() < 5
-    ) {
-        payAmount += payAmount + 2.5; // Night bonus added if order is created between 10 pm and 5 am
+    pay.orderPriceBonus = order.totalPrice / 100; // Bonus depending on order price
+
+    const multiplicationFactor = totalOrdersAmount / 1000 > 0.2 ? 0.2 : totalOrdersAmount / 1000;
+    pay.totalOrderQuantityMultiplier = 1 + multiplicationFactor; // Bonus for total amount of orders done. Bonus slowly increases and maxes out at 25% bonus
+
+    if (new Date(order.timestamp).getHours() >= 22 || new Date(order.timestamp).getHours() < 5) {
+        pay.nightTimeBonus = 2.5; // Night bonus added if order is created between 10 pm and 5 am
     }
 
     if (order.pickUpDate && order.completionDate) {
-        const deliveryTimeInMinutes =
-            (Number(order.pickUpDate) - Number(order.completionDate)) /
-            1000 /
-            60;
+        const deliveryTimeInMinutes = (Number(order.pickUpDate) - Number(order.completionDate)) / 1000 / 60;
         let multiplier = 1;
 
         if (deliveryTimeInMinutes <= 30) {
@@ -389,15 +368,23 @@ async function calculateAndUpdateOrderPay(orderID: string) {
         } else if (deliveryTimeInMinutes <= 60) {
             multiplier = 1.05; // 5% bonus for slower delivery
         }
-        payAmount *= multiplier; // Bonuns for delivery time
+        pay.deliverySpeedMultiplier = multiplier; // Bonuns for delivery time
     }
 
     const avgRating = await getRatingAVG(order._id);
-    if (avgRating) payAmount *= 1 + avgRating / 100; // Bonus for rating
+    if (avgRating) pay.feedbackRatingMultiplier *= 1 + avgRating / 100; // Bonus for rating
 
     const orderTemp: Order = {
         ...order,
-        pay: Number(payAmount.toFixed(2)),
+        pay: {
+            baseAmount: pay.baseAmount,
+            totalOrderQuantityMultiplier: pay.totalOrderQuantityMultiplier,
+            deliverySpeedMultiplier: pay.deliverySpeedMultiplier,
+            feedbackRatingMultiplier: pay.feedbackRatingMultiplier,
+            orderPriceBonus: pay.orderPriceBonus,
+            nightTimeBonus: pay.nightTimeBonus,
+            totalPay: calculateDeliveryPay(order.pay),
+        },
     };
 
     const updatedOrder = await orderRepository.save(orderTemp);
@@ -407,15 +394,15 @@ async function calculateAndUpdateOrderPay(orderID: string) {
 
 export {
     AddOrder,
-    GetAllAcceptedOrders,
+    GetAllAcceptedOrders, // Delivery
     createFeedbackAndLinkOrder,
     feedbackRepository,
     orderRepository,
     GetAllOrders,
     GetAllOrdersById,
     acceptRejectOrder,
-    acceptOrderAsDelivery,
-    GetOwnOrders,
-    completeOrderAsDelivery,
-    calculateAndUpdateOrderPay,
+    acceptOrderAsDelivery, // Delivery
+    GetOwnOrders, // Delivery
+    completeOrderAsDelivery, // Delivery
+    calculateAndUpdateOrderPay, // Delivery
 };

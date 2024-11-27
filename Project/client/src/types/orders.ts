@@ -11,7 +11,7 @@ export interface Order {
     pickUpDate?: string;
     completionDate?: string;
     rejectReason?: string;
-    pay?: number;
+    pay?: DelivereePayment;
 }
 
 export interface Address {
@@ -46,4 +46,15 @@ export interface FeedbackCollection {
     foodRating: number | null;
     overallRating: number | null;
     deliveryRating: number | null;
+}
+
+export interface DelivereePayment {
+    // Multipliers shall ALWAYS be above 1. The mutiplied  is supposed to be multiplied with the amount, not added to. So 100 (price) * 1.2 (multiplier) = 120 (total)
+    baseAmount: number;
+    totalOrderQuantityMultiplier: number | null;
+    deliverySpeedMultiplier: number | null;
+    feedbackRatingMultiplier: number | null;
+    orderPriceBonus: number;
+    nightTimeBonus: number;
+    totalPay: number;
 }

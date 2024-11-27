@@ -101,7 +101,7 @@ const OrderCard: React.FC<Props> = ({ order, setSelectedOrder, children }) => {
                     }}
                 >
                     <strong>Payout:</strong>
-                    <span>${order.pay}</span>
+                    <span>${order.pay.totalPay}</span>
                 </div>
             )}
 

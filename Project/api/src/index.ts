@@ -1,11 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
-import {
-    createOrder,
-    getAllAcceptedOrders,
-    getAllOrders,
-} from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+import { createOrder, getAllAcceptedOrders, getAllOrders } from './monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import {
     acceptOrderAsDelivery,
     acceptRejectOrder,
@@ -65,23 +61,9 @@ app.get('/restaurants', async (req: Request, res: Response) => {
 
 app.post('/createOrder', async (req: Request, res: Response) => {
     try {
-        const {
-            userID,
-            restaurantID,
-            menuItems,
-            address,
-            totalPrice,
-            timestamp,
-        } = req.body;
+        const { userID, restaurantID, menuItems, address, totalPrice, timestamp } = req.body;
 
-        const order = await createOrder(
-            userID,
-            restaurantID,
-            menuItems,
-            address,
-            totalPrice,
-            timestamp
-        );
+        const order = await createOrder(userID, restaurantID, menuItems, address, totalPrice, timestamp);
 
         if (!order) {
             res.status(401).json({ error: 'Invalid order data' });
@@ -232,14 +214,14 @@ app.post('/completeOrderAsDelivery', async (req: Request, res: Response) => {
 
         const order1 = await completeOrderAsDelivery(orderID);
 
-        const order2 = await calculateAndUpdateOrderPay(orderID);
+        await calculateAndUpdateOrderPay(orderID);
 
-        if (order1) {
+        if (!order1) {
             res.status(401).json({ error: 'Invalid order data' });
             return;
         }
 
-        res.json(order2);
+        res.json(order1);
     } catch (error) {
         console.error('Error accepting order: ', error);
         res.status(500).json({ error: 'Error accepting order' + error });
