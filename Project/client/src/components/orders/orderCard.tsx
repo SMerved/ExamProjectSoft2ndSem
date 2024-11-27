@@ -5,10 +5,12 @@ import { getColorFromStatus } from '../../utilities/utilities';
 
 interface Props {
     order: Order;
-    setSelectedOrder: (order: Order | null) => void;
+    setSelectedOrder?: (order: Order | null) => void;
+    children?: React.ReactNode;
 }
-const OrderCard: React.FC<Props> = ({ order, setSelectedOrder }) => {
+const OrderCard: React.FC<Props> = ({ order, setSelectedOrder, children }) => {
     async function handleOrderClick(order: Order) {
+        if (!setSelectedOrder) return;
         try {
             setSelectedOrder(order);
         } catch (error) {
@@ -100,6 +102,7 @@ const OrderCard: React.FC<Props> = ({ order, setSelectedOrder }) => {
                 <strong>Created:</strong>
                 <span>{new Date(order.timestamp).toLocaleString()}</span>
             </div>
+            {children && <div style={{ textAlign: 'right' }}>{children}</div>}
         </div>
     );
 };

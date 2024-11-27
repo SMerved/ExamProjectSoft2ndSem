@@ -14,9 +14,7 @@ export const GetOrdersAPI = async (): Promise<Order[]> => {
     return response.json();
 };
 
-export const GetOrdersAPIByRestaurantID = async (
-    restaurantID: string
-): Promise<Order[]> => {
+export const GetOrdersAPIByRestaurantID = async (restaurantID: string): Promise<Order[]> => {
     const response = await fetch(`${baseUrl}/ordersById`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -39,10 +37,7 @@ export const GetAcceptedOrdersAPI = async (): Promise<Order[]> => {
     return response.json();
 };
 
-export const GetOwnOrdersStatus = async (
-    employeeID: string,
-    status: number
-): Promise<Order[]> => {
+export const GetOwnOrdersStatus = async (employeeID: string, status: number): Promise<Order[]> => {
     const response = await fetch(`${baseUrl}/getOwnOrders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,11 +52,7 @@ export const GetOwnOrdersStatus = async (
     return response.json();
 };
 
-export const acceptRejectOrder = async (
-    id: string,
-    newStatus: number,
-    rejectReason?: string
-): Promise<Order> => {
+export const acceptRejectOrder = async (id: string, newStatus: number, rejectReason?: string): Promise<Order> => {
     const response = await fetch(`${baseUrl}/acceptRejectOrder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -103,10 +94,7 @@ export const submitFeedback = async (
     return response.json();
 };
 
-export const acceptOrderAsDelivery = async (
-    orderID: string,
-    employeeID: string
-): Promise<Order> => {
+export const acceptOrderAsDelivery = async (orderID: string, employeeID: string): Promise<Order> => {
     if (!orderID || !employeeID) {
         throw new Error('Missing value');
     }
@@ -117,6 +105,24 @@ export const acceptOrderAsDelivery = async (
         body: JSON.stringify({
             orderID,
             employeeID,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('failed to change order' + response.body);
+    }
+    return response.json();
+};
+
+export const completeOrderAsDelivery = async (orderID: string): Promise<Order> => {
+    if (!orderID) {
+        throw new Error('Missing value');
+    }
+
+    const response = await fetch(`${baseUrl}/completeOrderAsDelivery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderID,
         }),
     });
     if (!response.ok) {

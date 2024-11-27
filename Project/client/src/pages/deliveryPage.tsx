@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Order } from '../types/orders';
-import { GetAcceptedOrdersAPI, GetOwnOrdersStatus } from '../api/orders';
+import { completeOrderAsDelivery, GetAcceptedOrdersAPI, GetOwnOrdersStatus } from '../api/orders';
 import { User } from '../types/users';
 import { useLocation } from 'react-router-dom';
 import OrderCard from '../components/orders/orderCard';
@@ -27,6 +27,17 @@ function DeliveryPage() {
             console.error('Error fetching Orders:', error);
         }
     };
+
+    async function handleCompleteOrder(orderID: string) {
+        try {
+            await completeOrderAsDelivery(orderID);
+
+            fetchOrders();
+            setSelectedOrder(null);
+        } catch (error) {
+            console.error('Failed to fetch menu items:', error);
+        }
+    }
 
     useEffect(() => {
         fetchOrders();
@@ -87,7 +98,9 @@ function DeliveryPage() {
                 <div style={{ padding: '10px' }}>
                     <h1 style={{ textAlign: 'center' }}>Your current orders:</h1>
                     {ownOrdersPickedUp.map((ownOrder) => (
-                        <OrderCard order={ownOrder} setSelectedOrder={setSelectedOrder}></OrderCard>
+                        <OrderCard order={ownOrder}>
+                            <button onClick={() => handleCompleteOrder(ownOrder._id)}>Complete</button>
+                        </OrderCard>
                     ))}
                 </div>
                 <div style={{ padding: '10px' }}>
