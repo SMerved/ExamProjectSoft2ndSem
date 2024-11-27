@@ -63,7 +63,7 @@ async function getMenuItems(orders: Order[]) {
 
 async function acceptRejectOrder(orderId: string, newStatus: number, rejectReason: string) {
     if (newStatus < 0 || newStatus > 4) {
-        throw new Error('Status must be between inclusive 0 and 4, inclusive');
+        throw new Error('Status must be between between 0 and 4, inclusive');
     } else if (newStatus !== 1 && rejectReason) {
         throw new Error('There can only be a reason for rejecting, if status is set to 1, aka reject');
     }
@@ -120,14 +120,9 @@ async function GetAllOrdersById(restaurantID: string): Promise<Order[] | null> {
 }
 
 async function GetAllOrders(): Promise<Order[] | null> {
-    try {
-        const orders = await orderRepository.find();
+    const orders = await orderRepository.find();
 
-        return orders;
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-        return null;
-    }
+    return orders;
 }
 
 async function GetAllAcceptedOrders(): Promise<Order[] | null> {
