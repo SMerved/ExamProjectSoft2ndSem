@@ -170,6 +170,47 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
         return null;
     }
 }
+async function GetOwnOrders(
+    employeeID: string,
+    status: number
+): Promise<Order[] | null> {
+    try {
+        const employeeIDObjectID = new ObjectId(employeeID);
+
+        const orders = await orderRepository.find({
+            where: {
+                employeeID: employeeIDObjectID,
+                status: status,
+            },
+        });
+
+        if (!orders) {
+            throw new Error(`Orders with employee ID ${employeeID} not found`);
+        }
+
+        const ownOrderList: Order[] = [];
+
+        const ordersWithMenuItems = await getMenuItems(orders);
+
+        for (const ownOrder of ordersWithMenuItems) {
+            const address = await getAddress(ownOrder);
+            const customer = await getCustomer(ownOrder);
+
+            const ownOrderTemp = {
+                ...ownOrder,
+                address: address || ownOrder.address,
+                customerID: customer || ownOrder.customerID,
+            };
+
+            ownOrderList.push(ownOrderTemp);
+        }
+
+        return ownOrderList;
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        return null;
+    }
+}
 
 async function createFeedbackAndLinkOrder({
     foodRating,
@@ -246,4 +287,5 @@ export {
     GetAllOrdersById,
     acceptRejectOrder,
     acceptOrderAsDelivery,
+    GetOwnOrders,
 };

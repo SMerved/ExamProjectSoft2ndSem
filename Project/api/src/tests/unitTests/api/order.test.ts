@@ -158,7 +158,6 @@ describe('Post /create', () => {
             .post('/acceptRejectOrder')
             .send(payload);
 
-        console.log(response.status);
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockOrderReject);
     });

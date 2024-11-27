@@ -11,6 +11,7 @@ import {
     acceptRejectOrder,
     createFeedbackAndLinkOrder,
     GetAllOrdersById,
+    GetOwnOrders,
 } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { messagingRoutes } from './messagingService/messaging.ts';
 import { loginRouter } from './loginService/loginRoutes.ts';
@@ -219,6 +220,24 @@ app.post('/acceptOrderAsDelivery', async (req: Request, res: Response) => {
     } catch (error) {
         console.error('Error accepting order: ', error);
         res.status(500).json({ error: 'Error accepting order' + error });
+    }
+});
+
+app.post('/getOwnOrders', async (req: Request, res: Response) => {
+    try {
+        const { employeeID, status } = req.body;
+
+        const orders = await GetOwnOrders(employeeID, status);
+
+        if (!orders) {
+            res.status(401).json({ error: 'Invalid orders data' });
+            return;
+        }
+
+        res.json(orders);
+    } catch (error) {
+        console.error('Error accepting orders: ', error);
+        res.status(500).json({ error: 'Error accepting orders' + error });
     }
 });
 

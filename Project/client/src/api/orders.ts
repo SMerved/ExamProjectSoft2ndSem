@@ -39,6 +39,24 @@ export const GetAcceptedOrdersAPI = async (): Promise<Order[]> => {
     return response.json();
 };
 
+export const GetOwnOrdersStatus = async (
+    employeeID: string,
+    status: number
+): Promise<Order[]> => {
+    const response = await fetch(`${baseUrl}/getOwnOrders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            employeeID,
+            status,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to login');
+    }
+    return response.json();
+};
+
 export const acceptRejectOrder = async (
     id: string,
     newStatus: number,
