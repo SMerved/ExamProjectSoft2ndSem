@@ -2,6 +2,8 @@ import { VITE_BASE_URL } from '../constants';
 import { Order } from '../types/orders';
 import { OrderItem } from '../types/orders';
 import { MenuItem } from '../types/orders';
+import { Address} from "../types/address";
+
 const baseUrl = VITE_BASE_URL;
 
 export const GetOrdersAPI = async (): Promise<Order[]> => {
@@ -72,7 +74,7 @@ export const createOrder = async (
     userID: string,
     restaurantID: string,
     menuItems: { menuItem: MenuItem; quantity: number }[] | OrderItem[],
-    address: string,
+    address: Address | string,
     totalPrice: number,
 ): Promise<Order> => {
     const timestamp = new Date().toISOString();

@@ -1,3 +1,4 @@
+import { Address } from './address';
 export interface Order {
     _id: string;
     customerID: Customer;
@@ -14,12 +15,6 @@ export interface Order {
     pay?: DelivereePayment;
 }
 
-export interface Address {
-    _id: string;
-    street: string;
-    city: string;
-    postalCode: number;
-}
 
 export interface Customer {
     _id: string;

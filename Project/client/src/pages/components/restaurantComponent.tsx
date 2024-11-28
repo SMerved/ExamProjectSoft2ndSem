@@ -20,9 +20,9 @@ function RestaurantComponent({ restaurant , user}: RestaurantPageProps) {
 
     const handleProceedToPayment = async () => {
         try {
-            const address = user.address; // Assuming user has an address property
+
             const totalPrice = menuItems.reduce((total, item) => total + item.menuItem.price * item.quantity, 0);
-            const order = await createOrder(user._id, restaurant._id, menuItems, address, totalPrice);
+            const order = await createOrder(user._id, restaurant._id, menuItems, user.address, totalPrice);
             console.log('Order created:', order);
         } catch (error) {
             console.error('Error creating order:', error);
