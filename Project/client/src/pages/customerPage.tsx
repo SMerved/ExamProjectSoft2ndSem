@@ -107,7 +107,7 @@ function CustomerPage() {
 
 
             {restaurant && (
-                <RestaurantComponent restaurant={restaurant} />)
+                <RestaurantComponent restaurant={restaurant} user = {user} />)
             }
             <FeedbackForm order={order}></FeedbackForm>
 
