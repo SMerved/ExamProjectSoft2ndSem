@@ -45,6 +45,7 @@ describe('Total orders per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -68,6 +69,7 @@ describe('Total orders per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -91,6 +93,7 @@ describe('Total orders per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '2',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -116,6 +119,7 @@ describe('Total orders per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -139,6 +143,7 @@ describe('Total orders per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -171,7 +176,6 @@ describe('Total orders per restaurant to data series', () => {
             }];
 
         const result = orderCountToLineChartSeries(ordersSingleRestaurant);
-        console.log(result);
         expect(result).toEqual(expectedResult);
     });
 
@@ -179,7 +183,6 @@ describe('Total orders per restaurant to data series', () => {
         const expectedResult = [];
 
         const result = orderCountToLineChartSeries([]);
-        console.log(result);
         expect(result).toEqual(expectedResult);
     });
 });
@@ -221,6 +224,7 @@ describe('Total orders income per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -244,6 +248,7 @@ describe('Total orders income per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -267,6 +272,7 @@ describe('Total orders income per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '2',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -292,6 +298,7 @@ describe('Total orders income per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -315,6 +322,7 @@ describe('Total orders income per restaurant to data series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -353,7 +361,6 @@ describe('Total orders income per restaurant to data series', () => {
             }];
 
         const result = orderIncomeToLineChartSeries(ordersSingleRestaurant);
-        console.log(result);
         expect(result).toEqual(expectedResult);
     });
 
@@ -361,7 +368,6 @@ describe('Total orders income per restaurant to data series', () => {
         const expectedResult = [];
 
         const result = orderIncomeToLineChartSeries([]);
-        console.log(result);
         expect(result).toEqual(expectedResult);
     });
 });
@@ -403,6 +409,7 @@ describe('PieChart series to LineChart series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -426,6 +433,7 @@ describe('PieChart series to LineChart series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
@@ -449,6 +457,7 @@ describe('PieChart series to LineChart series', () => {
                 phoneNumber: undefined,
             },
             restaurantID: '1',
+            employeeID: '111',
             status: 0,
             address: {
                 _id: '',
