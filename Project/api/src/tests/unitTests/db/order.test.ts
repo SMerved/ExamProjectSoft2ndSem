@@ -1,11 +1,10 @@
 import { AppDataSource } from '../../../ormconfig.ts';
 import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
+import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { ObjectId } from 'mongodb';
-import {
-    getAllOrdersMockOrder1,
-    getAllOrdersMockOrder2,
-} from '../../mocks/orderMocksDB.ts';
+import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../mocks/orderMocksDB.ts';
 import { Order } from '../../../monolithOrderAndFeedback/Order.ts';
+import { Feedback } from '../../../monolithOrderAndFeedback/Feedback.ts';
 
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     beforeAll(async () => {
@@ -14,22 +13,10 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
 
     beforeEach(async () => {
         // Declare the variables once
-        let customerID,
-            restaurantID,
-            address,
-            totalPrice,
-            orderItemList,
-            timestamp;
+        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
 
         // Assign values from getAllOrdersMockOrder1
-        ({
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp,
-        } = getAllOrdersMockOrder1);
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
 
         await orderAndFeedbackService.createOrder(
             customerID,
@@ -41,14 +28,7 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         );
 
         // Assign values from getAllOrdersMockOrder2
-        ({
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp,
-        } = getAllOrdersMockOrder2);
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
 
         await orderAndFeedbackService.createOrder(
             customerID,
@@ -105,9 +85,7 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         );
 
         if (!order) {
-            throw new Error(
-                'Order creation failed, cannot proceed with feedback creation'
-            );
+            throw new Error('Order creation failed, cannot proceed with feedback creation');
         }
 
         const orderData = {
@@ -168,6 +146,683 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
                     timestamp: getAllOrdersMockOrder2.timestamp,
                 }),
             ])
+        );
+    });
+});
+
+describe('Retrieve orders functions', () => {
+    beforeAll(async () => {
+        await AppDataSource.initialize();
+    });
+
+    let dummyOrder2: Order | null;
+    let dummyOrder1: Order | null;
+
+    beforeEach(async () => {
+        // Declare the variables once
+        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        // Assign values from getAllOrdersMockOrder1
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
+
+        dummyOrder1 = await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+
+        dummyOrder1 = {
+            ...(dummyOrder1 as Order),
+            status: 2,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+        };
+
+        // Assign values from getAllOrdersMockOrder2
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
+
+        dummyOrder2 = await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+
+        dummyOrder2 = {
+            ...(dummyOrder2 as Order),
+            status: 2,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+        };
+
+        await orderRepository.save(dummyOrder1);
+        await orderRepository.save(dummyOrder2);
+    });
+
+    afterEach(async () => {
+        const repository = AppDataSource.getRepository(Order);
+        await repository.delete({}); //Deletes all documents in the collection
+    });
+
+    afterAll(async () => {
+        await AppDataSource.destroy();
+    });
+
+    it('should get all accepted orders', async () => {
+        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
+
+        const orders = await orderAndFeedbackRepository.GetAllAcceptedOrders();
+
+        expect(orders).not.toBeNull();
+
+        expect(orders).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    _id: expect.any(Object), // If the ID is autogenerated
+                    customerID: dummyOrder1.customerID,
+                    restaurantID: dummyOrder1.restaurantID,
+                    address: dummyOrder1.address,
+                    totalPrice: dummyOrder1.totalPrice,
+                    orderItemList: dummyOrder1.orderItemList,
+                    timestamp: dummyOrder1.timestamp,
+                }),
+                expect.objectContaining({
+                    _id: expect.any(Object),
+                    customerID: dummyOrder2.customerID,
+                    restaurantID: dummyOrder2.restaurantID,
+                    address: dummyOrder2.address,
+                    totalPrice: dummyOrder2.totalPrice,
+                    orderItemList: dummyOrder2.orderItemList,
+                    timestamp: dummyOrder2.timestamp,
+                }),
+            ])
+        );
+    });
+
+    it('should get all own orders', async () => {
+        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+
+        const orders = await orderAndFeedbackRepository.GetOwnOrders(dummyOrder1.employeeID?.toString(), 2);
+
+        expect(orders).not.toBeNull();
+
+        expect(orders).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    _id: expect.any(Object), // If the ID is autogenerated
+                    customerID: dummyOrder1.customerID,
+                    restaurantID: dummyOrder1.restaurantID,
+                    address: dummyOrder1.address,
+                    totalPrice: dummyOrder1.totalPrice,
+                    orderItemList: dummyOrder1.orderItemList,
+                    timestamp: dummyOrder1.timestamp,
+                }),
+                expect.objectContaining({
+                    _id: expect.any(Object),
+                    customerID: dummyOrder2.customerID,
+                    restaurantID: dummyOrder2.restaurantID,
+                    address: dummyOrder2.address,
+                    totalPrice: dummyOrder2.totalPrice,
+                    orderItemList: dummyOrder2.orderItemList,
+                    timestamp: dummyOrder2.timestamp,
+                }),
+            ])
+        );
+    });
+
+    it('should fail to get all own orders because of wrong ID', async () => {
+        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+
+        await expect(orderAndFeedbackRepository.GetOwnOrders('wrongID', 2)).rejects.toThrow('Error retrieving orders');
+    });
+
+    it('should get all orders basesd on restaurant id', async () => {
+        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+
+        const orders = await orderAndFeedbackRepository.GetAllOrdersById('672de88ff54107237ff75565');
+
+        expect(orders).not.toBeNull();
+
+        expect(orders).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    _id: expect.any(Object), // If the ID is autogenerated
+                    customerID: dummyOrder1.customerID,
+                    restaurantID: dummyOrder1.restaurantID,
+                    address: dummyOrder1.address,
+                    totalPrice: dummyOrder1.totalPrice,
+                    orderItemList: dummyOrder1.orderItemList,
+                    timestamp: dummyOrder1.timestamp,
+                }),
+                expect.objectContaining({
+                    _id: expect.any(Object),
+                    customerID: dummyOrder2.customerID,
+                    restaurantID: dummyOrder2.restaurantID,
+                    address: dummyOrder2.address,
+                    totalPrice: dummyOrder2.totalPrice,
+                    orderItemList: dummyOrder2.orderItemList,
+                    timestamp: dummyOrder2.timestamp,
+                }),
+            ])
+        );
+    });
+
+    it('should fail to get orders by restaurant id', async () => {
+        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+
+        const orders = await orderAndFeedbackRepository.GetAllOrdersById('wrongID');
+
+        expect(orders).toBeNull();
+    });
+});
+
+describe('Accept and reject order as restuarant', () => {
+    beforeAll(async () => {
+        await AppDataSource.initialize();
+    });
+
+    let dummyOrder: Order | null;
+
+    beforeEach(async () => {
+        // Declare the variables once
+        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
+
+        // Assign values from getAllOrdersMockOrder1
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
+
+        dummyOrder = await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+
+        // Assign values from getAllOrdersMockOrder2
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
+
+        await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+    });
+
+    afterEach(async () => {
+        const repository = AppDataSource.getRepository(Order);
+        await repository.delete({}); //Deletes all documents in the collection
+    });
+
+    afterAll(async () => {
+        await AppDataSource.destroy();
+    });
+
+    it('should accept order as restaurant', async () => {
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        const acceptedOrder = await orderAndFeedbackRepository.acceptRejectOrder(
+            dummyOrder?._id.toString(),
+            1,
+            'Han har bestilt bearnaise pizza, ewww :vomit:'
+        );
+
+        expect(acceptedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(acceptedOrder).toEqual(
+            expect.objectContaining({
+                _id: expect.any(Object), // If the ID is autogenerated
+                customerID: getAllOrdersMockOrder1.customerID,
+                restaurantID: getAllOrdersMockOrder1.restaurantID,
+                address: getAllOrdersMockOrder1.address,
+                totalPrice: getAllOrdersMockOrder1.totalPrice,
+                orderItemList: getAllOrdersMockOrder1.orderItemList,
+                timestamp: getAllOrdersMockOrder1.timestamp,
+                status: 1,
+                rejectReason: 'Han har bestilt bearnaise pizza, ewww :vomit:',
+            })
+        );
+    });
+
+    it('should reject order', async () => {
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        const acceptedOrder = await orderAndFeedbackRepository.acceptRejectOrder(dummyOrder?._id.toString(), 2, '');
+
+        expect(acceptedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(acceptedOrder).toEqual(
+            expect.objectContaining({
+                _id: expect.any(Object), // If the ID is autogenerated
+                customerID: getAllOrdersMockOrder1.customerID,
+                restaurantID: getAllOrdersMockOrder1.restaurantID,
+                address: getAllOrdersMockOrder1.address,
+                totalPrice: getAllOrdersMockOrder1.totalPrice,
+                orderItemList: getAllOrdersMockOrder1.orderItemList,
+                timestamp: getAllOrdersMockOrder1.timestamp,
+                status: 2,
+            })
+        );
+    });
+});
+
+describe('accept/complete order as delivery driver', () => {
+    beforeAll(async () => {
+        await AppDataSource.initialize();
+    });
+
+    let dummyOrder: Order | null;
+
+    beforeEach(async () => {
+        // Declare the variables once
+        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
+
+        // Assign values from getAllOrdersMockOrder1
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
+
+        dummyOrder = await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+
+        // Assign values from getAllOrdersMockOrder2
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
+
+        await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+    });
+
+    afterEach(async () => {
+        const repository = AppDataSource.getRepository(Order);
+        await repository.delete({}); //Deletes all documents in the collection
+    });
+
+    afterAll(async () => {
+        await AppDataSource.destroy();
+    });
+
+    it('should accept order as delivery', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 2,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+        };
+
+        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+
+        await orderRepository.save(dummyOrder);
+
+        const acceptedOrder = await orderAndFeedbackRepository.acceptOrderAsDelivery(
+            dummyOrder?._id.toString(),
+            dummyOrder.employeeID.toString()
+        );
+
+        expect(acceptedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(acceptedOrder).toEqual(
+            expect.objectContaining({
+                _id: expect.any(Object), // If the ID is autogenerated
+                customerID: dummyOrder.customerID,
+                restaurantID: dummyOrder.restaurantID,
+                address: dummyOrder.address,
+                totalPrice: dummyOrder.totalPrice,
+                orderItemList: dummyOrder.orderItemList,
+                timestamp: dummyOrder.timestamp,
+                employeeID: dummyOrder.employeeID,
+                status: 3,
+            })
+        );
+    });
+
+    it('complete order as delivery', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 3,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+        };
+
+        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+
+        await orderRepository.save(dummyOrder);
+
+        const acceptedOrder = await orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString());
+
+        expect(acceptedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(acceptedOrder).toEqual(
+            expect.objectContaining({
+                _id: expect.any(Object), // If the ID is autogenerated
+                customerID: dummyOrder.customerID,
+                restaurantID: dummyOrder.restaurantID,
+                address: dummyOrder.address,
+                totalPrice: dummyOrder.totalPrice,
+                orderItemList: dummyOrder.orderItemList,
+                timestamp: dummyOrder.timestamp,
+                employeeID: dummyOrder.employeeID,
+                status: 4,
+            })
+        );
+    });
+});
+describe('calculate and complete order', () => {
+    beforeAll(async () => {
+        await AppDataSource.initialize();
+    });
+
+    let dummyOrder: Order | null;
+
+    beforeEach(async () => {
+        // Declare the variables once
+        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
+
+        // Assign values from getAllOrdersMockOrder1
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
+
+        dummyOrder = await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+
+        // Assign values from getAllOrdersMockOrder2
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
+
+        await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+    });
+
+    afterEach(async () => {
+        const repository = AppDataSource.getRepository(Order);
+        await repository.delete({}); //Deletes all documents in the collection
+    });
+
+    afterAll(async () => {
+        await AppDataSource.destroy();
+    });
+
+    it('should calculate and update correctly', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        const feedbackData = {
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: dummyOrder._id,
+        };
+
+        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 3,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+            feedbackID: feedback._id,
+        };
+
+        const order = await orderRepository.save(dummyOrder);
+
+        if (!order.employeeID) throw new Error('Order was not created!');
+
+        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+            order?._id.toString()
+        );
+
+        expect(calculatedUpdatedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(calculatedUpdatedOrder).toEqual(
+            expect.objectContaining({
+                _id: expect.any(Object), // If the ID is autogenerated
+                pay: expect.any(Object),
+                customerID: dummyOrder.customerID,
+                restaurantID: dummyOrder.restaurantID,
+                address: dummyOrder.address,
+                totalPrice: dummyOrder.totalPrice,
+                orderItemList: dummyOrder.orderItemList,
+                timestamp: dummyOrder.timestamp,
+                employeeID: dummyOrder.employeeID,
+                status: 3,
+            })
+        );
+    });
+
+    it('should calculate and update with night bonus and speed bonus', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        const feedbackData = {
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: dummyOrder._id,
+        };
+
+        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 3,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+            feedbackID: feedback._id,
+            timestamp: (() => {
+                const now = new Date();
+                now.setHours(23, 30, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+            pickUpDate: (() => {
+                const now = new Date();
+                now.setHours(23, 35, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+            completionDate: (() => {
+                const now = new Date();
+                now.setHours(23, 45, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+        };
+
+        const order = await orderRepository.save(dummyOrder);
+
+        if (!order.employeeID) throw new Error('Order was not created!');
+
+        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+            order?._id.toString()
+        );
+
+        expect(calculatedUpdatedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(calculatedUpdatedOrder).toEqual(
+            expect.objectContaining({
+                _id: dummyOrder._id, // Adjusted for string ID
+                customerID: dummyOrder.customerID,
+                restaurantID: dummyOrder.restaurantID,
+                address: dummyOrder.address,
+                totalPrice: dummyOrder.totalPrice,
+                orderItemList: dummyOrder.orderItemList,
+                timestamp: dummyOrder.timestamp,
+                pickUpDate: dummyOrder.pickUpDate, // Fixed field name
+                completionDate: dummyOrder.completionDate, // Added field
+                feedbackID: feedback._id, // Added field
+                employeeID: dummyOrder.employeeID,
+                status: 3,
+            })
+        );
+    });
+
+    it('should calculate and update with moderate delivery time bonus', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        const feedbackData = {
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: dummyOrder._id,
+        };
+
+        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 3,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+            feedbackID: feedback._id,
+            timestamp: (() => {
+                const now = new Date();
+                now.setHours(19, 30, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+            pickUpDate: (() => {
+                const now = new Date();
+                now.setHours(20, 5, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+            completionDate: (() => {
+                const now = new Date();
+                now.setHours(20, 45, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+        };
+
+        const order = await orderRepository.save(dummyOrder);
+
+        if (!order.employeeID) throw new Error('Order was not created!');
+
+        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+            order?._id.toString()
+        );
+
+        expect(calculatedUpdatedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(calculatedUpdatedOrder).toEqual(
+            expect.objectContaining({
+                _id: dummyOrder._id, // Adjusted for string ID
+                customerID: dummyOrder.customerID,
+                restaurantID: dummyOrder.restaurantID,
+                address: dummyOrder.address,
+                totalPrice: dummyOrder.totalPrice,
+                orderItemList: dummyOrder.orderItemList,
+                timestamp: dummyOrder.timestamp,
+                pickUpDate: dummyOrder.pickUpDate, // Fixed field name
+                completionDate: dummyOrder.completionDate, // Added field
+                feedbackID: feedback._id, // Added field
+                employeeID: dummyOrder.employeeID,
+                status: 3,
+            })
+        );
+    });
+
+    it('should calculate and update with slow delivery time bonus', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        const feedbackData = {
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: dummyOrder._id,
+        };
+
+        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 3,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+            feedbackID: feedback._id,
+            timestamp: (() => {
+                const now = new Date();
+                now.setHours(19, 30, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+            pickUpDate: (() => {
+                const now = new Date();
+                now.setHours(20, 5, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+            completionDate: (() => {
+                const now = new Date();
+                now.setHours(20, 55, 0, 0); // Set to 11:30 PM
+                return now;
+            })(),
+        };
+
+        const order = await orderRepository.save(dummyOrder);
+
+        if (!order.employeeID) throw new Error('Order was not created!');
+
+        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+            order?._id.toString()
+        );
+
+        expect(calculatedUpdatedOrder).not.toBeNull();
+
+        // Match only the necessary properties
+        expect(calculatedUpdatedOrder).toEqual(
+            expect.objectContaining({
+                _id: dummyOrder._id, // Adjusted for string ID
+                customerID: dummyOrder.customerID,
+                restaurantID: dummyOrder.restaurantID,
+                address: dummyOrder.address,
+                totalPrice: dummyOrder.totalPrice,
+                orderItemList: dummyOrder.orderItemList,
+                timestamp: dummyOrder.timestamp,
+                pickUpDate: dummyOrder.pickUpDate, // Fixed field name
+                completionDate: dummyOrder.completionDate, // Added field
+                feedbackID: feedback._id, // Added field
+                employeeID: dummyOrder.employeeID,
+                status: 3,
+            })
+        );
+    });
+
+    it('should fail to get order because of wrong ID', async () => {
+        const wrongID = '672df427f54107237ff75569';
+        await expect(orderAndFeedbackRepository.calculateAndUpdateOrderPay(wrongID)).rejects.toThrow(
+            `Order with ID ${wrongID} not found`
         );
     });
 });
