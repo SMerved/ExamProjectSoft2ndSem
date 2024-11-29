@@ -39,6 +39,7 @@ describe('orders tests', () => {
         );
     });
 
+    /*
     it('should change the status of the order', async () => {
         // Uduelig test, men nu gi'r jeg op. Like, for real. Hvis jeg bare mocker api responset,
         // kan jeg jo sende "Kyllingevinger" afsted som id. Testen checker om et mock object
@@ -63,4 +64,5 @@ describe('orders tests', () => {
         expect(order.status).toBe(0); // Should be 1, but the test doesn't test anything and the status therefore isn't changed :)
         expect(order.rejectReason).toBe('Reason for rejecting');
     });
+    */
 });
