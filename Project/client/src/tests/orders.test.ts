@@ -14,11 +14,14 @@ import {
 } from '../mocks/orders';
 
 describe('orders tests', () => {
+    beforeEach(() => jest.resetAllMocks());
+
     it('should create an order', async () => {
         const order = await createOrder('id', 'res', [], '', 0);
 
         expect(order).toEqual(createdOrder);
     });
+
     it('should result in error', async () => {
         try {
             await createOrder('wrong id', 'res', [], '', 0);
@@ -36,10 +39,56 @@ describe('orders tests', () => {
         );
     });
 
+    it('should throw and handle error for get accepted orders', async () => {
+        jest.spyOn(global, 'fetch').mockImplementation(
+            jest.fn(
+                () => Promise.resolve({
+                    json: () => {
+                        JSON.stringify(''), {
+                            status: 401,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        };
+                    },
+                }),
+            ) as jest.Mock);
+
+        try {
+            await GetAcceptedOrdersAPI();
+        } catch (e) {
+            expect(e).toBeInstanceOf(Error);
+        }
+
+    });
+
     it('should return list of all Orders', async () => {
         const orders = await GetOrdersAPI();
 
         expect(orders).toEqual(allOrdersMock);
+    });
+
+    it('should throw and handle error for get orders', async () => {
+        jest.spyOn(global, 'fetch').mockImplementation(
+            jest.fn(
+                () => Promise.resolve({
+                    json: () => {
+                        JSON.stringify(''), {
+                            status: 401,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        };
+                    },
+                }),
+            ) as jest.Mock);
+
+        try {
+            await GetOrdersAPI();
+        } catch (e) {
+            expect(e).toBeInstanceOf(Error);
+        }
+
     });
 
     it('should return list of orders by restaurant id', async () => {
@@ -50,6 +99,29 @@ describe('orders tests', () => {
         expect(orders).toEqual(
             expect.arrayContaining([expect.objectContaining(ordersByIdMock)]),
         );
+    });
+
+    it('should throw and handle error for get orders by restaurant id', async () => {
+        jest.spyOn(global, 'fetch').mockImplementation(
+            jest.fn(
+                () => Promise.resolve({
+                    json: () => {
+                        JSON.stringify(''), {
+                            status: 401,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        };
+                    },
+                }),
+            ) as jest.Mock);
+
+        try {
+            await GetOrdersAPIByRestaurantID('random');
+        } catch (e) {
+            expect(e).toBeInstanceOf(Error);
+        }
+
     });
 
     it('should change the status of the order', async () => {
@@ -73,10 +145,32 @@ describe('orders tests', () => {
         expect(order.rejectReason).toBe('Reason for rejecting');
     });
 
+    it('should throw and handle error for accept reject orders', async () => {
+        jest.spyOn(global, 'fetch').mockImplementation(
+            jest.fn(
+                () => Promise.resolve({
+                    json: () => {
+                        JSON.stringify(''), {
+                            status: 401,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        };
+                    },
+                }),
+            ) as jest.Mock);
+
+        try {
+            await acceptRejectOrder('', 0);
+        } catch (e) {
+            expect(e).toBeInstanceOf(Error);
+        }
+    });
+
     it('should accept order as delivery', async () => {
         const order = await acceptOrderAsDelivery('orderid', 'employeeid');
 
-        expect(order).toEqual(acceptedOrderAsDeliveryMock)
+        expect(order).toEqual(acceptedOrderAsDeliveryMock);
     });
 
     it('should throw error because of missing values', async () => {
@@ -102,7 +196,7 @@ describe('orders tests', () => {
     });
 
     it('should return order', async () => {
-        const order = await completeOrderAsDelivery("orderid");
+        const order = await completeOrderAsDelivery('orderid');
 
         expect(order).toEqual(completeOrderAsDeliveryMock);
     });
@@ -113,7 +207,7 @@ describe('orders tests', () => {
         } catch (error) {
             expect(error.message).toContain('Missing value');
         }
-    })
+    });
 
     it('should throw error because of wrong order id', async () => {
         try {
@@ -121,5 +215,5 @@ describe('orders tests', () => {
         } catch (error) {
             expect(error.message).toContain('failed to change order');
         }
-    })
+    });
 });
