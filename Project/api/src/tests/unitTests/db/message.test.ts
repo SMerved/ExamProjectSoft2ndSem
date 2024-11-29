@@ -45,14 +45,16 @@ describe('KafkaAdapter Functionality', () => {
         const event = { type: 'OrderPlaced', payload: { orderId: '12345' } };
         await kafkaAdapter.sendEvent(event.type, event.payload);
         const producer = (Kafka as jest.Mock).mock.results[0].value.producer();
-        const sentMessage = JSON.parse(producer.send.mock.calls[0][0].messages[0].value);
-        
-        expect(sentMessage).toEqual(expect.objectContaining({
-            eventType: event.type,
-            payload: event.payload,
-            timestamp: expect.any(Number),
-        }));
-    });
+        const sentMessage = JSON.parse(
+            producer.send.mock.calls[0][0].messages[0].value
+        );
 
-    // Add more test cases as needed
+        expect(sentMessage).toEqual(
+            expect.objectContaining({
+                eventType: event.type,
+                payload: event.payload,
+                timestamp: expect.any(Number),
+            })
+        );
+    });
 });

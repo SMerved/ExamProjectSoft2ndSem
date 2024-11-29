@@ -1,7 +1,10 @@
 import { AppDataSource } from '../../../ormconfig.ts';
 import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import { ObjectId } from 'mongodb';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../mocks/orderMocksDB.ts';
+import {
+    getAllOrdersMockOrder1,
+    getAllOrdersMockOrder2,
+} from '../../mocks/orderMocksDB.ts';
 import { Order } from '../../../monolithOrderAndFeedback/Order.ts';
 
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
@@ -11,29 +14,48 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
 
     beforeEach(async () => {
         // Declare the variables once
-        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-
-        // Assign values from getAllOrdersMockOrder1
-        ({ customerID, restaurantID, address, totalPrice, orderItemList, timestamp } = getAllOrdersMockOrder1);
-
-        await orderAndFeedbackService.createOrder(
-            customerID,
+        let customerID,
             restaurantID,
             address,
             totalPrice,
             orderItemList,
+            timestamp;
+
+        // Assign values from getAllOrdersMockOrder1
+        ({
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp,
+        } = getAllOrdersMockOrder1);
+
+        await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
             timestamp
         );
 
         // Assign values from getAllOrdersMockOrder2
-        ({ customerID, restaurantID, address, totalPrice, orderItemList, timestamp } = getAllOrdersMockOrder2);
+        ({
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp,
+        } = getAllOrdersMockOrder2);
 
         await orderAndFeedbackService.createOrder(
             customerID,
             restaurantID,
+            orderItemList,
             address,
             totalPrice,
-            orderItemList,
             timestamp
         );
     });
@@ -76,14 +98,16 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         const order = await orderAndFeedbackService.createOrder(
             mockOrder.customerID,
             mockOrder.restaurantID,
+            mockOrder.orderItemList,
             mockOrder.address,
             mockOrder.totalPrice,
-            mockOrder.orderItemList,
             mockOrder.timestamp
         );
 
         if (!order) {
-            throw new Error('Order creation failed, cannot proceed with feedback creation');
+            throw new Error(
+                'Order creation failed, cannot proceed with feedback creation'
+            );
         }
 
         const orderData = {
