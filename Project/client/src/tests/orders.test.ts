@@ -12,7 +12,6 @@ import {
     ordersByIdMock,
 } from '../mocks/orders';
 
-
 describe('orders tests', () => {
     it('should return list of accepted Orders', async () => {
         const orders = await GetAcceptedOrdersAPI();
@@ -39,7 +38,6 @@ describe('orders tests', () => {
         );
     });
 
-    /*
     it('should change the status of the order', async () => {
         // Uduelig test, men nu gi'r jeg op. Like, for real. Hvis jeg bare mocker api responset,
         // kan jeg jo sende "Kyllingevinger" afsted som id. Testen checker om et mock object
@@ -61,8 +59,7 @@ describe('orders tests', () => {
             'Reason for rejecting',
         );
 
-        expect(order.status).toBe(0); // Should be 1, but the test doesn't test anything and the status therefore isn't changed :)
+        expect(order.status).toBe(1); // Should be 1, but the test doesn't test anything and the status therefore isn't changed :)
         expect(order.rejectReason).toBe('Reason for rejecting');
     });
-    */
 });
