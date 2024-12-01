@@ -243,6 +243,17 @@ describe('Retrieve orders functions', () => {
         );
     });
 
+    it('should handle errors and return null', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        jest.spyOn(orderRepository, 'find').mockRejectedValue(new Error('Database error'));
+
+        const orders = await orderAndFeedbackRepository.GetAllAcceptedOrders();
+
+        expect(orders).toBeNull();
+        jest.restoreAllMocks();
+    });
+
     it('should get all own orders', async () => {
         if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
         if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
@@ -499,6 +510,28 @@ describe('accept/complete order as delivery driver', () => {
         );
     });
 
+    it('should fail to accept order because there is a reject reason, but status not 1', async () => {
+        await expect(
+            orderAndFeedbackRepository.acceptRejectOrder(
+                'randomID',
+                3,
+                'This reason is not allowed because status is not 1'
+            )
+        ).rejects.toThrow('There can only be a reason for rejecting, if status is set to 1, aka reject');
+    });
+
+    it('should fail to accept order because status not between 0 and 4', async () => {
+        await expect(orderAndFeedbackRepository.acceptRejectOrder('randomID', 9)).rejects.toThrow(
+            'Status must be between between 0 and 4, inclusive'
+        );
+    });
+
+    it('should fail to accept order because status not between 0 and 4', async () => {
+        await expect(orderAndFeedbackRepository.acceptRejectOrder('672df427f54107237ff75561', 3)).rejects.toThrow(
+            'Order with ID 672df427f54107237ff75561 not found'
+        );
+    });
+
     it('complete order as delivery', async () => {
         const orderRepository = AppDataSource.getMongoRepository(Order);
         dummyOrder = {
@@ -530,7 +563,130 @@ describe('accept/complete order as delivery driver', () => {
             })
         );
     });
+
+    it('complete order fail because no order found', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 2,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+        };
+
+        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+
+        await orderRepository.save(dummyOrder);
+
+        await expect(
+            orderAndFeedbackRepository.acceptOrderAsDelivery(
+                dummyOrder?._id.toString(),
+                dummyOrder?.employeeID.toString()
+            )
+        ).rejects.toThrow(`Order with ID ${dummyOrder?._id.toString()} not found`);
+
+        jest.restoreAllMocks();
+    });
+
+    it('should fail to accept order because of no order ID', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+
+        jest.restoreAllMocks();
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 4,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+        };
+
+        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+
+        await expect(
+            orderAndFeedbackRepository.acceptOrderAsDelivery(
+                '672df427f54107237ff75561',
+                dummyOrder.employeeID?.toString()
+            )
+        ).rejects.toThrow('Order with ID 672df427f54107237ff75561 not found');
+    });
+
+    it('complete order fail because status is not 2', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 4,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+        };
+
+        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+
+        await orderRepository.save(dummyOrder);
+
+        await expect(
+            orderAndFeedbackRepository.acceptOrderAsDelivery(
+                dummyOrder?._id.toString(),
+                dummyOrder?.employeeID.toString()
+            )
+        ).rejects.toThrow(`Order is not at pick up stage`);
+    });
+
+    it('complete order fail because status is not 2', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        await orderRepository.save(dummyOrder);
+
+        await expect(orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString())).rejects.toThrow(
+            `Order with ID ${dummyOrder?._id} not found`
+        );
+
+        jest.restoreAllMocks();
+    });
+
+    it('complete order fail because wrong order status', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        jest.spyOn(orderRepository, 'findOne').mockResolvedValue({
+            _id: dummyOrder?._id,
+            customerID: new ObjectId(),
+            restaurantID: new ObjectId(),
+            employeeID: new ObjectId('672df427f54107237ff75569'), // Same `employeeID` for filtering
+            status: 4,
+            address: new ObjectId(),
+            totalPrice: Math.random() * 100,
+            orderItemList: Array.from({ length: Math.floor(Math.random() * 5) + 1 }, () => ({
+                menuItemId: new ObjectId(),
+                quantity: Math.floor(Math.random() * 5) + 1,
+            })),
+            feedbackID: new ObjectId(),
+            timestamp: new Date(),
+            pickUpDate: new Date(),
+            completionDate: new Date(),
+            pay: {
+                baseAmount: Math.random() * 10,
+                totalOrderQuantityMultiplier: Math.random() * 2,
+                deliverySpeedMultiplier: Math.random() * 2,
+                feedbackRatingMultiplier: Math.random(),
+                orderPriceBonus: Math.random(),
+                nightTimeBonus: Math.random(),
+                totalPay: Math.random() * 100,
+            },
+            rejectReason: null,
+        });
+
+        await expect(orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString())).rejects.toThrow(
+            'Order is not ready to be completed'
+        );
+
+        jest.restoreAllMocks();
+    });
 });
+
 describe('calculate and complete order', () => {
     beforeAll(async () => {
         await AppDataSource.initialize();
@@ -689,8 +845,39 @@ describe('calculate and complete order', () => {
         );
     });
 
-    it('should calculate and update with moderate delivery time bonus', async () => {
+    it('should calculate and update with moderate delivery time bonus and max TOQmultiplier', async () => {
         const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const mockOrders = Array.from({ length: 201 }, (_, index) => ({
+            _id: new ObjectId(),
+            customerID: new ObjectId(),
+            restaurantID: new ObjectId(),
+            employeeID: new ObjectId('672df427f54107237ff75569'), // Same `employeeID` for filtering
+            status: 4,
+            address: new ObjectId(),
+            totalPrice: Math.random() * 100,
+            orderItemList: Array.from({ length: Math.floor(Math.random() * 5) + 1 }, () => ({
+                menuItemId: new ObjectId(),
+                quantity: Math.floor(Math.random() * 5) + 1,
+            })),
+            feedbackID: new ObjectId(),
+            timestamp: new Date(),
+            pickUpDate: new Date(),
+            completionDate: new Date(),
+            pay: {
+                baseAmount: Math.random() * 10,
+                totalOrderQuantityMultiplier: Math.random() * 2,
+                deliverySpeedMultiplier: Math.random() * 2,
+                feedbackRatingMultiplier: Math.random(),
+                orderPriceBonus: Math.random(),
+                nightTimeBonus: Math.random(),
+                totalPay: Math.random() * 100,
+            },
+            rejectReason: null,
+        }));
+
+        jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
@@ -732,6 +919,8 @@ describe('calculate and complete order', () => {
         const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
             order?._id.toString()
         );
+
+        jest.restoreAllMocks();
 
         expect(calculatedUpdatedOrder).not.toBeNull();
 
@@ -818,11 +1007,140 @@ describe('calculate and complete order', () => {
             })
         );
     });
+});
 
-    it('should fail to get order because of wrong ID', async () => {
+describe('get average rating', () => {
+    beforeAll(async () => {
+        await AppDataSource.initialize();
+    });
+
+    let dummyOrder: Order | null;
+
+    beforeEach(async () => {
+        // Declare the variables once
+        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
+
+        // Assign values from getAllOrdersMockOrder1
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
+
+        dummyOrder = await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+
+        // Assign values from getAllOrdersMockOrder2
+        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
+
+        await orderAndFeedbackService.createOrder(
+            customerID,
+            restaurantID,
+            orderItemList,
+            address,
+            totalPrice,
+            timestamp
+        );
+    });
+
+    afterEach(async () => {
+        const repository = AppDataSource.getRepository(Order);
+        await repository.delete({}); //Deletes all documents in the collection
+    });
+
+    afterAll(async () => {
+        await AppDataSource.destroy();
+    });
+
+    it('should succeed gettin average rating', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        const feedbackData = {
+            foodRating: 5,
+            overallRating: 4,
+            deliveryRating: 3,
+            orderId: dummyOrder._id,
+        };
+
+        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            status: 3,
+            employeeID: new ObjectId('672df427f54107237ff75569'),
+            feedbackID: feedback._id,
+        };
+
+        const order = await orderRepository.save(dummyOrder);
+
+        if (!order.employeeID) throw new Error('Order was not created!');
+
+        const avgRating = await orderAndFeedbackRepository.getRatingAVG(new ObjectId(order?._id.toString()));
+
+        expect(avgRating).not.toBeNull();
+        expect(avgRating).toEqual(4);
+    });
+
+    it('should failed to find order', async () => {
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        jest.restoreAllMocks();
         const wrongID = '672df427f54107237ff75569';
-        await expect(orderAndFeedbackRepository.calculateAndUpdateOrderPay(wrongID)).rejects.toThrow(
+
+        await expect(orderAndFeedbackRepository.getRatingAVG(new ObjectId(wrongID))).rejects.toThrow(
             `Order with ID ${wrongID} not found`
         );
+    });
+
+    it('should fail to find feedback connected to order', async () => {
+        const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            feedbackID: new ObjectId('672df427f54107237ff75569'),
+        };
+        await orderRepository.save(dummyOrder);
+
+        jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue(null);
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        jest.restoreAllMocks();
+
+        await expect(orderAndFeedbackRepository.getRatingAVG(new ObjectId(dummyOrder?._id))).rejects.toThrow(
+            `Feedback with ID ${dummyOrder?.feedbackID} not found`
+        );
+    });
+
+    it('should fail to find feedback connected to order', async () => {
+        const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
+        const orderRepository = AppDataSource.getMongoRepository(Order);
+        dummyOrder = {
+            ...(dummyOrder as Order),
+            feedbackID: new ObjectId('672df427f54107237ff75569'),
+        };
+        await orderRepository.save(dummyOrder);
+
+        jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue({
+            _id: new ObjectId('672df427f54107237ff75569'),
+            foodRating: 5,
+            deliveryRating: 3,
+            overallRating: null as unknown as number,
+        });
+
+        if (!dummyOrder?._id) throw new Error('Order was not created!');
+
+        await expect(orderAndFeedbackRepository.getRatingAVG(new ObjectId(dummyOrder?._id))).rejects.toThrow(
+            `Feedback ratings are incomplete for feedback #${dummyOrder?.feedbackID}`
+        );
+
+        jest.restoreAllMocks();
     });
 });

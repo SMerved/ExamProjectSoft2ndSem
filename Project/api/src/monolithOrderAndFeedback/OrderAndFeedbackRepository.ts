@@ -286,7 +286,7 @@ async function getRatingAVG(orderID: ObjectId) {
         },
     });
 
-    if (!feedback) throw new Error(`Feedback with ID ${order.feedbackID} not found`);
+    if (!feedback) throw new Error(`Feedback with ID ${order?.feedbackID} not found`);
 
     if (!feedback?.deliveryRating || !feedback?.foodRating || !feedback?.overallRating)
         throw new Error('Feedback ratings are incomplete for feedback #' + feedback?._id);
@@ -348,7 +348,6 @@ async function calculateAndUpdateOrderPay(orderID: string) {
     if (order.pickUpDate && order.completionDate) {
         const deliveryTimeInMinutes = (Number(order.completionDate) - Number(order.pickUpDate)) / 1000 / 60;
         let multiplier = 1;
-        console.log(deliveryTimeInMinutes);
 
         if (deliveryTimeInMinutes <= 30) {
             multiplier = 1.2; // 20% bonus for fast delivery
