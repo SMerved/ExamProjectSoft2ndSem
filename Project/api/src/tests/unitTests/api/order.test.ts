@@ -107,7 +107,7 @@ describe('Post /acceptRejectOrder', () => {
     });
 });
 
-describe('Post /GetAllOrdersById', () => {
+describe('Post /ordersById', () => {
     beforeEach(() => {
         jest.resetAllMocks();
     });
@@ -306,38 +306,6 @@ describe('Post /completeOrderAsDelivery', () => {
         const response = await request(app).post('/completeOrderAsDelivery').send(payload);
         expect(response.status).toBe(500);
         expect(response.body).toEqual({ error: 'Error completing order: Error: Order is not at pick up stage' });
-    });
-});
-
-describe('Post /ordersById', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
-
-    it('should return orders array if orders where found successfully based on restaurant id', async () => {
-        (orderAndFeedbackRepository.GetAllOrdersById as jest.Mock).mockResolvedValue(mockOrdersByIDArray);
-
-        const payload = {
-            restaurantID: '672de88ff54107237ff75565',
-        };
-
-        const response = await request(app).post('/ordersById').send(payload);
-
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual(mockOrdersByIDArray);
-    });
-
-    it('should return error 500 since the id does not exist in the database', async () => {
-        (orderAndFeedbackRepository.GetAllOrdersById as jest.Mock).mockRejectedValue(new Error('No orders found'));
-
-        const payload = {
-            restaurantID: 'wrongID',
-        };
-
-        const response = await request(app).post('/ordersById').send(payload);
-
-        expect(response.status).toBe(500);
-        expect(response.body).toEqual({ error: 'An error occurred while fetching orders' });
     });
 });
 
