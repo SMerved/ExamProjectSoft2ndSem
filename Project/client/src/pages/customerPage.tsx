@@ -31,7 +31,7 @@ function CustomerPage() {
             _id: '672df723f54107237ff75573',
             street: 'Maple Street 12',
             city: 'Copenhagen',
-            postalCode: 1001,
+            postalCode: '1001',
         },
         totalPrice: 50,
         orderItemList: [
@@ -66,6 +66,7 @@ function CustomerPage() {
         timestamp: '2024-11-20T12:00:00.000Z',
         rejectReason: undefined,
         feedbackID: '',
+        employeeID: '',
     };
 
     const fetchRestaurants = async () => {
