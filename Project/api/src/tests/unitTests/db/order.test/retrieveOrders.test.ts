@@ -6,6 +6,8 @@ import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/o
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 
 describe('Retrieve orders functions', () => {
+    const orderRepository = AppDataSource.getMongoRepository(Order);
+
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
@@ -16,7 +18,6 @@ describe('Retrieve orders functions', () => {
     beforeEach(async () => {
         // Declare the variables once
         let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-        const orderRepository = AppDataSource.getMongoRepository(Order);
 
         // Assign values from getAllOrdersMockOrder1
         ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
@@ -99,8 +100,6 @@ describe('Retrieve orders functions', () => {
     });
 
     it('should handle errors and return null', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
-
         jest.spyOn(orderRepository, 'find').mockRejectedValue(new Error('Database error'));
 
         const orders = await orderAndFeedbackRepository.GetAllAcceptedOrders();

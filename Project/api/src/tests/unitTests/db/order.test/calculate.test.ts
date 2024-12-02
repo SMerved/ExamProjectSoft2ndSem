@@ -6,6 +6,8 @@ import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/o
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 
 describe('calculate and complete order', () => {
+    const orderRepository = AppDataSource.getMongoRepository(Order);
+
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
@@ -51,8 +53,6 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update correctly', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
-
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -99,8 +99,6 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update with night bonus and speed bonus', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
-
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -164,8 +162,6 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update with moderate delivery time bonus and max TOQmultiplier', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
-
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const mockOrders = Array.from({ length: 201 }, (_, index) => ({
             _id: new ObjectId(),
@@ -262,8 +258,6 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update with slow delivery time bonus', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
-
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -327,7 +321,6 @@ describe('calculate and complete order', () => {
     });
 
     it('should fail to find order', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');

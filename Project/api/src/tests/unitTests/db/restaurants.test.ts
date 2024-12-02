@@ -4,15 +4,15 @@ import { Address, MenuItem, Restaurant } from '../../../RestaurantService/Restau
 import { getAllRestaurants } from '../../../RestaurantService/dbFunctions.ts';
 
 describe('Database functionality for restaurant tests', () => {
+    const restaurantRepository = AppDataSource.getMongoRepository(Restaurant);
+    const addressRepository = AppDataSource.getMongoRepository(Address);
+    const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
 
     beforeEach(async () => {
         // Declare the variables once
-        const restaurantRepository = AppDataSource.getMongoRepository(Restaurant);
-        const addressRepository = AppDataSource.getMongoRepository(Address);
-        const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
 
         // Mock Addresses
         const address1 = {

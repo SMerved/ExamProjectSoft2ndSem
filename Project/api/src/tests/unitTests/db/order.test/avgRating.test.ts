@@ -7,6 +7,9 @@ import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 import { Feedback } from '../../../../monolithOrderAndFeedback/Feedback.ts';
 
 describe('get average rating', () => {
+    const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
+    const orderRepository = AppDataSource.getMongoRepository(Order);
+
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
@@ -52,8 +55,6 @@ describe('get average rating', () => {
     });
 
     it('should succeed getting average rating', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
-
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -83,7 +84,6 @@ describe('get average rating', () => {
     });
 
     it('should fail to find order', async () => {
-        const orderRepository = AppDataSource.getMongoRepository(Order);
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
@@ -98,8 +98,6 @@ describe('get average rating', () => {
     });
 
     it('should fail to find feedback connected to order', async () => {
-        const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
-        const orderRepository = AppDataSource.getMongoRepository(Order);
         dummyOrder = {
             ...(dummyOrder as Order),
             feedbackID: new ObjectId('672df427f54107237ff75569'),
@@ -118,8 +116,6 @@ describe('get average rating', () => {
     });
 
     it('should fail to find feedback connected to order', async () => {
-        const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
-        const orderRepository = AppDataSource.getMongoRepository(Order);
         dummyOrder = {
             ...(dummyOrder as Order),
             feedbackID: new ObjectId('672df427f54107237ff75569'),

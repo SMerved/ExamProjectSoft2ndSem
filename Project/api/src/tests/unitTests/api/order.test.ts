@@ -154,7 +154,7 @@ describe('Post /getAllOrders', () => {
     });
 
     //Get all orders
-    it('should return orders array if orders where found successfully', async () => {
+    it('should return orders array if orders were found successfully from OaFService', async () => {
         (orderAndFeedbackService.getAllOrders as jest.Mock).mockResolvedValue(mockOrderListAPI);
 
         const response = await request(app).get('/orders').send();
@@ -163,7 +163,7 @@ describe('Post /getAllOrders', () => {
         expect(response.body).toEqual(mockOrderListAPI);
     });
 
-    it('should return 401 if orders where not found successfully', async () => {
+    it('should return 401 if orders where not found successfully - from OaFService', async () => {
         (orderAndFeedbackService.getAllOrders as jest.Mock).mockResolvedValue(null);
 
         const response = await request(app).get('/orders').send();
@@ -172,7 +172,7 @@ describe('Post /getAllOrders', () => {
         expect(response.body).toEqual({ error: 'No orders found' });
     });
 
-    it('should return 500 if orders where not found successfully', async () => {
+    it('should return 500 if orders were not found successfully from OaFService', async () => {
         (orderAndFeedbackService.getAllOrders as jest.Mock).mockRejectedValue(new Error('Connection failed'));
 
         const response = await request(app).get('/orders').send();
@@ -188,7 +188,7 @@ describe('Post /getAllAcceptedOrders', () => {
     });
 
     //Get all accepted orders
-    it('should return orders array if orders where found successfully', async () => {
+    it('should return array of accepted orders', async () => {
         (orderAndFeedbackService.getAllAcceptedOrders as jest.Mock).mockResolvedValue(mockOrderListAPI);
 
         const response = await request(app).get('/acceptedOrders').send();
@@ -197,7 +197,7 @@ describe('Post /getAllAcceptedOrders', () => {
         expect(response.body).toContainEqual(mockOrderListAPI[0]);
     });
 
-    it('should return error', async () => {
+    it('should return error 401', async () => {
         (orderAndFeedbackService.getAllAcceptedOrders as jest.Mock).mockResolvedValue(null);
 
         const response = await request(app).get('/acceptedOrders').send();
@@ -206,7 +206,7 @@ describe('Post /getAllAcceptedOrders', () => {
         expect(response.body).toEqual({ error: 'No orders found' });
     });
 
-    it('should return error', async () => {
+    it('should return error 500', async () => {
         (orderAndFeedbackService.getAllAcceptedOrders as jest.Mock).mockRejectedValue(
             new Error('An error occurred while fetching orders')
         );
@@ -283,7 +283,7 @@ describe('Post /completeOrderAsDelivery', () => {
         expect(response.body).toEqual(mockCompleteAsDelivery);
     });
 
-    it('should return 401 if order completeance fails', async () => {
+    it('should return 401 because of wrong id', async () => {
         (orderAndFeedbackRepository.completeOrderAsDelivery as jest.Mock).mockResolvedValue(null);
 
         const payload = {
@@ -296,7 +296,7 @@ describe('Post /completeOrderAsDelivery', () => {
         expect(response.body).toEqual({ error: 'Invalid order data' });
     });
 
-    it('should return 500 if order where not found successfully', async () => {
+    it('should return 500 if order were not found successfully', async () => {
         (orderAndFeedbackRepository.completeOrderAsDelivery as jest.Mock).mockRejectedValue(
             new Error('Order is not at pick up stage')
         );
@@ -314,7 +314,7 @@ describe('Post /GetOwnOrders', () => {
         jest.resetAllMocks();
     });
 
-    it('should return orders array if orders where found successfully based on employee ID and status', async () => {
+    it('should return orders array based on employee ID and status', async () => {
         (orderAndFeedbackRepository.GetOwnOrders as jest.Mock).mockResolvedValue(mockOrdersByEmployeeAndStatusArr);
 
         const payload = {
@@ -328,7 +328,7 @@ describe('Post /GetOwnOrders', () => {
         expect(response.body).toEqual(mockOrdersByEmployeeAndStatusArr);
     });
 
-    it('should return error 500 since the id does not exist in the database', async () => {
+    it('should return error 401 since the id does not exist in the database', async () => {
         (orderAndFeedbackRepository.GetOwnOrders as jest.Mock).mockResolvedValue(null);
 
         const payload = {
@@ -362,7 +362,7 @@ describe('Post /calculateAndUpdateOrderPay', () => {
         jest.resetAllMocks();
     });
 
-    it('should return orders array if orders where found successfully based on employee ID and status', async () => {
+    it('should return orders array based on employee ID and status', async () => {
         (orderAndFeedbackRepository.calculateAndUpdateOrderPay as jest.Mock).mockResolvedValue(calcAndUpdatedOrder);
 
         const payload = { orderID: 'validOrderID' };
@@ -373,7 +373,7 @@ describe('Post /calculateAndUpdateOrderPay', () => {
         expect(response.body).toEqual(calcAndUpdatedOrder);
     });
 
-    it('should return error 500 since the id does not exist in the database', async () => {
+    it('should return error 401 since the id does not exist in the database', async () => {
         (orderAndFeedbackRepository.calculateAndUpdateOrderPay as jest.Mock).mockResolvedValue(null);
 
         const payload = { orderID: 'invalidOrderID' };
