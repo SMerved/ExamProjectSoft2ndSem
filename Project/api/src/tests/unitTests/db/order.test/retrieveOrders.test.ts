@@ -70,7 +70,7 @@ describe('Retrieve orders functions', () => {
     it('should get all accepted orders', async () => {
         if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
 
-        const orders = await orderAndFeedbackRepository.GetAllAcceptedOrders();
+        const orders = await orderAndFeedbackService.getAllAcceptedOrders();
 
         expect(orders).not.toBeNull();
 
