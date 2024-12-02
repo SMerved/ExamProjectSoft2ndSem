@@ -91,7 +91,6 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         await createFeedbackAndLinkOrder(feedbackData);
 
         const rating = await orderAndFeedbackRepository.getRatingAVG(feedbackData.orderId);
-        console.log(rating);
 
         expect(rating).not.toBeNull();
         expect(rating).toBe(4);
