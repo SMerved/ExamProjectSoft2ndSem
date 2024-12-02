@@ -233,7 +233,6 @@ describe('Post /acceptOrderAsDelivery', () => {
 
         const response = await request(app).post('/acceptOrderAsDelivery').send(payload);
 
-        console.log(response.status);
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockAcceptAsDelivery);
     });
@@ -247,7 +246,6 @@ describe('Post /acceptOrderAsDelivery', () => {
             employeeID: '672df427f54107237ff75569',
         };
         const response = await request(app).post('/acceptOrderAsDelivery').send(payload);
-        console.log(response.status);
         expect(response.status).toBe(500);
         expect(response.body).toEqual({ error: 'Error accepting orderError: Order is not at pick up stage' });
     });
@@ -281,7 +279,6 @@ describe('Post /completeOrderAsDelivery', () => {
 
         const response = await request(app).post('/completeOrderAsDelivery').send(payload);
 
-        console.log(response.status);
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockCompleteAsDelivery);
     });
@@ -307,7 +304,6 @@ describe('Post /completeOrderAsDelivery', () => {
             orderID: '67412feda778184dc774ecf7',
         };
         const response = await request(app).post('/completeOrderAsDelivery').send(payload);
-        console.log(response.status);
         expect(response.status).toBe(500);
         expect(response.body).toEqual({ error: 'Error completing order: Error: Order is not at pick up stage' });
     });
