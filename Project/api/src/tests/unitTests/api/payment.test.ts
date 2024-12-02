@@ -1,7 +1,6 @@
 import request from 'supertest';
 import app from '../../../index.ts';
 import { pay } from '../../../paymentService/stripePaymentServiceAdapter.ts';
-import * as stripePaymentServiceAdapter from '../../../paymentService/stripePaymentServiceAdapter.ts';
 
 jest.mock('axios');
 

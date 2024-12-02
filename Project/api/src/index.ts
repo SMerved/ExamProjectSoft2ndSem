@@ -33,8 +33,12 @@ app.use('/paymentService', paymentRouter);
 
 app.post('/pay', async (req, res) => {
     try {
-        const { price, customerId } = req.body;
-        const response = await paymentServiceValidatePayment(price, customerId);
+        const { price, customerId, cardNumber } = req.body;
+        const response = await paymentServiceValidatePayment(
+            price,
+            customerId,
+            cardNumber
+        );
 
         if (response) {
             res.status(200).json({ message: 'Payment successful' });

@@ -8,12 +8,14 @@ const BASE_URL = `http://localhost:${port}/paymentService`;
 
 async function paymentServiceValidatePayment(
     price: number,
-    customerId: string
+    customerId: string,
+    cardNumber: number
 ): Promise<boolean> {
     try {
         const response = await axios.post(`${BASE_URL}/validatePayment`, {
             price,
             customerId,
+            cardNumber,
         });
 
         return response.status == 200;
