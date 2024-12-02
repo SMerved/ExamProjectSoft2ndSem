@@ -94,9 +94,5 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
 
         expect(rating).not.toBeNull();
         expect(rating).toBe(4);
-
-        // await expect(orderAndFeedbackRepository.getRatingAVG(feedbackData.orderId)).rejects.toThrow(
-        //     `Order with id ${feedbackData.orderId} not found`
-        // );
     });
 });
