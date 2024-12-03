@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import monster4Image from '../../public/monster_4.png';
-import monster4CloseUp from '../../public/monster_4_CloseUp.png';
+import monster4Image from '../other/monster_4.png';
+import monster4CloseUp from '../other/monster_4_CloseUp.png';
 
 const ImageDisplay = () => {
     const [isHovered, setIsHovered] = useState(false);
@@ -26,8 +26,6 @@ const ImageDisplay = () => {
                     position: 'absolute',
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    transition: 'opacity 0.3s ease',
                     opacity: isHovered ? 0 : 1,
                 }}
             />
@@ -38,8 +36,6 @@ const ImageDisplay = () => {
                     position: 'absolute',
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    transition: 'opacity 0.3s ease',
                     opacity: isHovered ? 1 : 0,
                 }}
             />
