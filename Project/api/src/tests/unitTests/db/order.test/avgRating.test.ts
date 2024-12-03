@@ -14,9 +14,10 @@ describe('get average rating', () => {
     });
 
     let dummyOrder: Order | null;
+    let getOrder: () => Order | null;
 
     beforeEach(async () => {
-        dummyOrder = await createOrders();
+        ({ getOrder } = await createOrders());
         await createOrders2();
     });
 
@@ -30,6 +31,7 @@ describe('get average rating', () => {
     });
 
     it('should succeed getting average rating', async () => {
+        dummyOrder = getOrder();
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -59,6 +61,8 @@ describe('get average rating', () => {
     });
 
     it('should fail to find order', async () => {
+        dummyOrder = getOrder();
+
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
@@ -73,6 +77,8 @@ describe('get average rating', () => {
     });
 
     it('should fail to find feedback connected to order', async () => {
+        dummyOrder = getOrder();
+
         dummyOrder = {
             ...(dummyOrder as Order),
             feedbackID: new ObjectId('672df427f54107237ff75569'),
@@ -91,6 +97,8 @@ describe('get average rating', () => {
     });
 
     it('should fail because of no overall rating', async () => {
+        dummyOrder = getOrder();
+
         dummyOrder = {
             ...(dummyOrder as Order),
             feedbackID: new ObjectId('672df427f54107237ff75569'),

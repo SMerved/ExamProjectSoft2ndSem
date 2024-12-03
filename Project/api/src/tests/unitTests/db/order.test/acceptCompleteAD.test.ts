@@ -7,16 +7,17 @@ import { mockOrder } from '../../../mocks/orderMocksDB.ts';
 
 describe('accept/complete order as delivery driver', () => {
     const orderRepository = AppDataSource.getMongoRepository(Order);
-    let dummyOrder: Order | null;
 
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
 
-    beforeEach(async () => {
-        dummyOrder = await createOrders();
-    });
+    let dummyOrder: Order | null;
+    let getOrder: () => Order | null;
 
+    beforeEach(async () => {
+        ({ getOrder } = await createOrders());
+    });
     afterEach(async () => {
         const repository = AppDataSource.getRepository(Order);
         await repository.delete({}); //Deletes all documents in the collection
@@ -27,6 +28,8 @@ describe('accept/complete order as delivery driver', () => {
     });
 
     it('should accept order as delivery', async () => {
+        dummyOrder = getOrder();
+
         dummyOrder = {
             ...(dummyOrder as Order),
             status: 2,
@@ -83,6 +86,8 @@ describe('accept/complete order as delivery driver', () => {
     });
 
     it('complete order as delivery', async () => {
+        dummyOrder = getOrder();
+
         dummyOrder = {
             ...(dummyOrder as Order),
             status: 3,
@@ -114,6 +119,8 @@ describe('accept/complete order as delivery driver', () => {
     });
 
     it('fail to complete order because no order found', async () => {
+        dummyOrder = getOrder();
+
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         dummyOrder = {
@@ -137,6 +144,8 @@ describe('accept/complete order as delivery driver', () => {
     });
 
     it('should fail to accept order because of no order ID', async () => {
+        dummyOrder = getOrder();
+
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         dummyOrder = {
@@ -158,6 +167,8 @@ describe('accept/complete order as delivery driver', () => {
     });
 
     it('fail to complete order because status is not 2', async () => {
+        dummyOrder = getOrder();
+
         dummyOrder = {
             ...(dummyOrder as Order),
             status: 4,
@@ -177,6 +188,8 @@ describe('accept/complete order as delivery driver', () => {
     });
 
     it('complete order fail because status is not 2', async () => {
+        dummyOrder = getOrder();
+
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
@@ -189,6 +202,8 @@ describe('accept/complete order as delivery driver', () => {
     });
 
     it('complete order fail because wrong order status', async () => {
+        dummyOrder = getOrder();
+
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue({ ...mockOrder, _id: dummyOrder._id });

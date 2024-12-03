@@ -15,10 +15,15 @@ describe('Retrieve orders functions', () => {
 
     let dummyOrder1: Order | null;
     let dummyOrder2: Order | null;
+    let getOrder: () => Order | null;
+    let getOrder2: () => Order | null;
 
     beforeEach(async () => {
-        dummyOrder1 = await createOrders();
-        dummyOrder2 = await createOrders2();
+        ({ getOrder } = await createOrders());
+        ({ getOrder2 } = await createOrders2());
+
+        dummyOrder1 = await getOrder();
+        dummyOrder2 = await getOrder2();
 
         dummyOrder1 = {
             ...(dummyOrder1 as Order),
