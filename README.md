@@ -28,7 +28,7 @@ Start a command terminal in the folder and write the command `npm install` which
 With dependicies installed, run `npm run dev`.
 
 You should then see in the terminal which port the application is running on.
-The "api" (Backend) runs on port 3001 and "client" (Frontend) runs on port 5173.
+The "api" (Backend) runs on port [3001](http://localhost/3001) and "client" (Frontend) runs on port [5173](http://localhost/5173).
 
 To stop the application from the terminal use "Ctrl + C".
 
@@ -39,4 +39,4 @@ Navigate the folders to `/.github/workflows` to view any yaml files made for aut
 
 "testBuildDeploy.yml" runs on the "deploy" branch and automaticly tests and transfer the newest version of our applications to a remote droplet and then deploys them.
 
-To acess the remote frontend navigate to `http://134.122.90.179/`.
+To acess the remote frontend navigate to [`http://134.122.90.179/`](http://134.122.90.179/).
