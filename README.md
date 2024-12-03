@@ -28,8 +28,9 @@ Start a command terminal in the folder and write the command `npm install` which
 With dependicies installed, run `npm run dev`.
 
 You should then see in the terminal which port the application is running on.
-
 The "api" (Backend) runs on port 3001 and "client" (Frontend) runs on port 5173.
+
+To stop the application from the terminal use "Ctrl + C".
 
 ## Automation
 Navigate the folders to `/.github/workflows` to view any yaml files made for automation of the workflow using GitHub Actions.
