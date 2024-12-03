@@ -48,7 +48,9 @@ describe('get average rating', () => {
             feedbackID: feedback._id,
         };
 
+        console.log(dummyOrder)
         const order = await orderRepository.save(dummyOrder);
+        console.log('newOrder', order)
 
         if (!order.employeeID) throw new Error('Order was not created!');
 
