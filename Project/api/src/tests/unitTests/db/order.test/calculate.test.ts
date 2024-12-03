@@ -1,9 +1,9 @@
 import { AppDataSource } from '../../../../ormconfig.ts';
-import * as orderAndFeedbackService from '../../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import * as orderAndFeedbackRepository from '../../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { ObjectId } from 'mongodb';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
+import { createOrders, createOrders2, setOrderHours } from '../../../utilities.ts';
+import { mockOrderWithId } from '../../../mocks/orderMocksDB.ts';
 
 describe('calculate and complete order', () => {
     const orderRepository = AppDataSource.getMongoRepository(Order);
@@ -15,32 +15,8 @@ describe('calculate and complete order', () => {
     let dummyOrder: Order | null;
 
     beforeEach(async () => {
-        // Declare the variables once
-        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-
-        // Assign values from getAllOrdersMockOrder1
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
-
-        dummyOrder = await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
-
-        // Assign values from getAllOrdersMockOrder2
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
-
-        await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
+        dummyOrder = await createOrders();
+        await createOrders2();
     });
 
     afterEach(async () => {
@@ -110,27 +86,7 @@ describe('calculate and complete order', () => {
 
         const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
 
-        dummyOrder = {
-            ...(dummyOrder as Order),
-            status: 3,
-            employeeID: new ObjectId('672df427f54107237ff75569'),
-            feedbackID: feedback._id,
-            timestamp: (() => {
-                const time = new Date();
-                time.setHours(23, 30, 0, 0);
-                return time;
-            })(),
-            pickUpDate: (() => {
-                const time = new Date();
-                time.setHours(23, 35, 0, 0);
-                return time;
-            })(),
-            completionDate: (() => {
-                const time = new Date();
-                time.setHours(23, 45, 0, 0);
-                return time;
-            })(),
-        };
+        dummyOrder = setOrderHours(dummyOrder, feedback._id, [23, 30, 0, 0], [23, 35, 0, 0], [23, 45, 0, 0]);
 
         const order = await orderRepository.save(dummyOrder);
 
@@ -162,34 +118,7 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update with moderate delivery time bonus and max TOQmultiplier', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const mockOrders = Array.from({ length: 201 }, (_, index) => ({
-            _id: new ObjectId(),
-            customerID: new ObjectId(),
-            restaurantID: new ObjectId(),
-            employeeID: new ObjectId('672df427f54107237ff75569'), // Same `employeeID` for filtering
-            status: 4,
-            address: new ObjectId(),
-            totalPrice: Math.random() * 100,
-            orderItemList: Array.from({ length: Math.floor(Math.random() * 5) + 1 }, () => ({
-                menuItemId: new ObjectId(),
-                quantity: Math.floor(Math.random() * 5) + 1,
-            })),
-            feedbackID: new ObjectId(),
-            timestamp: new Date(),
-            pickUpDate: new Date(),
-            completionDate: new Date(),
-            pay: {
-                baseAmount: Math.random() * 10,
-                totalOrderQuantityMultiplier: Math.random() * 2,
-                deliverySpeedMultiplier: Math.random() * 2,
-                feedbackRatingMultiplier: Math.random(),
-                orderPriceBonus: Math.random(),
-                nightTimeBonus: Math.random(),
-                totalPay: Math.random() * 100,
-            },
-            rejectReason: null,
-        }));
+        const mockOrders = Array.from({ length: 201 }, () => mockOrderWithId);
 
         jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders);
 
@@ -203,28 +132,7 @@ describe('calculate and complete order', () => {
         };
 
         const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
-
-        dummyOrder = {
-            ...(dummyOrder as Order),
-            status: 3,
-            employeeID: new ObjectId('672df427f54107237ff75569'),
-            feedbackID: feedback._id,
-            timestamp: (() => {
-                const now = new Date();
-                now.setHours(19, 30, 0, 0);
-                return now;
-            })(),
-            pickUpDate: (() => {
-                const now = new Date();
-                now.setHours(20, 5, 0, 0);
-                return now;
-            })(),
-            completionDate: (() => {
-                const now = new Date();
-                now.setHours(20, 45, 0, 0);
-                return now;
-            })(),
-        };
+        dummyOrder = setOrderHours(dummyOrder, feedback._id, [19, 30, 0, 0], [20, 5, 0, 0], [20, 45, 0, 0]);
 
         const order = await orderRepository.save(dummyOrder);
 
@@ -268,28 +176,7 @@ describe('calculate and complete order', () => {
         };
 
         const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
-
-        dummyOrder = {
-            ...(dummyOrder as Order),
-            status: 3,
-            employeeID: new ObjectId('672df427f54107237ff75569'),
-            feedbackID: feedback._id,
-            timestamp: (() => {
-                const now = new Date();
-                now.setHours(19, 30, 0, 0);
-                return now;
-            })(),
-            pickUpDate: (() => {
-                const now = new Date();
-                now.setHours(20, 5, 0, 0);
-                return now;
-            })(),
-            completionDate: (() => {
-                const now = new Date();
-                now.setHours(20, 55, 0, 0);
-                return now;
-            })(),
-        };
+        dummyOrder = setOrderHours(dummyOrder, feedback._id, [19, 30, 0, 0], [20, 5, 0, 0], [20, 55, 0, 0]);
 
         const order = await orderRepository.save(dummyOrder);
 

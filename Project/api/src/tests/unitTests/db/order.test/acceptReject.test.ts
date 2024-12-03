@@ -1,8 +1,8 @@
 import { AppDataSource } from '../../../../ormconfig.ts';
-import * as orderAndFeedbackService from '../../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import * as orderAndFeedbackRepository from '../../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/orderMocksDB.ts';
+import { getAllOrdersMockOrder1 } from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
+import { createOrders, createOrders2 } from '../../../utilities.ts';
 
 describe('Accept and reject order as restuarant', () => {
     beforeAll(async () => {
@@ -12,32 +12,8 @@ describe('Accept and reject order as restuarant', () => {
     let dummyOrder: Order | null;
 
     beforeEach(async () => {
-        // Declare the variables once
-        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-
-        // Assign values from getAllOrdersMockOrder1
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
-
-        dummyOrder = await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
-
-        // Assign values from getAllOrdersMockOrder2
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
-
-        await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
+        dummyOrder = await createOrders();
+        await createOrders2();
     });
 
     afterEach(async () => {

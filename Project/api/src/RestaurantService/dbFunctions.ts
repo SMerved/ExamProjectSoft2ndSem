@@ -28,6 +28,8 @@ async function getMenuItems(object: Restaurant) {
 async function getAllRestaurants() {
     const restaurants = await restaurantRepository.find();
 
+    if (!restaurants) throw new Error('No restaurants found!');
+
     const restaurantList = [];
 
     for (const restaurant of restaurants) {

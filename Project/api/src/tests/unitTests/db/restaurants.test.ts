@@ -85,11 +85,18 @@ describe('Database functionality for restaurant tests', () => {
     it('should get all restaurants succesfully', async () => {
         const restaurants = await getAllRestaurants();
 
-        if (!restaurants) throw new Error('No restaurants found!');
-
         expect(restaurants).not.toBeNull();
         expect(restaurants[0].name).toBe('The White Chameleon');
         expect(restaurants[0].menu).toHaveLength(2);
         expect(restaurants[0].menu[0].name).toBe('Chicken Nuggets');
+    });
+
+    it('should fail to receive orders', async () => {
+        jest.spyOn(restaurantRepository, 'find').mockResolvedValue([]);
+
+        const restaurants = await getAllRestaurants();
+        expect(restaurants).toEqual([]);
+
+        jest.restoreAllMocks();
     });
 });

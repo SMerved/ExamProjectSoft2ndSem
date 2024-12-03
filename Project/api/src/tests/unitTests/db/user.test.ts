@@ -4,15 +4,12 @@ import { validateCredentials } from '../../../loginService/userRepository.ts';
 import { Address, User } from '../../../loginService/User.ts';
 
 describe('Database functionality for login tests', () => {
+    const userRepository = AppDataSource.getMongoRepository(User);
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
 
     beforeEach(async () => {
-        // Declare the variables once
-        const userRepository = AppDataSource.getMongoRepository(User);
-
-        // Mock Addresses
         const userCredentials = {
             username: 'hesteAbe',
             password: '123456789',

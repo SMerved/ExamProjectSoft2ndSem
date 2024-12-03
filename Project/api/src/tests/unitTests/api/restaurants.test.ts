@@ -1,7 +1,6 @@
 import request from 'supertest';
 import app from '../../../index.ts';
 import * as restaurantRepository from '../../../RestaurantService/dbFunctions.ts';
-import { error } from 'console';
 
 jest.mock('../../../RestaurantService/dbFunctions');
 

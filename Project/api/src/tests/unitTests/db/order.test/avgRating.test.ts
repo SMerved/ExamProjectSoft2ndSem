@@ -1,10 +1,9 @@
 import { AppDataSource } from '../../../../ormconfig.ts';
-import * as orderAndFeedbackService from '../../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import * as orderAndFeedbackRepository from '../../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { ObjectId } from 'mongodb';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 import { Feedback } from '../../../../monolithOrderAndFeedback/Feedback.ts';
+import { createOrders, createOrders2 } from '../../../utilities.ts';
 
 describe('get average rating', () => {
     const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
@@ -17,32 +16,8 @@ describe('get average rating', () => {
     let dummyOrder: Order | null;
 
     beforeEach(async () => {
-        // Declare the variables once
-        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-
-        // Assign values from getAllOrdersMockOrder1
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
-
-        dummyOrder = await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
-
-        // Assign values from getAllOrdersMockOrder2
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
-
-        await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
+        dummyOrder = await createOrders();
+        await createOrders2();
     });
 
     afterEach(async () => {
@@ -115,7 +90,7 @@ describe('get average rating', () => {
         jest.restoreAllMocks();
     });
 
-    it('should fail to find feedback connected to order', async () => {
+    it('should fail because of no overall rating', async () => {
         dummyOrder = {
             ...(dummyOrder as Order),
             feedbackID: new ObjectId('672df427f54107237ff75569'),

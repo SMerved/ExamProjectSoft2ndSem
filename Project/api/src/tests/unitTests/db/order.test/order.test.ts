@@ -1,8 +1,8 @@
 import { AppDataSource } from '../../../../ormconfig.ts';
 import * as orderAndFeedbackService from '../../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
-import { ObjectId } from 'mongodb';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/orderMocksDB.ts';
+import { getAllOrdersMockOrder1, getAllOrdersMockOrder2, mockOrderCreate } from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
+import { createOrders, createOrders2 } from '../../../utilities.ts';
 
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     beforeAll(async () => {
@@ -10,32 +10,8 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     beforeEach(async () => {
-        // Declare the variables once
-        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-
-        // Assign values from getAllOrdersMockOrder1
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
-
-        await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
-
-        // Assign values from getAllOrdersMockOrder2
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
-
-        await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
+        await createOrders();
+        await createOrders2();
     });
 
     afterEach(async () => {
@@ -48,30 +24,7 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     it('should create order', async () => {
-        const mockOrder = {
-            _id: new ObjectId('673de997fa60e0a917658708'),
-            customerID: new ObjectId('672df427f54107237ff75565'),
-            restaurantID: new ObjectId('672de88ff54107237ff75565'),
-            address: new ObjectId('672df723f54107237ff75573'),
-            totalPrice: 50,
-            orderItemList: [
-                {
-                    menuItemId: new ObjectId('672de8c4f54107237ff75546'),
-                    quantity: 2,
-                },
-                {
-                    menuItemId: new ObjectId('672de8c4f54107237ff75547'),
-                    quantity: 3,
-                },
-                {
-                    menuItemId: new ObjectId('672de8c4f54107237ff75548'),
-                    quantity: 1,
-                },
-            ],
-            timestamp: new Date('2024-11-20T12:00:00.000Z'),
-            employeeID: null,
-            feedbackID: null,
-        };
+        const mockOrder = mockOrderCreate;
 
         const order = await orderAndFeedbackService.createOrder(
             mockOrder.customerID,
@@ -86,35 +39,10 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
             throw new Error('Order creation failed, cannot proceed with feedback creation');
         }
 
-        const orderData = {
-            _id: new ObjectId('673de997fa60e0a917658708'),
-            customerID: new ObjectId('672df427f54107237ff75565'),
-            restaurantID: new ObjectId('672de88ff54107237ff75565'),
-            address: new ObjectId('672df723f54107237ff75573'),
-            totalPrice: 50,
-            orderItemList: [
-                {
-                    menuItemId: new ObjectId('672de8c4f54107237ff75546'),
-                    quantity: 2,
-                },
-                {
-                    menuItemId: new ObjectId('672de8c4f54107237ff75547'),
-                    quantity: 3,
-                },
-                {
-                    menuItemId: new ObjectId('672de8c4f54107237ff75548'),
-                    quantity: 1,
-                },
-            ],
-            timestamp: new Date('2024-11-20T12:00:00.000Z'),
-            employeeID: null,
-            feedbackID: null,
-        };
-
         expect(order).not.toBeNull();
-        expect(order.timestamp).toStrictEqual(orderData.timestamp);
-        expect(order.totalPrice).toBe(orderData.totalPrice);
-        expect(order.orderItemList).toStrictEqual(orderData.orderItemList);
+        expect(order.timestamp).toStrictEqual(mockOrder.timestamp);
+        expect(order.totalPrice).toBe(mockOrder.totalPrice);
+        expect(order.orderItemList).toStrictEqual(mockOrder.orderItemList);
     });
 
     it('should get all orders', async () => {

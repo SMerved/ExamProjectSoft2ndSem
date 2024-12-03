@@ -2,8 +2,9 @@ import { AppDataSource } from '../../../../ormconfig.ts';
 import * as orderAndFeedbackService from '../../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import * as orderAndFeedbackRepository from '../../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { ObjectId } from 'mongodb';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
+import { createOrders, createOrders2 } from '../../../utilities.ts';
+import { getAllOrdersMockOrder1 } from '../../../mocks/orderMocksDB.ts';
 
 describe('Retrieve orders functions', () => {
     const orderRepository = AppDataSource.getMongoRepository(Order);
@@ -12,42 +13,18 @@ describe('Retrieve orders functions', () => {
         await AppDataSource.initialize();
     });
 
-    let dummyOrder2: Order | null;
     let dummyOrder1: Order | null;
+    let dummyOrder2: Order | null;
 
     beforeEach(async () => {
-        // Declare the variables once
-        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-
-        // Assign values from getAllOrdersMockOrder1
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
-
-        dummyOrder1 = await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
+        dummyOrder1 = await createOrders();
+        dummyOrder2 = await createOrders2();
 
         dummyOrder1 = {
             ...(dummyOrder1 as Order),
             status: 2,
             employeeID: new ObjectId('672df427f54107237ff75569'),
         };
-
-        // Assign values from getAllOrdersMockOrder2
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
-
-        dummyOrder2 = await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
 
         dummyOrder2 = {
             ...(dummyOrder2 as Order),
@@ -99,12 +76,11 @@ describe('Retrieve orders functions', () => {
         );
     });
 
-    it('should handle errors and return null', async () => {
+    it('should throw error', async () => {
         jest.spyOn(orderRepository, 'find').mockRejectedValue(new Error('Database error'));
 
-        const orders = await orderAndFeedbackRepository.GetAllAcceptedOrders();
+        await expect(orderAndFeedbackRepository.GetAllAcceptedOrders()).rejects.toThrow('Error: Database error');
 
-        expect(orders).toBeNull();
         jest.restoreAllMocks();
     });
 
@@ -151,7 +127,9 @@ describe('Retrieve orders functions', () => {
         if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
         if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
 
-        const orders = await orderAndFeedbackRepository.GetAllOrdersById('672de88ff54107237ff75565');
+        const orders = await orderAndFeedbackRepository.GetAllOrdersById(
+            getAllOrdersMockOrder1.restaurantID.toString()
+        );
 
         expect(orders).not.toBeNull();
 

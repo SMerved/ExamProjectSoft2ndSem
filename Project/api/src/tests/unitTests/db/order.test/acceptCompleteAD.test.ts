@@ -1,46 +1,20 @@
 import { AppDataSource } from '../../../../ormconfig.ts';
-import * as orderAndFeedbackService from '../../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import * as orderAndFeedbackRepository from '../../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { ObjectId } from 'mongodb';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
+import { createOrders } from '../../../utilities.ts';
+import { mockOrder } from '../../../mocks/orderMocksDB.ts';
 
 describe('accept/complete order as delivery driver', () => {
     const orderRepository = AppDataSource.getMongoRepository(Order);
+    let dummyOrder: Order | null;
 
     beforeAll(async () => {
         await AppDataSource.initialize();
     });
 
-    let dummyOrder: Order | null;
-
     beforeEach(async () => {
-        // Declare the variables once
-        let customerID, restaurantID, address, totalPrice, orderItemList, timestamp;
-
-        // Assign values from getAllOrdersMockOrder1
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder1);
-
-        dummyOrder = await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
-
-        // Assign values from getAllOrdersMockOrder2
-        ({ customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2);
-
-        await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            orderItemList,
-            address,
-            totalPrice,
-            timestamp
-        );
+        dummyOrder = await createOrders();
     });
 
     afterEach(async () => {
@@ -217,33 +191,7 @@ describe('accept/complete order as delivery driver', () => {
     it('complete order fail because wrong order status', async () => {
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        jest.spyOn(orderRepository, 'findOne').mockResolvedValue({
-            _id: dummyOrder?._id,
-            customerID: new ObjectId(),
-            restaurantID: new ObjectId(),
-            employeeID: new ObjectId('672df427f54107237ff75569'), // Same `employeeID` for filtering
-            status: 4,
-            address: new ObjectId(),
-            totalPrice: Math.random() * 100,
-            orderItemList: Array.from({ length: Math.floor(Math.random() * 5) + 1 }, () => ({
-                menuItemId: new ObjectId(),
-                quantity: Math.floor(Math.random() * 5) + 1,
-            })),
-            feedbackID: new ObjectId(),
-            timestamp: new Date(),
-            pickUpDate: new Date(),
-            completionDate: new Date(),
-            pay: {
-                baseAmount: Math.random() * 10,
-                totalOrderQuantityMultiplier: Math.random() * 2,
-                deliverySpeedMultiplier: Math.random() * 2,
-                feedbackRatingMultiplier: Math.random(),
-                orderPriceBonus: Math.random(),
-                nightTimeBonus: Math.random(),
-                totalPay: Math.random() * 100,
-            },
-            rejectReason: null,
-        });
+        jest.spyOn(orderRepository, 'findOne').mockResolvedValue({ ...mockOrder, _id: dummyOrder._id });
 
         await expect(orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString())).rejects.toThrow(
             'Order is not ready to be completed'

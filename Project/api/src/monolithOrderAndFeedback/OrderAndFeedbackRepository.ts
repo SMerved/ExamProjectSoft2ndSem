@@ -151,7 +151,7 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
         return acceptedOrderList;
     } catch (error) {
         console.error('Error fetching orders:', error);
-        return null;
+        throw new Error('' + error);
     }
 }
 async function GetOwnOrders(employeeID: string, status: number): Promise<Order[] | null> {
@@ -310,13 +310,6 @@ async function calculateAndUpdateOrderPay(orderID: string) {
     });
 
     const totalOrdersAmount = allOrders.length;
-
-    // const totalOrders = await orderRepository.count({
-    //     where: {
-    //         employeeID: order?.employeeID,
-    //     },
-    // });
-    // Commented out code above no work... count() works, the "where clause" on find() works , but count() with the same "where clause" returns 0...
 
     if (!order) {
         throw new Error(`Order with ID ${orderID} not found`);
