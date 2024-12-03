@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
-import { Order } from '../monolithOrderAndFeedback/Order.ts';
 import * as orderAndFeedbackService from '../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import { getAllOrdersMockOrder1, getAllOrdersMockOrder2 } from './mocks/orderMocksDB.ts';
+import { Order } from '../monolithOrderAndFeedback/Order.ts';
 
 export async function createOrders() {
     // Assign values from getAllOrdersMockOrder1
@@ -16,11 +16,13 @@ export async function createOrders() {
         timestamp
     );
 
-    return order;
+    return {
+        getOrder: () => order,
+    };
 }
 
 export async function createOrders2() {
-    // Assign values from getAllOrdersMockOrder2
+    // Assign values from getAllOrdersMockOrder1
     const { customerID, restaurantID, orderItemList, address, totalPrice, timestamp } = getAllOrdersMockOrder2;
 
     const order = await orderAndFeedbackService.createOrder(
@@ -31,7 +33,10 @@ export async function createOrders2() {
         totalPrice,
         timestamp
     );
-    return order;
+
+    return {
+        getOrder2: () => order,
+    };
 }
 
 export function setOrderHours(

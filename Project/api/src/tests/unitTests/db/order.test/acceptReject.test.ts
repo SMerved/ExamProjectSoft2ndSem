@@ -10,9 +10,10 @@ describe('Accept and reject order as restuarant', () => {
     });
 
     let dummyOrder: Order | null;
+    let getOrder: () => Order | null;
 
     beforeEach(async () => {
-        dummyOrder = await createOrders();
+        ({ getOrder } = await createOrders());
         await createOrders2();
     });
 
@@ -26,6 +27,8 @@ describe('Accept and reject order as restuarant', () => {
     });
 
     it('should succesfully reject order as restaurant', async () => {
+        dummyOrder = getOrder();
+
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const acceptedOrder = await orderAndFeedbackRepository.acceptRejectOrder(
@@ -53,6 +56,8 @@ describe('Accept and reject order as restuarant', () => {
     });
 
     it('should accept order', async () => {
+        dummyOrder = getOrder();
+
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const acceptedOrder = await orderAndFeedbackRepository.acceptRejectOrder(dummyOrder?._id.toString(), 2, '');

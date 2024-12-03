@@ -13,9 +13,10 @@ describe('calculate and complete order', () => {
     });
 
     let dummyOrder: Order | null;
+    let getOrder: () => Order | null;
 
     beforeEach(async () => {
-        dummyOrder = await createOrders();
+        ({ getOrder } = await createOrders());
         await createOrders2();
     });
 
@@ -29,6 +30,8 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update correctly', async () => {
+        dummyOrder = getOrder();
+
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -75,6 +78,8 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update with night bonus and speed bonus', async () => {
+        dummyOrder = getOrder();
+
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -118,6 +123,8 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update with moderate delivery time bonus and max TOQmultiplier', async () => {
+        dummyOrder = getOrder();
+
         const mockOrders = Array.from({ length: 201 }, () => mockOrderWithId);
 
         jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders);
@@ -166,6 +173,8 @@ describe('calculate and complete order', () => {
     });
 
     it('should calculate and update with slow delivery time bonus', async () => {
+        dummyOrder = getOrder();
+
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const feedbackData = {
@@ -208,6 +217,8 @@ describe('calculate and complete order', () => {
     });
 
     it('should fail to find order', async () => {
+        dummyOrder = getOrder();
+
         jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');

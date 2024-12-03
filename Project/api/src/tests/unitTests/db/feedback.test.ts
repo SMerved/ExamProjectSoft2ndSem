@@ -1,35 +1,23 @@
 import { AppDataSource } from '../../../ormconfig.ts';
-import * as orderAndFeedbackService from '../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
 import * as orderAndFeedbackRepository from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import {
     createFeedbackAndLinkOrder,
     orderRepository,
 } from '../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
-import { mockOrderDB } from '../../mocks/feedbackMocksDB.ts';
 import { Order } from '../../../monolithOrderAndFeedback/Order.ts';
 import { ObjectId } from 'mongodb';
+import { createOrders } from '../../utilities.ts';
 
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     let order: Order | null;
+    let getOrder: () => Order | null;
+
+    beforeEach(async () => {
+        ({ getOrder } = await createOrders());
+    });
 
     beforeAll(async () => {
         await AppDataSource.initialize();
-    });
-
-    beforeEach(async () => {
-        // Create a fresh order before each test
-        const { customerID, restaurantID, menuItems, address, totalPrice, timestamp } = mockOrderDB;
-        order = await orderAndFeedbackService.createOrder(
-            customerID,
-            restaurantID,
-            menuItems,
-            address,
-            totalPrice,
-            timestamp
-        );
-        if (!order) {
-            throw new Error('Order creation failed, cannot proceed with feedback creation');
-        }
     });
 
     afterAll(async () => {
@@ -37,6 +25,8 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     it('should create feedback and link it to the correct order', async () => {
+        order = getOrder();
+
         if (!order) {
             throw new Error('Order creation failed, cannot proceed with feedback creation');
         }
@@ -61,6 +51,8 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     it('should throw an error if the order is not found', async () => {
+        order = getOrder();
+
         if (!order) {
             throw new Error('Order creation failed, cannot proceed with feedback creation');
         }
@@ -77,6 +69,8 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     });
 
     it('should return the average rating number for the given order ID', async () => {
+        order = getOrder();
+
         if (!order) {
             throw new Error('Order creation failed, cannot proceed with feedback creation');
         }
