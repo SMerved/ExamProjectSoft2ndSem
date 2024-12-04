@@ -10,7 +10,7 @@
     "dev": "nodemon src/server.ts",
     "test": "jest --runInBand",
     "testCoverage": "jest --runInBand --coverage",
-    "testIterations": "ts-node src/utilities/jestReRun.ts",
+    "testIterations": "nodemon src/utilities/jestReRun.ts",
     "lint": "eslint ."
   },
   "keywords": [],
