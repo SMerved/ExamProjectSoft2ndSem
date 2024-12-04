@@ -6,6 +6,6 @@ export default {
   },
   extensionsToTreatAsEsm: ['.ts'],
   moduleFileExtensions: ["ts", "tsx", "js", "json"],
-  setupFilesAfterEnv: ['<rootDir>/src/utilities/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/src/utilities/jestSetup.ts'],
   globalTeardown: '<rootDir>/src/utilities/jestGlobalTeardown.ts'
 };

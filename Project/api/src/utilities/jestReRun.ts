@@ -7,18 +7,18 @@ const runTests = (iterations: number): void => {
   const run = (): void => {
     if (count >= iterations) {
       console.log('All iterations completed.');
-      console.log('Failures:', results.filter((r) => r.includes('FAIL')));
+      console.log('Failures:', results);
       return;
     }
 
     console.log(`Running iteration ${count + 1}/${iterations}...`);
-    exec('jest --runInBand', (error, stdout, stderr) => {
+    exec('npm run test', (error, stdout, stderr) => {
+      const output = stdout || stderr || '';
       if (error) {
         console.error(`Error in iteration ${count + 1}:`, error.message);
+        results.push(output);
       }
 
-      const output = stdout || stderr || '';
-      results.push(output);
       console.log(output);
       count++;
       run();

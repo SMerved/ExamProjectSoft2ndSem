@@ -7,9 +7,10 @@
   "scripts": {
     "start": "ts-node src/server.ts",
     "build": "node esbuild.config.js",
-    "dev": "nodemon src/utilities/jestReRun.ts",
+    "dev": "nodemon src/server.ts",
     "test": "jest --runInBand",
     "testCoverage": "jest --runInBand --coverage",
+    "testIterations": "ts-node src/utilities/jestReRun.ts",
     "lint": "eslint ."
   },
   "keywords": [],
