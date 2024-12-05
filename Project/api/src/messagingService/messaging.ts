@@ -1,6 +1,6 @@
 import { Express, Request, Response } from 'express';
 import { KafkaAdapter } from './kafkaAdapter.ts';
-import MessageBroker from './types/types';
+import MessageBroker from './types/types.ts';
 // Configure Kafka Adapter
 const messageBroker: MessageBroker = new KafkaAdapter(
     'mtogo', //Name for the specific service for debugging purposes
