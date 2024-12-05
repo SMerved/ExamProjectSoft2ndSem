@@ -6,7 +6,8 @@ import {
     GetAllAcceptedOrders,
 } from './OrderAndFeedbackRepository.ts';
 import { OrderItem } from './types/order.ts';
-
+import { KafkaAdapter} from "../messagingService/kafkaAdapter.ts";
+import MessageBroker from "../messagingService/types/types.ts";
 async function createOrder(
     customerID: ObjectId,
     restaurantID: ObjectId,
@@ -26,6 +27,19 @@ async function createOrder(
         timestamp
     );
 
+    const messageBroker: MessageBroker = new KafkaAdapter( 'order-service', 'order-service-group', 'restaurant_topic');
+    const retries = 3;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            await messageBroker.sendEvent("order", order);
+
+        } catch (error) {
+            if (attempt === retries) {
+                throw error;
+            }
+            console.warn(`Attempt ${attempt} failed. Retrying...`);
+        }
+    }
     return order;
 }
 

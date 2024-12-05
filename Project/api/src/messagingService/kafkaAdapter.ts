@@ -1,34 +1,51 @@
-import { Kafka, Producer, Consumer } from 'kafkajs';
+import {Kafka, Producer, Consumer} from 'kafkajs';
 import MessageBroker from './types/types.ts';
 
 export class KafkaAdapter implements MessageBroker {
     private kafka: Kafka;
-    private producer: Producer;
-    private consumer: Consumer;
+    private producer: Producer | undefined;
+    private consumer: Consumer | undefined;
     private readonly topic: string;
+    private readonly groupId: string;
 
     constructor(
-        brokers: string[],
         clientId: string,
         groupId: string,
         topic: string
     ) {
+        const brokers =  process.env.KAFKA_BROKERS?.split(',') || [];
         this.kafka = new Kafka({
             clientId,
             brokers,
         });
-
-        this.producer = this.kafka.producer();
-        this.consumer = this.kafka.consumer({ groupId });
+        this.groupId = groupId;
         this.topic = topic;
     }
 
+    createProducer() {
+        if (!this.producer) {
+            this.producer = this.kafka.producer();
+        }
+        return this.producer;
+    }
+
+    createConsumer(groupId: string) {
+        if (!this.consumer) {
+            this.consumer = this.kafka.consumer({ groupId: groupId });
+        }
+        return this.consumer;
+    }
+
+
+
+
     // Adapter method for sending events
     async sendEvent(eventType: string, payload: any): Promise<void> {
-        await this.producer.connect();
+        const producer = this.createProducer();
+        await producer.connect();
 
         try {
-            await this.producer.send({
+            const message = {
                 topic: this.topic,
                 messages: [
                     {
@@ -39,9 +56,11 @@ export class KafkaAdapter implements MessageBroker {
                         }),
                     },
                 ],
-            });
+            }
+            await producer.send( message );
+            console.log('Event sent:', message);
         } finally {
-            await this.producer.disconnect();
+            await producer.disconnect();
         }
     }
 
@@ -49,21 +68,22 @@ export class KafkaAdapter implements MessageBroker {
     async consumeEvents(
         handler: (eventType: string, payload: any) => void
     ): Promise<void> {
-        await this.consumer.connect();
-        await this.consumer.subscribe({
+        const consumer = this.createConsumer(this.groupId);
+        await consumer.connect();
+        await consumer.subscribe({
             topic: this.topic,
             fromBeginning: false,
         });
 
-        await this.consumer.run({
-            eachMessage: async ({ topic, partition, message }) => {
+        await consumer.run({
+            eachMessage: async ({topic, partition, message}) => {
                 if (!message.value) {
                     console.warn('Message value is null');
                     return;
                 }
 
                 const event = JSON.parse(message.value.toString());
-                const { eventType, payload } = event;
+                const {eventType, payload} = event;
 
                 try {
                     handler(eventType, payload);
@@ -74,7 +94,7 @@ export class KafkaAdapter implements MessageBroker {
                     );
                 }
 
-                await this.consumer.commitOffsets([
+                await consumer.commitOffsets([
                     {
                         topic,
                         partition,

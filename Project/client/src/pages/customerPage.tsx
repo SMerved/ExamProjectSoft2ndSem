@@ -33,7 +33,7 @@ function CustomerPage() {
             _id: '672df723f54107237ff75573',
             street: 'Maple Street 12',
             city: 'Copenhagen',
-            postalCode: 1001,
+            postalCode: "1001",
         },
         totalPrice: 50,
         orderItemList: [

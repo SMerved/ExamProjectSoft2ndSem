@@ -3,7 +3,6 @@ import { KafkaAdapter } from './kafkaAdapter.ts';
 import MessageBroker from './types/types';
 // Configure Kafka Adapter
 const messageBroker: MessageBroker = new KafkaAdapter(
-    process.env.KAFKA_BROKERS?.split(',') || [],
     'mtogo', //Name for the specific service for debugging purposes
     'mtogo-group', //Group name for the service, used for load balancing
     'test-topic' //Topic name for the service, used for message routing so that only relevant services receive the message

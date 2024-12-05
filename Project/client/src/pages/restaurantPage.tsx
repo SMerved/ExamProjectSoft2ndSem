@@ -14,6 +14,7 @@ import OrderCardDetailed from '../components/orders/orderCardDetailed.tsx';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import { Divider } from '@mui/material';
 
+
 function RestaurantPage() {
     const location = useLocation();
     const user: User = location.state?.user;
@@ -24,6 +25,7 @@ function RestaurantPage() {
     const [yData, setYData] = useState<number[]>([]);
     const [labels, setLabels] = useState<string[]>([]);
     const [labelType, setLabelType] = useState<string>('Income');
+
 
     const fetchOrders = async () => {
         try {
