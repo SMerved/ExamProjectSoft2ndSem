@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { getAllRestaurants } from './RestaurantService/dbFunctions.ts';
 import {
     createOrder,
     getAllAcceptedOrders,
@@ -22,6 +21,8 @@ import { UserCredentials } from './interfaces/users.ts';
 import { loginServiceValidateCredentials } from './adapters/loginServiceAdapter.ts';
 import { CustomError } from './types/generic.ts';
 import { paymentServiceValidatePayment } from './paymentService/paymentServiceAdapter.ts';
+import { restaurantServiceGetAllRestaurants } from './adapters/restaurantServiceAdapter.ts';
+import { restaurantRouter } from './RestaurantService/restaurantRoutes.ts';
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use(express.json());
 
 app.use('/loginService', loginRouter);
 app.use('/paymentService', paymentRouter);
+app.use('/restaurantService', restaurantRouter)
 
 app.post('/pay', async (req, res) => {
     try {
@@ -73,8 +75,7 @@ app.post('/login', async (req: Request, res: Response) => {
 
 app.get('/restaurants', async (req: Request, res: Response) => {
     try {
-        const restaurants = await getAllRestaurants();
-
+        const restaurants = await restaurantServiceGetAllRestaurants();
         res.json(restaurants);
     } catch (error) {
         console.error('Error fetching restaurants:', error);

@@ -7,7 +7,7 @@ const paymentRouter = express.Router();
 paymentRouter.post('/validatePayment', async (req, res) => {
     try {
         const paymentCredentials: PaymentCredentials = req.body;
-        const { price, customerId, cardNumber } = paymentCredentials;
+        const { price, customerId } = paymentCredentials;
         const response = await pay(price, customerId);
 
         if (response) {

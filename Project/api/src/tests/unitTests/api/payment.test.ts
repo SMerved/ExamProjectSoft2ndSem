@@ -7,7 +7,6 @@ jest.mock('axios');
 describe('Post /paymentService/validatePayment', () => {
     afterEach(() => {
         jest.resetAllMocks();
-        jest.restoreAllMocks();
     });
 
     it('Should return true', async () => {

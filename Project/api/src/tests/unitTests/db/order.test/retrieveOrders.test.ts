@@ -82,11 +82,11 @@ describe('Retrieve orders functions', () => {
     });
 
     it('should throw error', async () => {
-        jest.spyOn(orderRepository, 'find').mockRejectedValue(new Error('Database error'));
+        const findOrderSpy = jest.spyOn(orderRepository, 'find').mockRejectedValue(new Error('Database error'));
 
         await expect(orderAndFeedbackRepository.GetAllAcceptedOrders()).rejects.toThrow('Error: Database error');
 
-        jest.restoreAllMocks();
+        findOrderSpy.mockRestore();
     });
 
     it('should get all own orders', async () => {

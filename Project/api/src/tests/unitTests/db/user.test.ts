@@ -31,7 +31,7 @@ describe('Database functionality for login tests', () => {
             postalCode: '1001',
         };
 
-        jest.spyOn(addressRepository, 'findOne').mockResolvedValue(address);
+        const findAddressSpy = jest.spyOn(addressRepository, 'findOne').mockResolvedValue(address);
 
         const userCredentials = {
             username: 'hesteAbe',
@@ -44,7 +44,7 @@ describe('Database functionality for login tests', () => {
         expect(user?.username).toEqual('hesteAbe');
         expect(user?.password).toEqual('123456789');
         expect(user?.address).toEqual(address);
-        jest.restoreAllMocks();
+        findAddressSpy.mockRestore();
     });
 
     it('should succesfully log in but have no address', async () => {
