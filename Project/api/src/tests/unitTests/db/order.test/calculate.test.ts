@@ -127,7 +127,7 @@ describe('calculate and complete order', () => {
 
         const mockOrders = Array.from({ length: 201 }, () => mockOrderWithId);
 
-        jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders);
+        const findOrderSpy = jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
@@ -149,7 +149,7 @@ describe('calculate and complete order', () => {
             order?._id.toString()
         );
 
-        jest.restoreAllMocks();
+        findOrderSpy.mockRestore();
 
         expect(calculatedUpdatedOrder).not.toBeNull();
 
@@ -219,7 +219,7 @@ describe('calculate and complete order', () => {
     it('should fail to find order', async () => {
         dummyOrder = getOrder();
 
-        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
@@ -227,6 +227,6 @@ describe('calculate and complete order', () => {
             `Order with ID ${dummyOrder?._id.toString()} not found`
         );
 
-        jest.restoreAllMocks();
+        findOneOrderSpy.mockRestore();
     });
 });

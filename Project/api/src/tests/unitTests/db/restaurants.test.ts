@@ -92,11 +92,11 @@ describe('Database functionality for restaurant tests', () => {
     });
 
     it('should fail to receive orders', async () => {
-        jest.spyOn(restaurantRepository, 'find').mockResolvedValue([]);
+        const findRestaurantsSpy = jest.spyOn(restaurantRepository, 'find').mockResolvedValue([]);
 
         const restaurants = await getAllRestaurants();
         expect(restaurants).toEqual([]);
 
-        jest.restoreAllMocks();
+        findRestaurantsSpy.mockRestore();
     });
 });

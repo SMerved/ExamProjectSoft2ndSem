@@ -65,7 +65,7 @@ describe('get average rating', () => {
     it('should fail to find order', async () => {
         dummyOrder = getOrder();
 
-        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
@@ -75,7 +75,7 @@ describe('get average rating', () => {
             `Order with ID ${wrongID} not found`
         );
 
-        jest.restoreAllMocks();
+        findOneOrderSpy.mockRestore();
     });
 
     it('should fail to find feedback connected to order', async () => {
@@ -87,7 +87,7 @@ describe('get average rating', () => {
         };
         await orderRepository.save(dummyOrder);
 
-        jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue(null);
+        const findOneFeedbackSpy = jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
@@ -95,7 +95,7 @@ describe('get average rating', () => {
             `Feedback with ID ${dummyOrder?.feedbackID} not found`
         );
 
-        jest.restoreAllMocks();
+        findOneFeedbackSpy.mockRestore();
     });
 
     it('should fail because of no overall rating', async () => {
@@ -107,7 +107,7 @@ describe('get average rating', () => {
         };
         await orderRepository.save(dummyOrder);
 
-        jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue({
+        const findOneFeedbackSpy = jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue({
             _id: new ObjectId('672df427f54107237ff75569'),
             foodRating: 5,
             deliveryRating: 3,
@@ -120,6 +120,6 @@ describe('get average rating', () => {
             `Feedback ratings are incomplete for feedback #${dummyOrder?.feedbackID}`
         );
 
-        jest.restoreAllMocks();
+        findOneFeedbackSpy.mockRestore();
     });
 });

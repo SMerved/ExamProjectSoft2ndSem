@@ -121,7 +121,7 @@ describe('accept/complete order as delivery driver', () => {
     it('fail to complete order because no order found', async () => {
         dummyOrder = getOrder();
 
-        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         dummyOrder = {
             ...(dummyOrder as Order),
@@ -140,13 +140,13 @@ describe('accept/complete order as delivery driver', () => {
             )
         ).rejects.toThrow(`Order with ID ${dummyOrder?._id.toString()} not found`);
 
-        jest.restoreAllMocks();
+        findOneOrderSpy.mockRestore();
     });
 
     it('should fail to accept order because of no order ID', async () => {
         dummyOrder = getOrder();
 
-        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         dummyOrder = {
             ...(dummyOrder as Order),
@@ -163,7 +163,7 @@ describe('accept/complete order as delivery driver', () => {
             )
         ).rejects.toThrow('Order with ID 672df427f54107237ff75561 not found');
 
-        jest.restoreAllMocks();
+        findOneOrderSpy.mockRestore();
     });
 
     it('fail to complete order because status is not 2', async () => {
@@ -190,7 +190,7 @@ describe('accept/complete order as delivery driver', () => {
     it('complete order fail because status is not 2', async () => {
         dummyOrder = getOrder();
 
-        jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
@@ -198,7 +198,7 @@ describe('accept/complete order as delivery driver', () => {
             `Order with ID ${dummyOrder?._id} not found`
         );
 
-        jest.restoreAllMocks();
+        findOneOrderSpy.mockRestore();
     });
 
     it('complete order fail because wrong order status', async () => {
@@ -206,12 +206,12 @@ describe('accept/complete order as delivery driver', () => {
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        jest.spyOn(orderRepository, 'findOne').mockResolvedValue({ ...mockOrder, _id: dummyOrder._id });
+        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue({ ...mockOrder, _id: dummyOrder._id });
 
         await expect(orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString())).rejects.toThrow(
             'Order is not ready to be completed'
         );
 
-        jest.restoreAllMocks();
+        findOneOrderSpy.mockRestore();
     });
 });
