@@ -32,6 +32,18 @@ The "api" (Backend) runs on port [3001](http://localhost/3001) and "client" (Fro
 
 To stop the application from the terminal use "Ctrl + C".
 
+### Logins
+
+When using the application, either remotly or locally, you will need to login. We have not included a way to create new users and so you will need to make use of one of the already existing ones.
+
+| Role | Username | Password |
+| :--- | :----: | ---: |
+| Customer | Abejægeren | test123 |
+| Customer | user | test123 |
+| Admin | admin | test123 |
+| Restaurant | MarioPizzaMaker | test123 |
+| Delivery | bestdriver | test123 |
+
 ## Automation
 Navigate the folders to `/.github/workflows` to view any yaml files made for automation of the workflow using GitHub Actions.
 
