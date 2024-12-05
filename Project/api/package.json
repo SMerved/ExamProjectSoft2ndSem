@@ -10,6 +10,7 @@
     "dev": "nodemon src/server.ts",
     "test": "jest --runInBand",
     "testCoverage": "jest --runInBand --coverage",
+    "testIterations": "nodemon src/utilities/jestReRun.ts",
     "lint": "eslint ."
   },
   "keywords": [],
@@ -22,6 +23,7 @@
     "kafkajs": "^2.2.4",
     "mongodb": "^5.9.2",
     "reflect-metadata": "^0.2.2",
+    "stripe": "^17.4.0",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {
