@@ -2,7 +2,7 @@
 ## About this repository
 This repository is made as part of our exams for System Integration, Development of  Big Systems and Software Quality.
 
-The repository includes two applications located in the "Project" folder and are a backend and a frontend for a high fidelity food ordering application. 
+The repository includes two applications located in the "Project" folder and are a backend and a frontend for a high fidelity prototype of a food ordering application. 
 
 In the "Documentation" folder you can view any pdf documents, videos and other for each individual exam, as well as the work assignment document.
 
