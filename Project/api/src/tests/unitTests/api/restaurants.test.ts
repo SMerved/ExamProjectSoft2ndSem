@@ -11,7 +11,7 @@ describe('GET /restaurants', () => {
 
     it('should return restaurant array', async () => {
         const mockRestaurants = [{ id: 1, name: 'Mock Restaurant' }];
-        (axios.get as jest.Mock).mockResolvedValue(mockRestaurants);
+        (axios.get as jest.Mock).mockResolvedValue({data: mockRestaurants});
 
         const response = await request(app).get('/restaurants').send();
 

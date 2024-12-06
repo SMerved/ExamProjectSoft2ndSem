@@ -8,8 +8,9 @@ const BASE_URL = `http://localhost:${port}/restaurantService`;
 
 async function restaurantServiceGetAllRestaurants() {  
         const response = await axios.get(`${BASE_URL}/getAllRestaurants`);
+        console.log('Restaurants:', response);
 
-        return response; //Potential errors get thrown to caller and handled.
+        return response.data; //Potential errors get thrown to caller and handled.
 }
 
 
