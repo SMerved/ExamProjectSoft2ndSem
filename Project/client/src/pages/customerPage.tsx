@@ -16,7 +16,7 @@ function CustomerPage() {
 
     const order: Order = {
         // Change this to the actual, completed order when implemented
-        userID: '673de997fa60e0a917658809',
+        _ID: '673de997fa60e0a917658809',
         customerID: {
             _id: '672df427f54107237ff75565',
             username: 'Abejægeren',

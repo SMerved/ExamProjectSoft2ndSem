@@ -31,7 +31,7 @@ app.use(express.json());
 
 app.use('/loginService', loginRouter);
 app.use('/paymentService', paymentRouter);
-app.use('/restaurantService', restaurantRouter)
+app.use('/restaurantService', restaurantRouter);
 
 app.post('/pay', async (req, res) => {
     try {
@@ -104,7 +104,6 @@ app.post('/createOrder', async (req: Request, res: Response) => {
             totalPrice,
             timestamp
         );
-
 
         if (!order) {
             res.status(401).json({ error: 'Invalid order data' });
@@ -276,7 +275,9 @@ app.post('/calcAndUpdatePay', async (req: Request, res: Response) => {
         res.json(order);
     } catch (error) {
         console.error('Error calculating and updating order: ', error);
-        res.status(500).json({ error: 'Error calculating and updating order' + error });
+        res.status(500).json({
+            error: 'Error calculating and updating order' + error,
+        });
     }
 });
 

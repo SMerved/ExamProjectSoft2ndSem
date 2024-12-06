@@ -1,13 +1,13 @@
 import { Address } from './address';
 export interface Order {
-    userID: string;
+    _ID: string;
     customerID: Customer;
     restaurantID: string;
-    employeeID: string;
+    employeeID?: string;
     status: number;
     address: Address;
     totalPrice: number;
-    feedbackID: string;
+    feedbackID?: string;
     timestamp: string;
     orderItemList: OrderItem[];
     pickUpDate?: string;
