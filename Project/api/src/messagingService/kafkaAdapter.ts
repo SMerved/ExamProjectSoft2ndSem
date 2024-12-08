@@ -58,7 +58,7 @@ export class KafkaAdapter implements MessageBroker {
                 ],
             }
             await producer.send( message );
-            console.log('Event sent:', message);
+            console.info('Event sent:', message);
         } finally {
             await producer.disconnect();
         }

@@ -64,14 +64,11 @@ async function getMenuItems(orders: Order[]) {
 async function getFullMenuItems(orders: Order[]) {
     const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemID));
 
-    console.error('menuItemIds', menuItemIds)
     const menuItems = await menuItemRepository.find({
         where: {
             _id: { $in: menuItemIds.map((id) => id) },
         },
     });
-
-    console.error('menuItems', menuItems)
 
     const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
 
@@ -94,7 +91,6 @@ async function getFullMenuItems(orders: Order[]) {
 
 
 async function acceptRejectOrder(orderId: string, newStatus: number, rejectReason?: string) {
-    console.log('acceptRejectOrder', orderId, newStatus, rejectReason);
     if (newStatus < 0 || newStatus > 4) {
         throw new Error('Status must be between between 0 and 4, inclusive');
     } else if (newStatus !== 1 && rejectReason) {
@@ -163,23 +159,9 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
             where: { status: 2 },
         });
 
-        console.log('acceptedOrders')
-        for (const menuItem of acceptedOrders){
-            for (const orderItem of menuItem.orderItemList){
-                console.log('orderItem', orderItem)
-            }
-        }
-
         const acceptedOrderList: Order[] = [];
 
         const ordersWithMenuItems = await getFullMenuItems(acceptedOrders);
-
-        console.log('AfterARSSSSSSASD')
-        for (const menuItem of ordersWithMenuItems){
-            for (const orderItem of menuItem.orderItemList){
-                console.log('orderItem', orderItem)
-            }
-        }
 
         for (const acceptedOrder of ordersWithMenuItems) {
             const address = await getAddress(acceptedOrder);
