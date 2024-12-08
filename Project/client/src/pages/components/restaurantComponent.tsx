@@ -13,7 +13,7 @@ interface RestaurantPageProps {
 }
 
 interface menuItemLine {
-    menuItem: MenuItem;
+    menuItemID: MenuItem;
     quantity: number;
 }
 
@@ -23,7 +23,7 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
 
         setHandlingPayment(true);
         try {
-            setTotalPrice(menuItems.reduce((total, item) => total + item.menuItem.price * item.quantity, 0));
+            setTotalPrice(menuItems.reduce((total, item) => total + item.menuItemID.price * item.quantity, 0));
             //const order = await createOrder(user._id, restaurant._id, menuItems, user.address, totalPrice);
             //console.log('Order created:', order);
         } catch (error) {
@@ -54,18 +54,18 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
     const [card, setCard] = useState<number>(0);
 
     const addToCart = (menuItem: MenuItem) => {
-        const existingMenuItem = menuItems.find((item) => item.menuItem._id === menuItem._id);
+        const existingMenuItem = menuItems.find((item) => item.menuItemID._id === menuItem._id);
 
         if (existingMenuItem) {
             setMenuItems(
                 menuItems.map((item) =>
-                    item.menuItem._id === menuItem._id
+                    item.menuItemID._id === menuItem._id
                         ? { ...existingMenuItem, quantity: existingMenuItem.quantity + 1 }
                         : item
                 )
             );
         } else {
-            setMenuItems([...menuItems, { menuItem, quantity: 1 }]);
+            setMenuItems([...menuItems, { menuItemID: menuItem, quantity: 1 }]);
         }
     };
 

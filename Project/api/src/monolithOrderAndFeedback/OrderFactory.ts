@@ -12,14 +12,25 @@ export class OrderFactory {
         orderItemList: OrderItem[],
         timestamp: Date
     ): Promise<Order | null> {
+
+
+        orderItemList = orderItemList.map((item) => {
+            return {
+                menuItemId: new ObjectId(item.menuItemId),
+                quantity: item.quantity,
+            }
+        });
+        
+       console.log("OrderFactory.CreateOrder");
+       console.log("Orders", orderItemList);
         const order = {
-            customerID,
-            restaurantID,
+            customerID: new ObjectId(customerID),
+            restaurantID: new ObjectId(restaurantID),
             address,
             totalPrice,
             orderItemList,
             timestamp,
-            status: 0,
+            status: 0
         };
 
         return await AddOrder(order);

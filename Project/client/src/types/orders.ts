@@ -27,7 +27,7 @@ export interface Customer {
 }
 
 export interface OrderItem {
-    menuItem: MenuItem;
+    menuItemID: MenuItem | string;
     quantity: number;
 }
 

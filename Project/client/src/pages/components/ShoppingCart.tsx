@@ -46,9 +46,9 @@ const ShoppingCart: React.FC<ShoppingCartProps> = ({ orderItemList }) => {
                             color: '#555',
                         }}
                     >
-                        <span>{item.menuItem.name}</span>
+                        <span>{item.menuItemID.name}</span>
                         <span>Quantity: {item.quantity}</span>
-                        <span>Price: ${item.menuItem.price.toFixed(2)}</span>
+                        <span>Price: ${item.menuItemID.price.toFixed(2)}</span>
                     </li>
                 ))}
             </ul>

@@ -74,10 +74,28 @@ export const acceptRejectOrder = async (id: string, newStatus: number, rejectRea
 export const createOrder = async (
     userID: string,
     restaurantID: string,
-    menuItems: { menuItem: MenuItem; quantity: number }[] | OrderItem[],
+    menuItems:  OrderItem[],
     address: Address | string,
     totalPrice: number,
 ): Promise<Order> => {
+
+    //Convert OrderItem
+    menuItems = menuItems.map((item) => {
+        console.log("item");
+        console.log(item);
+        console.log(typeof(item.menuItemID));
+        if (typeof item.menuItemID === 'string') {
+            return item;
+        } else
+       {
+            return {
+                menuItemID: item.menuItemID._id,
+                quantity: item.quantity,
+            };
+        }
+    })
+
+
     const timestamp = new Date().toISOString();
     const response = await fetch(`${baseUrl}/createOrder`, {
         method: 'POST',

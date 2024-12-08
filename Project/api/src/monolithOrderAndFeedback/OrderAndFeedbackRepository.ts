@@ -48,13 +48,14 @@ async function getMenuItems(orders: Order[]) {
             _id: { $in: menuItemIds.map((id) => id) },
         },
     });
-
-    const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
+    console.log('Orders:');
+    console.table(orders);
+    //const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
 
     for (const order of orders) {
         order.orderItemList = order.orderItemList.map((item) => ({
-            ...item,
-            menuItem: menuItemMap.get(item.menuItemId.toHexString()),
+            menuItemId: item.menuItemId,
+            quantity: item.quantity,
         }));
     }
 
@@ -94,7 +95,6 @@ async function GetAllOrdersById(restaurantID: string): Promise<Order[] | null> {
         const orders = await orderRepository.find({
             where: { restaurantID: restaurantObjectID },
         });
-        console.log(orders);
         const ordersList: Order[] = [];
 
         const orderWithMenuItems = await getMenuItems(orders);
