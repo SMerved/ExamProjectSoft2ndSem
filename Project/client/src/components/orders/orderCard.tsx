@@ -21,7 +21,7 @@ const OrderCard: React.FC<Props> = ({ order, setSelectedOrder, children }) => {
 
     return (
         <div
-            key={order._id}
+            key={order._ID}
             style={{
                 border: '1px solid #ddd',
                 borderRadius: '8px',

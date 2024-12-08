@@ -16,13 +16,11 @@ export class OrderFactory {
 
         orderItemList = orderItemList.map((item) => {
             return {
-                menuItemId: new ObjectId(item.menuItemId),
+                menuItemID: new ObjectId(item.menuItemID),
                 quantity: item.quantity,
             }
         });
-        
-       console.log("OrderFactory.CreateOrder");
-       console.log("Orders", orderItemList);
+
         const order = {
             customerID: new ObjectId(customerID),
             restaurantID: new ObjectId(restaurantID),

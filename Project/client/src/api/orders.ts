@@ -1,7 +1,7 @@
 import { VITE_BASE_URL } from '../constants';
 import { Order } from '../types/orders';
 import { OrderItem } from '../types/orders';
-import { MenuItem } from '../types/orders';
+//import { MenuItem } from '../types/orders';
 import { Address} from "../types/address";
 
 const baseUrl = VITE_BASE_URL;
@@ -81,9 +81,6 @@ export const createOrder = async (
 
     //Convert OrderItem
     menuItems = menuItems.map((item) => {
-        console.log("item");
-        console.log(item);
-        console.log(typeof(item.menuItemID));
         if (typeof item.menuItemID === 'string') {
             return item;
         } else

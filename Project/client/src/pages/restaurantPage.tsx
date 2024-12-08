@@ -141,7 +141,7 @@ function RestaurantPage() {
                                 }}
                             >
                                 {filterOrders(orders, [OrderStatusEnum.Created]).map((order) => (
-                                    <OrderCard key={order.userID} order={order} setSelectedOrder={setSelectedOrder} />
+                                    <OrderCard key={order._id} order={order} setSelectedOrder={setSelectedOrder} />
                                 ))}
                             </div>
                         </div>
@@ -166,7 +166,7 @@ function RestaurantPage() {
                                 {filterOrders(orders, [OrderStatusEnum.Accepted, OrderStatusEnum.OnItsWay]).map(
                                     (order) => (
                                         <OrderCard
-                                            key={order.userID}
+                                            key={order._id}
                                             order={order}
                                             setSelectedOrder={setSelectedOrder}
                                         />
@@ -196,7 +196,7 @@ function RestaurantPage() {
                                 {filterOrders(orders, [OrderStatusEnum.Complete, OrderStatusEnum.Rejected]).map(
                                     (order) => (
                                         <OrderCard
-                                            key={order.userID}
+                                            key={order._id}
                                             order={order}
                                             setSelectedOrder={setSelectedOrder}
                                         />

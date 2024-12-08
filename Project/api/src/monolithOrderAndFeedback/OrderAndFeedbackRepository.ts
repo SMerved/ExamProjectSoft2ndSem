@@ -41,20 +41,18 @@ async function getCustomer(object: Order) {
 }
 
 async function getMenuItems(orders: Order[]) {
-    const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemId));
+    const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemID));
 
-    const menuItems = await menuItemRepository.find({
+    /*const menuItems = await menuItemRepository.find({
         where: {
             _id: { $in: menuItemIds.map((id) => id) },
         },
-    });
-    console.log('Orders:');
-    console.table(orders);
+    });*/
     //const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
 
     for (const order of orders) {
         order.orderItemList = order.orderItemList.map((item) => ({
-            menuItemId: item.menuItemId,
+            menuItemID: item.menuItemID,
             quantity: item.quantity,
         }));
     }
@@ -62,7 +60,41 @@ async function getMenuItems(orders: Order[]) {
     return orders;
 }
 
+//THIS FUNCTION DOESNT WORK AS INTENDED, while the menuItems are fetched, they are not added to the order as menuItemID because of wrong use of types
+async function getFullMenuItems(orders: Order[]) {
+    const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemID));
+
+    console.error('menuItemIds', menuItemIds)
+    const menuItems = await menuItemRepository.find({
+        where: {
+            _id: { $in: menuItemIds.map((id) => id) },
+        },
+    });
+
+    console.error('menuItems', menuItems)
+
+    const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
+
+    for (const order of orders) {
+        order.orderItemList = order.orderItemList.map((item) => {
+            const menuItem = menuItemMap.get(item.menuItemID.toHexString());
+            if (!menuItem) {
+                console.warn(`MenuItem with ID ${item.menuItemID.toHexString()} not found`);
+            }
+            return {
+                ...item,
+                menuItem: menuItem || null,
+            };
+        });
+    }
+    return orders;
+}
+
+
+
+
 async function acceptRejectOrder(orderId: string, newStatus: number, rejectReason?: string) {
+    console.log('acceptRejectOrder', orderId, newStatus, rejectReason);
     if (newStatus < 0 || newStatus > 4) {
         throw new Error('Status must be between between 0 and 4, inclusive');
     } else if (newStatus !== 1 && rejectReason) {
@@ -131,9 +163,23 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
             where: { status: 2 },
         });
 
+        console.log('acceptedOrders')
+        for (const menuItem of acceptedOrders){
+            for (const orderItem of menuItem.orderItemList){
+                console.log('orderItem', orderItem)
+            }
+        }
+
         const acceptedOrderList: Order[] = [];
 
-        const ordersWithMenuItems = await getMenuItems(acceptedOrders);
+        const ordersWithMenuItems = await getFullMenuItems(acceptedOrders);
+
+        console.log('AfterARSSSSSSASD')
+        for (const menuItem of ordersWithMenuItems){
+            for (const orderItem of menuItem.orderItemList){
+                console.log('orderItem', orderItem)
+            }
+        }
 
         for (const acceptedOrder of ordersWithMenuItems) {
             const address = await getAddress(acceptedOrder);
