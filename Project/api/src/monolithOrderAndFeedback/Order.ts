@@ -48,7 +48,7 @@ export class Order {
     completionDate?: Date;
 
     @Column()
-    pay?: DelivereePayment;
+    pay?: DelivereePayment ;
 
     @Column()
     rejectReason?: string | null;

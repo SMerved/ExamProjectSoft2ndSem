@@ -19,6 +19,7 @@ export class OrderFactory {
             totalPrice,
             orderItemList,
             timestamp,
+            status: 0,
         };
 
         return await AddOrder(order);

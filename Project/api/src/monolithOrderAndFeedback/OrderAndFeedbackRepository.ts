@@ -94,7 +94,7 @@ async function GetAllOrdersById(restaurantID: string): Promise<Order[] | null> {
         const orders = await orderRepository.find({
             where: { restaurantID: restaurantObjectID },
         });
-
+        console.log(orders);
         const ordersList: Order[] = [];
 
         const orderWithMenuItems = await getMenuItems(orders);
