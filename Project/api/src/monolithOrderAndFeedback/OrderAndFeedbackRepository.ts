@@ -26,7 +26,6 @@ async function getAddress(object: Order) {
             _id: object.address,
         },
     });
-
     return address;
 }
 
@@ -41,7 +40,7 @@ async function getCustomer(object: Order) {
 }
 
 async function getMenuItems(orders: Order[]) {
-    
+
     for (const order of orders) {
         order.orderItemList = order.orderItemList.map((item) => ({
             menuItemID: item.menuItemID,

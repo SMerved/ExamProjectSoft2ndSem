@@ -17,7 +17,6 @@ function CustomerPage() {
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const fetchOrders = async () => {
-        console.log('Fetching orders');
         const _orders = await GetOrdersAPIByCustomerID(user._id);
         setOrders(_orders);
     };
