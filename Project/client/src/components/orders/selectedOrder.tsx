@@ -69,7 +69,7 @@ const SelectedOrder: React.FC<Props> = ({ selectedOrder, fetchOrders, userID, se
                         textTransform: 'none',
                         padding: '8px 20px',
                     }}
-                    onClick={() => handleAcceptOrder(selectedOrder._ID, userID)}
+                    onClick={() => handleAcceptOrder(selectedOrder._id, userID)}
                 >
                     Accept
                 </Button>{' '}
