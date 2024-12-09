@@ -27,7 +27,9 @@ const SelectedOrder: React.FC<Props> = ({ selectedOrder, fetchOrders, userID, se
     }
 
     return (
+
         <div>
+
             <h3>Order Details</h3>
             <p>
                 <strong>Customer Name:</strong> {selectedOrder.customerID.username}
@@ -67,7 +69,7 @@ const SelectedOrder: React.FC<Props> = ({ selectedOrder, fetchOrders, userID, se
                         textTransform: 'none',
                         padding: '8px 20px',
                     }}
-                    onClick={() => handleAcceptOrder(selectedOrder._id, userID)}
+                    onClick={() => handleAcceptOrder(selectedOrder._ID, userID)}
                 >
                     Accept
                 </Button>{' '}
