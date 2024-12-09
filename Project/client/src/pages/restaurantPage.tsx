@@ -10,7 +10,7 @@ import OrderCardDetailed from '../components/orders/orderCardDetailed.tsx';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import { Divider } from '@mui/material';
 import NoUser from './components/noUser.tsx';
-import KafkaWebSocketComponent from '../components/KafkaWebSocketComponent.tsx'; // Import the component
+import RestaurantKafkaWebSocketComponent from '../components/orders/RestaurantKafkaWebSocketComponent.tsx'; // Import the component
 
 
 function RestaurantPage() {
@@ -64,7 +64,7 @@ function RestaurantPage() {
 
     return (
         <div>
-            <KafkaWebSocketComponent /> {/* Add the component here */}
+            <RestaurantKafkaWebSocketComponent />
             <div>
                 <button
                     onClick={() => {

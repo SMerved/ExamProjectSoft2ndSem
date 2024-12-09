@@ -19,8 +19,8 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
     ) {
         try {
             if (accept) {
-                await acceptRejectOrder(selectedOrder.userID, 2);
-            } else await acceptRejectOrder(selectedOrder.userID, 1, rejectReason);
+                await acceptRejectOrder(selectedOrder._ID, 2);
+            } else await acceptRejectOrder(selectedOrder._ID, 1, rejectReason);
 
             fetchOrders();
         } catch (error) {
@@ -34,7 +34,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
 
     return (
         <div
-            key={selectedOrder._id}
+            key={selectedOrder._ID}
             style={{
                 border: '1px solid #ddd',
                 borderRadius: '8px',
@@ -56,7 +56,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
                 }}
             >
                 <strong>Order ID:</strong>
-                <span>{selectedOrder._id}</span>
+                <span>{selectedOrder._ID}</span>
             </div>
 
             <div

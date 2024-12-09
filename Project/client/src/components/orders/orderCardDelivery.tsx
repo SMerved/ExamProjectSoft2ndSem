@@ -9,13 +9,13 @@ interface Props {
 const OrderCardDelivery: React.FC<Props> = ({ order, setSelectedOrder, selectedOrderID }) => {
     return (
         <div
-            key={order._id}
+            key={order._ID}
             style={{
                 border: '1px solid #ddd',
                 borderRadius: '8px',
                 padding: '8px',
                 marginBottom: '20px',
-                backgroundColor: selectedOrderID === order._id ? '#e0f7fa' : '#f9f9f9',
+                backgroundColor: selectedOrderID === order._ID ? '#e0f7fa' : '#f9f9f9',
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                 maxWidth: '450px',
                 width: '100%',
@@ -35,7 +35,7 @@ const OrderCardDelivery: React.FC<Props> = ({ order, setSelectedOrder, selectedO
             >
                 <div>
                     <strong>Order ID:</strong>
-                    <p>{order._id}</p>
+                    <p>{order._ID}</p>
                 </div>
                 <div>
                     <strong>Customer ID:</strong>
