@@ -1,12 +1,12 @@
-import { ObjectId } from 'mongodb';
-import { User } from '../loginService/User.ts';
-import { AppDataSource } from '../ormconfig.ts';
-import { Address, MenuItem } from '../RestaurantService/Restaurant.ts';
-import { Feedback } from './Feedback.ts';
-import { Order } from './Order.ts';
-import { FeedbackData } from './types/feedback.ts';
-import { OrderData } from './types/order.ts';
-import { calculateDeliveryPay } from '../utilities/order.ts';
+import {ObjectId} from 'mongodb';
+import {User} from '../loginService/User.ts';
+import {AppDataSource} from '../ormconfig.ts';
+import {Address, MenuItem} from '../RestaurantService/Restaurant.ts';
+import {Feedback} from './Feedback.ts';
+import {Order} from './Order.ts';
+import {FeedbackData} from './types/feedback.ts';
+import {OrderData} from './types/order.ts';
+import {calculateDeliveryPay} from '../utilities/order.ts';
 
 const orderRepository = AppDataSource.getMongoRepository(Order);
 const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
@@ -26,7 +26,6 @@ async function getAddress(object: Order) {
             _id: object.address,
         },
     });
-
     return address;
 }
 
@@ -41,25 +40,45 @@ async function getCustomer(object: Order) {
 }
 
 async function getMenuItems(orders: Order[]) {
-    const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemId));
+
+    for (const order of orders) {
+        order.orderItemList = order.orderItemList.map((item) => ({
+            menuItemID: item.menuItemID,
+            quantity: item.quantity,
+        }));
+    }
+
+    return orders;
+}
+
+//THIS FUNCTION DOESNT WORK AS INTENDED, while the menuItems are fetched, they are not added to the order as menuItemID because of wrong use of types
+async function getFullMenuItems(orders: Order[]) {
+    const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemID));
+
 
     const menuItems = await menuItemRepository.find({
         where: {
-            _id: { $in: menuItemIds.map((id) => id) },
+            _id: {$in: menuItemIds.map((id) => id)},
         },
     });
 
     const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
 
     for (const order of orders) {
-        order.orderItemList = order.orderItemList.map((item) => ({
-            ...item,
-            menuItem: menuItemMap.get(item.menuItemId.toHexString()),
-        }));
+        order.orderItemList = order.orderItemList.map((item) => {
+            const menuItem = menuItemMap.get(item.menuItemID.toHexString());
+            if (!menuItem) {
+                console.warn(`MenuItem with ID ${item.menuItemID.toHexString()} not found`);
+            }
+            return {
+                ...item,
+                menuItem: menuItem || null,
+            };
+        });
     }
-
     return orders;
 }
+
 
 async function acceptRejectOrder(orderId: string, newStatus: number, rejectReason?: string) {
     if (newStatus < 0 || newStatus > 4) {
@@ -70,7 +89,7 @@ async function acceptRejectOrder(orderId: string, newStatus: number, rejectReaso
 
     const orderObjectId = new ObjectId(orderId);
     const order = await orderRepository.findOne({
-        where: { _id: orderObjectId },
+        where: {_id: orderObjectId},
     });
 
     if (!order) {
@@ -92,9 +111,8 @@ async function GetAllOrdersById(restaurantID: string): Promise<Order[] | null> {
     try {
         const restaurantObjectID = new ObjectId(restaurantID);
         const orders = await orderRepository.find({
-            where: { restaurantID: restaurantObjectID },
+            where: {restaurantID: restaurantObjectID},
         });
-
         const ordersList: Order[] = [];
 
         const orderWithMenuItems = await getMenuItems(orders);
@@ -119,6 +137,36 @@ async function GetAllOrdersById(restaurantID: string): Promise<Order[] | null> {
     }
 }
 
+async function GetAllOrdersByCustomer(customerID: string): Promise<Order[] | null> {
+    try {
+        const customerObjectID = new ObjectId(customerID);
+        const orders = await orderRepository.find({
+            where: {customerID: customerObjectID},
+        });
+
+        const ordersList: Order[] = [];
+
+        const ordersWithMenuItems = await getMenuItems(orders);
+
+        for (const order of ordersWithMenuItems) {
+            const address = await getAddress(order);
+            const customer = await getCustomer(order);
+
+            const ordersTemp: Order = {
+                ...order,
+                address: address || order.address,
+                customerID: customer || order.customerID,
+            };
+
+            ordersList.push(ordersTemp);
+        }
+        return ordersList;
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        return null;
+    }
+}
+
 async function GetAllOrders(): Promise<Order[] | null> {
     const orders = await orderRepository.find();
 
@@ -128,7 +176,7 @@ async function GetAllOrders(): Promise<Order[] | null> {
 async function GetAllAcceptedOrders(): Promise<Order[] | null> {
     try {
         const acceptedOrders = await orderRepository.find({
-            where: { status: 2 },
+            where: {status: 2},
         });
 
         const acceptedOrderList: Order[] = [];
@@ -154,6 +202,7 @@ async function GetAllAcceptedOrders(): Promise<Order[] | null> {
         throw new Error('' + error);
     }
 }
+
 async function GetOwnOrders(employeeID: string, status: number): Promise<Order[] | null> {
     try {
         const employeeIDObjectID = new ObjectId(employeeID);
@@ -189,12 +238,12 @@ async function GetOwnOrders(employeeID: string, status: number): Promise<Order[]
     }
 }
 
-async function createFeedbackAndLinkOrder({ foodRating, overallRating, deliveryRating, orderId }: FeedbackData) {
+async function createFeedbackAndLinkOrder({foodRating, overallRating, deliveryRating, orderId}: FeedbackData) {
     return await AppDataSource.manager.transaction(async (transactionalEntityManager) => {
         const orderIdOjectID = new ObjectId(orderId);
 
         const order = await transactionalEntityManager.findOne(Order, {
-            where: { _id: orderIdOjectID },
+            where: {_id: orderIdOjectID},
         });
 
         if (!order) {
@@ -211,8 +260,8 @@ async function createFeedbackAndLinkOrder({ foodRating, overallRating, deliveryR
 
         const updateResult = await transactionalEntityManager.update(
             Order,
-            { _id: orderIdOjectID },
-            { feedbackID: feedback._id }
+            {_id: orderIdOjectID},
+            {feedbackID: feedback._id}
         );
 
         if (updateResult.affected === 0) {
@@ -227,7 +276,7 @@ async function acceptOrderAsDelivery(orderID: string, employeeID: string) {
     const employeeIDObjectID = new ObjectId(employeeID);
     const orderObjectID = new ObjectId(orderID);
     const order = await orderRepository.findOne({
-        where: { _id: orderObjectID },
+        where: {_id: orderObjectID},
     });
 
     if (!order) {
@@ -251,7 +300,7 @@ async function acceptOrderAsDelivery(orderID: string, employeeID: string) {
 async function completeOrderAsDelivery(orderID: string) {
     const orderObjectID = new ObjectId(orderID);
     const order = await orderRepository.findOne({
-        where: { _id: orderObjectID },
+        where: {_id: orderObjectID},
     });
 
     if (!order) {
@@ -273,7 +322,7 @@ async function completeOrderAsDelivery(orderID: string) {
 
 async function getRatingAVG(orderID: ObjectId) {
     const order = await orderRepository.findOne({
-        where: { _id: orderID },
+        where: {_id: orderID},
     });
 
     if (!order) {
@@ -300,7 +349,7 @@ async function calculateAndUpdateOrderPay(orderID: string) {
     const orderObjectID = new ObjectId(orderID);
 
     const order = await orderRepository.findOne({
-        where: { _id: orderObjectID },
+        where: {_id: orderObjectID},
     });
 
     const allOrders = await orderRepository.find({
@@ -387,4 +436,5 @@ export {
     completeOrderAsDelivery, // Delivery
     calculateAndUpdateOrderPay, // Delivery
     getRatingAVG,
+    GetAllOrdersByCustomer
 };

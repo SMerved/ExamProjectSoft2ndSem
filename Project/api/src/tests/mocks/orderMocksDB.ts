@@ -7,15 +7,15 @@ export const getAllOrdersMockOrder1 = {
     totalPrice: 50,
     orderItemList: [
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75546'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75546'),
             quantity: 2,
         },
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75547'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75547'),
             quantity: 3,
         },
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75548'),
+            menuItemID: new ObjectId( '672de8c4f54107237ff75548'),
             quantity: 1,
         },
     ],
@@ -32,15 +32,15 @@ export const getAllOrdersMockOrder2 = {
     totalPrice: 50,
     orderItemList: [
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75546'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75546'),
             quantity: 2,
         },
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75547'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75547'),
             quantity: 3,
         },
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75548'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75548'),
             quantity: 1,
         },
     ],
@@ -59,7 +59,7 @@ export const mockOrder = {
     address: new ObjectId(),
     totalPrice: Math.random() * 100,
     orderItemList: Array.from({ length: Math.floor(Math.random() * 5) + 1 }, () => ({
-        menuItemId: new ObjectId(),
+        menuItemID: new ObjectId(),
         quantity: Math.floor(Math.random() * 5) + 1,
     })),
     feedbackID: new ObjectId(),
@@ -87,7 +87,7 @@ export const mockOrderWithId = {
     address: new ObjectId(),
     totalPrice: Math.random() * 100,
     orderItemList: Array.from({ length: Math.floor(Math.random() * 5) + 1 }, () => ({
-        menuItemId: new ObjectId(),
+        menuItemID: new ObjectId(),
         quantity: Math.floor(Math.random() * 5) + 1,
     })),
     feedbackID: new ObjectId(),
@@ -114,15 +114,15 @@ export const mockOrderCreate = {
     totalPrice: 50,
     orderItemList: [
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75546'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75546'),
             quantity: 2,
         },
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75547'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75547'),
             quantity: 3,
         },
         {
-            menuItemId: new ObjectId('672de8c4f54107237ff75548'),
+            menuItemID: new ObjectId('672de8c4f54107237ff75548'),
             quantity: 1,
         },
     ],

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Order } from '../../types/orders';
+import { Order , MenuItem} from '../../types/orders';
 import { Button } from '@mui/material';
 import { acceptOrderAsDelivery } from '../../api/orders';
 
@@ -9,6 +9,11 @@ interface Props {
     setSelectedOrder: (order: Order | null) => void;
     userID: string;
 }
+
+function isMenuItem(item: string | MenuItem): item is MenuItem {
+    return typeof item === 'object' && item !== null && '_id' in item;
+}
+
 const SelectedOrder: React.FC<Props> = ({ selectedOrder, fetchOrders, userID, setSelectedOrder }) => {
     async function handleAcceptOrder(orderID: string, employeeID: string) {
         try {
@@ -44,10 +49,12 @@ const SelectedOrder: React.FC<Props> = ({ selectedOrder, fetchOrders, userID, se
             </p>
             <ul>
                 {selectedOrder.orderItemList.map((item, index) => (
-                    <li key={index}>
-                        {item.quantity}x {item.menuItem.name} ($
-                        {item.menuItem.price.toFixed(2)})
-                    </li>
+                    isMenuItem(item.menuItemID) && (
+                        <li key={index}>
+                            {item.quantity}x {item.menuItemID.name ?? 'Unknown Item'} ($
+                            {item.menuItemID.price.toFixed(2)})
+                        </li>
+                    )
                 ))}
             </ul>
             <div

@@ -1,7 +1,7 @@
 import { VITE_BASE_URL } from '../constants';
 import { Order } from '../types/orders';
 import { OrderItem } from '../types/orders';
-import { MenuItem } from '../types/orders';
+//import { MenuItem } from '../types/orders';
 import { Address} from "../types/address";
 
 const baseUrl = VITE_BASE_URL;
@@ -28,6 +28,20 @@ export const GetOrdersAPIByRestaurantID = async (restaurantID: string): Promise<
     }
     return response.json();
 };
+
+export const GetOrdersAPIByCustomerID = async (userID: string): Promise<Order[]> => {
+    const response = await fetch(`${baseUrl}/ordersByUserId`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userID }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to get orders');
+    }
+    return response.json();
+};
+
+
 
 export const GetAcceptedOrdersAPI = async (): Promise<Order[]> => {
     const response = await fetch(`${baseUrl}/acceptedOrders`, {
@@ -74,10 +88,25 @@ export const acceptRejectOrder = async (id: string, newStatus: number, rejectRea
 export const createOrder = async (
     userID: string,
     restaurantID: string,
-    menuItems: { menuItem: MenuItem; quantity: number }[] | OrderItem[],
+    menuItems:  OrderItem[],
     address: Address | string,
     totalPrice: number,
 ): Promise<Order> => {
+
+    //Convert OrderItem
+    menuItems = menuItems.map((item) => {
+        if (typeof item.menuItemID === 'string') {
+            return item;
+        } else
+       {
+            return {
+                menuItemID: item.menuItemID._id,
+                quantity: item.quantity,
+            };
+        }
+    })
+
+
     const timestamp = new Date().toISOString();
     const response = await fetch(`${baseUrl}/createOrder`, {
         method: 'POST',

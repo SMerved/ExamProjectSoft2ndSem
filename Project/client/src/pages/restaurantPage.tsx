@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Order } from '../types/orders';
 import { GetOrdersAPIByRestaurantID } from '../api/orders';
+import { useLocation } from 'react-router-dom';
 import { User } from '../types/users';
 import { LineChart } from '@mui/x-charts';
 import { orderCountToLineChartSeries, orderIncomeToLineChartSeries } from '../chartFunctions/linechart.ts';
@@ -10,7 +10,6 @@ import OrderCardDetailed from '../components/orders/orderCardDetailed.tsx';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import { Divider } from '@mui/material';
 import NoUser from './components/noUser.tsx';
-import RestaurantKafkaWebSocketComponent from '../components/orders/RestaurantKafkaWebSocketComponent.tsx'; // Import the component
 
 
 function RestaurantPage() {
@@ -64,7 +63,6 @@ function RestaurantPage() {
 
     return (
         <div>
-            <RestaurantKafkaWebSocketComponent />
             <div>
                 <button
                     onClick={() => {
@@ -143,7 +141,7 @@ function RestaurantPage() {
                                 }}
                             >
                                 {filterOrders(orders, [OrderStatusEnum.Created]).map((order) => (
-                                    <OrderCard key={order._ID} order={order} setSelectedOrder={setSelectedOrder} />
+                                    <OrderCard key={order._id} order={order} setSelectedOrder={setSelectedOrder} />
                                 ))}
                             </div>
                         </div>
@@ -168,7 +166,7 @@ function RestaurantPage() {
                                 {filterOrders(orders, [OrderStatusEnum.Accepted, OrderStatusEnum.OnItsWay]).map(
                                     (order) => (
                                         <OrderCard
-                                            key={order._ID}
+                                            key={order._id}
                                             order={order}
                                             setSelectedOrder={setSelectedOrder}
                                         />
@@ -198,7 +196,7 @@ function RestaurantPage() {
                                 {filterOrders(orders, [OrderStatusEnum.Complete, OrderStatusEnum.Rejected]).map(
                                     (order) => (
                                         <OrderCard
-                                            key={order._ID}
+                                            key={order._id}
                                             order={order}
                                             setSelectedOrder={setSelectedOrder}
                                         />

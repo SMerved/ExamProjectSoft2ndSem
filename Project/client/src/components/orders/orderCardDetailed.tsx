@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Order } from '../../types/orders';
+import { Order , MenuItem} from '../../types/orders';
 import { Button } from '@mui/material';
 import { acceptRejectOrder } from '../../api/orders';
-
 interface Props {
     selectedOrder: Order;
     fetchOrders: () => void;
@@ -19,8 +18,8 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
     ) {
         try {
             if (accept) {
-                await acceptRejectOrder(selectedOrder._ID, 2);
-            } else await acceptRejectOrder(selectedOrder._ID, 1, rejectReason);
+                await acceptRejectOrder(selectedOrder._id, 2);
+            } else await acceptRejectOrder(selectedOrder._id, 1, rejectReason);
 
             fetchOrders();
         } catch (error) {
@@ -28,13 +27,19 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
         }
     }
 
+    function isMenuItem(item: string | MenuItem): item is MenuItem {
+        return typeof item === 'object' && item !== null && '_id' in item;
+    }
+    
+    
+    
     useEffect(() => {
         setRejectReason(selectedOrder.rejectReason || '');
     }, [selectedOrder]);
 
     return (
         <div
-            key={selectedOrder._ID}
+            key={selectedOrder._id}
             style={{
                 border: '1px solid #ddd',
                 borderRadius: '8px',
@@ -56,7 +61,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
                 }}
             >
                 <strong>Order ID:</strong>
-                <span>{selectedOrder._ID}</span>
+                <span>{selectedOrder._id}</span>
             </div>
 
             <div
@@ -110,41 +115,40 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
                 }}
             >
                 <strong>Created:</strong>
-                <span>
-                    {new Date(selectedOrder.timestamp).toLocaleString()}
-                </span>
+                <span>{new Date(selectedOrder.timestamp).toLocaleString()}</span>
             </div>
 
             {/* Order Items */}
             <div style={{ display: 'grid', gap: '1rem', padding: '1rem' }}>
-                {selectedOrder.orderItemList.map((orderItem) => (
-                    <div
-                        key={orderItem.menuItem._id}
-                        style={{
-                            border: '1px solid #ccc',
-                            borderRadius: '8px',
-                            padding: '1rem',
-                        }}
-                    >
-                        <p
-                            style={{
-                                margin: '0.5rem 0',
-                                fontWeight: 'bold',
-                                fontSize: '1.2rem',
-                            }}
-                        >
-                            {orderItem.menuItem.name}
-                        </p>
-                        <p style={{ margin: '0.25rem 0', color: '#555' }}>
-                            <strong>Available:</strong>{' '}
-                            {orderItem.menuItem.availability ? 'Yes' : 'No'}
-                        </p>
-                        <p style={{ margin: '0.25rem 0', color: '#555' }}>
-                            <strong>Price:</strong> $
-                            {orderItem.menuItem.price.toFixed(2)}
-                        </p>
-                    </div>
-                ))}
+                {selectedOrder.orderItemList.map(
+                    (orderItem) =>
+                        isMenuItem(orderItem.menuItemID) && (
+                            <div
+                                key={orderItem.menuItemID._id}
+                                style={{
+                                    border: '1px solid #ccc',
+                                    borderRadius: '8px',
+                                    padding: '1rem',
+                                }}
+                            >
+                                <p
+                                    style={{
+                                        margin: '0.5rem 0',
+                                        fontWeight: 'bold',
+                                        fontSize: '1.2rem',
+                                    }}
+                                >
+                                    {orderItem.menuItemID.name}
+                                </p>
+                                <p style={{ margin: '0.25rem 0', color: '#555' }}>
+                                    <strong>Available:</strong> {orderItem.menuItemID.availability ? 'Yes' : 'No'}
+                                </p>
+                                <p style={{ margin: '0.25rem 0', color: '#555' }}>
+                                    <strong>Price:</strong> ${orderItem.menuItemID.price.toFixed(2)}
+                                </p>
+                            </div>
+                        )
+                )}
             </div>
             <div>
                 <input
@@ -177,13 +181,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
                         textTransform: 'none',
                         padding: '8px 20px',
                     }}
-                    onClick={() =>
-                        handleRejectAcceptOrder(
-                            selectedOrder,
-                            false,
-                            rejectReason
-                        )
-                    }
+                    onClick={() => handleRejectAcceptOrder(selectedOrder, false, rejectReason)}
                 >
                     Reject
                 </Button>

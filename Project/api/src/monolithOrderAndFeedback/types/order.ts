@@ -11,7 +11,7 @@ export interface OrderData {
 }
 
 export interface OrderItem {
-    menuItemId: ObjectId;
+    menuItemID: ObjectId;
     quantity: number;
 }
 

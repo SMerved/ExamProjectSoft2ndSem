@@ -10,7 +10,7 @@ import {
     acceptRejectOrder,
     calculateAndUpdateOrderPay,
     completeOrderAsDelivery,
-    createFeedbackAndLinkOrder,
+    createFeedbackAndLinkOrder, GetAllOrdersByCustomer,
     GetAllOrdersById,
     GetOwnOrders,
 } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
@@ -137,6 +137,29 @@ app.get('/orders', async (req: Request, res: Response) => {
     }
 });
 
+
+app.post('/ordersByUserId', async (req: Request, res: Response) => {
+    try {
+        const { userID } = req.body;
+
+        const orders = await GetAllOrdersByCustomer(userID);
+
+        if (!orders) {
+            res.status(401).json({
+                error: 'No orders found',
+            });
+            return;
+        }
+
+        res.json(orders);
+    } catch (error) {
+        console.error('Error creating order:', error);
+        res.status(500).json({
+            error: 'An error occurred while fetching orders',
+        });
+    }
+});
+
 app.post('/ordersById', async (req: Request, res: Response) => {
     try {
         const { restaurantID } = req.body;
@@ -215,6 +238,8 @@ app.post('/createFeedback', async (req: Request, res: Response) => {
             res.status(401).json({ error: 'Invalid feedback data' });
             return;
         }
+
+        const order = await calculateAndUpdateOrderPay(orderId);
 
         res.json(feedback);
     } catch (error) {

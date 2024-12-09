@@ -29,7 +29,7 @@ describe('KafkaAdapter Functionality', () => {
     const topic = 'my-topic';
 
     beforeAll(() => {
-        kafkaAdapter = new KafkaAdapter(brokers, clientId, groupId, topic);
+        kafkaAdapter = new KafkaAdapter(clientId, groupId, topic);
     });
 
     afterAll(() => {
