@@ -9,6 +9,7 @@ import { Order } from '../types/orders.ts';
 import { GetOrdersAPIByCustomerID } from '../api/orders.ts';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import FeedbackForm from '../components/Feedback/feedbackForm.tsx';
+import UserKafkaWebSocketComponent from '../components/orders/UserKafkaWebSocketComponent.tsx';
 
 function CustomerPage() {
     const location = useLocation();
@@ -89,6 +90,7 @@ function CustomerPage() {
                 orders
                     .filter((order) => (order.status === OrderStatusEnum.Complete)&&(!order.feedbackID))
                     .map((order) => <FeedbackForm order={order}></FeedbackForm>)}
+            <UserKafkaWebSocketComponent />
         </div>
     );
 }

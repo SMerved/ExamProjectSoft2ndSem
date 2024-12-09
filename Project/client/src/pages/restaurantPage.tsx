@@ -10,7 +10,7 @@ import OrderCardDetailed from '../components/orders/orderCardDetailed.tsx';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import { Divider } from '@mui/material';
 import NoUser from './components/noUser.tsx';
-
+import RestaurantKafkaWebSocketComponent from '../components/orders/RestaurantKafkaWebSocketComponent.tsx';
 
 function RestaurantPage() {
     const location = useLocation();
@@ -227,7 +227,10 @@ function RestaurantPage() {
                     <h1>There are no accepted orders pending...</h1>
                     <p>Come back later to find tasks to deliver!</p>
                 </>
+
             )}
+
+            <RestaurantKafkaWebSocketComponent />
         </div>
     );
 }

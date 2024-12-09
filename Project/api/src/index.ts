@@ -10,11 +10,12 @@ import {
     acceptRejectOrder,
     calculateAndUpdateOrderPay,
     completeOrderAsDelivery,
-    createFeedbackAndLinkOrder, GetAllOrdersByCustomer,
+    createFeedbackAndLinkOrder,
+    GetAllOrdersByCustomer,
     GetAllOrdersById,
     GetOwnOrders,
 } from './monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
-import { messagingRoutes } from './messagingService/messaging.ts';
+import { messagingRoutes } from './adapters/messaging.ts';
 import { loginRouter } from './loginService/loginRoutes.ts';
 import { paymentRouter } from './paymentService/paymentRoutes.ts';
 import { UserCredentials } from './interfaces/users.ts';
@@ -23,6 +24,8 @@ import { CustomError } from './types/generic.ts';
 import { paymentServiceValidatePayment } from './paymentService/paymentServiceAdapter.ts';
 import { restaurantServiceGetAllRestaurants } from './adapters/restaurantServiceAdapter.ts';
 import { restaurantRouter } from './RestaurantService/restaurantRoutes.ts';
+import { KafkaAdapter } from './adapters/kafkaAdapter.ts';
+import MessageBroker from './adapters/types/types.ts';
 
 const app = express();
 
@@ -136,7 +139,6 @@ app.get('/orders', async (req: Request, res: Response) => {
         });
     }
 });
-
 
 app.post('/ordersByUserId', async (req: Request, res: Response) => {
     try {
@@ -278,6 +280,14 @@ app.post('/completeOrderAsDelivery', async (req: Request, res: Response) => {
             res.status(401).json({ error: 'Invalid order data' });
             return;
         }
+        const messageBroker: MessageBroker = new KafkaAdapter(
+            'mtogo',
+            'mtogo-group',
+            'user_events'
+        );
+        await messageBroker.sendEvent('OrderCompleted', {
+            order: order1,
+        });
 
         res.json(order1);
     } catch (error) {

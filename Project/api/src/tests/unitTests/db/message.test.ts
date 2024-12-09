@@ -1,4 +1,4 @@
-import { KafkaAdapter } from '../../../messagingService/kafkaAdapter.ts';
+import { KafkaAdapter } from '../../../adapters/kafkaAdapter.ts';
 import { Kafka } from 'kafkajs';
 
 jest.mock('kafkajs', () => {

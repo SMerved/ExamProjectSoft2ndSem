@@ -1,4 +1,4 @@
-import {Kafka, Producer, Consumer} from 'kafkajs';
+import { Kafka, Producer, Consumer } from 'kafkajs';
 import MessageBroker from './types/types.ts';
 
 export class KafkaAdapter implements MessageBroker {
@@ -8,12 +8,8 @@ export class KafkaAdapter implements MessageBroker {
     private readonly topic: string;
     private readonly groupId: string;
 
-    constructor(
-        clientId: string,
-        groupId: string,
-        topic: string
-    ) {
-        const brokers =  process.env.KAFKA_BROKERS?.split(',') || [];
+    constructor(clientId: string, groupId: string, topic: string) {
+        const brokers = process.env.KAFKA_BROKERS?.split(',') || [];
         this.kafka = new Kafka({
             clientId,
             brokers,
@@ -36,9 +32,6 @@ export class KafkaAdapter implements MessageBroker {
         return this.consumer;
     }
 
-
-
-
     // Adapter method for sending events
     async sendEvent(eventType: string, payload: any): Promise<void> {
         const producer = this.createProducer();
@@ -56,8 +49,8 @@ export class KafkaAdapter implements MessageBroker {
                         }),
                     },
                 ],
-            }
-            await producer.send( message );
+            };
+            await producer.send(message);
             console.info('Event sent:', message);
         } finally {
             await producer.disconnect();
@@ -76,14 +69,14 @@ export class KafkaAdapter implements MessageBroker {
         });
 
         await consumer.run({
-            eachMessage: async ({topic, partition, message}) => {
+            eachMessage: async ({ topic, partition, message }) => {
                 if (!message.value) {
                     console.warn('Message value is null');
                     return;
                 }
 
                 const event = JSON.parse(message.value.toString());
-                const {eventType, payload} = event;
+                const { eventType, payload } = event;
 
                 try {
                     handler(eventType, payload);
