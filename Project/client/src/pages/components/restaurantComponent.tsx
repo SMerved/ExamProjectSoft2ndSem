@@ -1,11 +1,12 @@
 import { Restaurant } from '../../types/restaurants';
 import { MenuItem } from '../../types/restaurants';
 import { User } from '../../types/users';
-import { useState } from 'react';
+import {  useState } from 'react';
 import ShoppingCart from './ShoppingCart';
 import { createOrder } from '../../api/orders';
 import { ValidatePaymentAPI } from '../../api/payment.ts';
 import { Button } from '@mui/material';
+
 
 interface RestaurantPageProps {
     restaurant: Restaurant;
@@ -18,6 +19,7 @@ interface menuItemLine {
 }
 
 function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
+
     const handleProceedToPayment = async () => {
         if (menuItems.length == 0) return;
 
@@ -37,7 +39,6 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
 
             if (paymentResponse) {
                 const order = await createOrder(user._id, restaurant._id, menuItems, user.address, totalPrice);
-                console.log('Order created:', order);
                 setHandlingPayment(false);
                 setOrderComplete(true);
             } else {
@@ -299,6 +300,8 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
                     </Button>
                 </>
             )}
+
+
         </div>
     );
 }

@@ -29,6 +29,20 @@ export const GetOrdersAPIByRestaurantID = async (restaurantID: string): Promise<
     return response.json();
 };
 
+export const GetOrdersAPIByCustomerID = async (userID: string): Promise<Order[]> => {
+    const response = await fetch(`${baseUrl}/ordersByUserId`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userID }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to get orders');
+    }
+    return response.json();
+};
+
+
+
 export const GetAcceptedOrdersAPI = async (): Promise<Order[]> => {
     const response = await fetch(`${baseUrl}/acceptedOrders`, {
         method: 'GET',
