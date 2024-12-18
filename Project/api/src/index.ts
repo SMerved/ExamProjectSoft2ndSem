@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import {
     createOrder,
@@ -26,15 +26,40 @@ import { restaurantServiceGetAllRestaurants } from './adapters/restaurantService
 import { restaurantRouter } from './RestaurantService/restaurantRoutes.ts';
 import { KafkaAdapter } from './adapters/kafkaAdapter.ts';
 import MessageBroker from './adapters/types/types.ts';
+import client from 'prom-client';
+
+const register = new client.Registry();
+const httpRequestDuration = new client.Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'status_code'],
+});
+
+register.registerMetric(httpRequestDuration);
+client.collectDefaultMetrics({ register });
+
+const metricsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const end = httpRequestDuration.startTimer();
+    res.on('finish', () => {
+        end({
+            method: req.method,
+            route: req.route?.path || req.path,
+            status_code: res.statusCode.toString(),
+        });
+    });
+    next();
+}
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(metricsMiddleware);
 
 app.use('/loginService', loginRouter);
 app.use('/paymentService', paymentRouter);
 app.use('/restaurantService', restaurantRouter);
+
 
 app.post('/pay', async (req, res) => {
     try {
@@ -332,6 +357,11 @@ app.post('/getOwnOrders', async (req: Request, res: Response) => {
         console.error('Error getting orders: ', error);
         res.status(500).json({ error: 'Error getting orders: ' + error });
     }
+});
+
+app.get('/metrics', async (req: Request, res: Response) => {
+    res.set('Content-Type', register.contentType);
+    res.send(await register.metrics());
 });
 
 messagingRoutes(app);

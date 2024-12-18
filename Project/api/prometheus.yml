@@ -3,5 +3,6 @@ global:
 
 scrape_configs:
   - job_name: 'api'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['host.docker.internal:3001']  # If running Prometheus on Docker, use 'host.docker.internal' to reference the host
