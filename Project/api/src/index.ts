@@ -48,7 +48,7 @@ const metricsMiddleware = (req: Request, res: Response, next: NextFunction) => {
         });
     });
     next();
-}
+};
 
 const app = express();
 
@@ -59,7 +59,6 @@ app.use(metricsMiddleware);
 app.use('/loginService', loginRouter);
 app.use('/paymentService', paymentRouter);
 app.use('/restaurantService', restaurantRouter);
-
 
 app.post('/pay', async (req, res) => {
     try {
