@@ -1,7 +1,7 @@
 import {ObjectId} from 'mongodb';
 import {User} from '../loginService/User.ts';
 import {AppDataSource} from '../ormconfig.ts';
-import {Address, MenuItem} from '../RestaurantService/Restaurant.ts';
+import {Address} from '../RestaurantService/Restaurant.ts';
 import {Feedback} from './Feedback.ts';
 import {Order} from './Order.ts';
 import {FeedbackData} from './types/feedback.ts';
@@ -9,7 +9,6 @@ import {OrderData} from './types/order.ts';
 import {calculateDeliveryPay} from '../utilities/order.ts';
 
 const orderRepository = AppDataSource.getMongoRepository(Order);
-const menuItemRepository = AppDataSource.getMongoRepository(MenuItem);
 const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
 const addressRepository = AppDataSource.getMongoRepository(Address);
 const userRepository = AppDataSource.getMongoRepository(User);
@@ -50,35 +49,6 @@ async function getMenuItems(orders: Order[]) {
 
     return orders;
 }
-
-//THIS FUNCTION DOESNT WORK AS INTENDED, while the menuItems are fetched, they are not added to the order as menuItemID because of wrong use of types
-async function getFullMenuItems(orders: Order[]) {
-    const menuItemIds = orders.flatMap((order) => order.orderItemList.map((item) => item.menuItemID));
-
-
-    const menuItems = await menuItemRepository.find({
-        where: {
-            _id: {$in: menuItemIds.map((id) => id)},
-        },
-    });
-
-    const menuItemMap = new Map(menuItems.map((item) => [item._id.toHexString(), item]));
-
-    for (const order of orders) {
-        order.orderItemList = order.orderItemList.map((item) => {
-            const menuItem = menuItemMap.get(item.menuItemID.toHexString());
-            if (!menuItem) {
-                console.warn(`MenuItem with ID ${item.menuItemID.toHexString()} not found`);
-            }
-            return {
-                ...item,
-                menuItem: menuItem || null,
-            };
-        });
-    }
-    return orders;
-}
-
 
 async function acceptRejectOrder(orderId: string, newStatus: number, rejectReason?: string) {
     if (newStatus < 0 || newStatus > 4) {
