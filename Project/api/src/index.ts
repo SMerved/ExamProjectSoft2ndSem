@@ -265,7 +265,7 @@ app.post('/createFeedback', async (req: Request, res: Response) => {
             return;
         }
 
-        const order = await calculateAndUpdateOrderPay(orderId);
+        await calculateAndUpdateOrderPay(orderId);
 
         res.json(feedback);
     } catch (error) {
