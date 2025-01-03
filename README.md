@@ -36,13 +36,14 @@ Grafana runs on port [3000](http://localhost:3000).
 Prometheus runs on port [9090](http://localhost:9090).
 
 If any of the links fail to connect you may need to check that the ports aren't already in use. Kubernetes/Docker has been known to keep ports when containers/pods have been stopped/removed/deleted even after restarting your computer. 
+
 The commands
 `netstat -ano | findstr :<yourPortNumber>`
 and
 `taskkill /PID <typeyourPIDhere> /F`
 can help in killing applications running on a port.
 
-After clearing the ports try restarting docker, as the application killed may have been docker it self, and/or the containers/pods.
+After clearing the ports try restarting docker, as the application killed may have been docker itself, and/or the containers/pods.
 
 To remove the Kubernetes pods use the command `kubectl get pods` to get all pod names. Then use `kubectl delete pods -l app=<podName>` where podName is the name of the pod minus the identifiying numbers. Example: "api-649d66df74-knkcj" would be remove using `kubectl delete pods -l app=api`.
 
