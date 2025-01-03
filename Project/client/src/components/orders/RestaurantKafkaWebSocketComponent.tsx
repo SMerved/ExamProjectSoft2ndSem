@@ -6,7 +6,6 @@ const RestaurantKafkaWebSocketComponent = () => {
     const [currentMessage, setCurrentMessage] = useState<string>('');
     const serverUrl = 'ws://localhost:7080/v2/broker/?topics=restaurant_topic';
 
-
     useEffect(() => {
         const ws = new WebSocket(serverUrl);
 
@@ -31,7 +30,7 @@ const RestaurantKafkaWebSocketComponent = () => {
         return () => {
             ws.close();
         };
-    }, [serverUrl,currentMessage]);
+    }, [serverUrl, currentMessage]);
 
     const formatMessage = (message: string) => {
         try {
@@ -51,7 +50,6 @@ const RestaurantKafkaWebSocketComponent = () => {
     const handleClose = () => {
         setPopupOpen(false);
     };
-
 
     return (
         <div>

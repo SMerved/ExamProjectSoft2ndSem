@@ -1,12 +1,11 @@
 import { Restaurant } from '../../types/restaurants';
 import { MenuItem } from '../../types/restaurants';
 import { User } from '../../types/users';
-import {  useState } from 'react';
+import { useState } from 'react';
 import ShoppingCart from './ShoppingCart';
 import { createOrder } from '../../api/orders';
 import { ValidatePaymentAPI } from '../../api/payment.ts';
 import { Button } from '@mui/material';
-
 
 interface RestaurantPageProps {
     restaurant: Restaurant;
@@ -19,7 +18,6 @@ interface menuItemLine {
 }
 
 function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
-
     const handleProceedToPayment = async () => {
         if (menuItems.length == 0) return;
 
@@ -168,6 +166,7 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
                                                 }}
                                             >
                                                 <button
+                                                    id="cy_addToCartButton"
                                                     onClick={() => addToCart(menuItem)}
                                                     style={{
                                                         padding: '8px 12px',
@@ -191,6 +190,7 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
 
                     <ShoppingCart orderItemList={menuItems} />
                     <a
+                        id="cy_proceedToPaymentButton"
                         onClick={handleProceedToPayment}
                         style={{
                             cursor: 'pointer',
@@ -237,6 +237,7 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
                                     Card Number
                                 </h3>
                                 <input
+                                    id="cy_cardNumberInput"
                                     value={card}
                                     onChange={onCardChange}
                                     style={{
@@ -255,6 +256,7 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
                                     }}
                                 >
                                     <button
+                                        id="cy_payButton"
                                         onClick={() => handlePayment()}
                                         style={{
                                             padding: '10px 20px',
@@ -300,8 +302,6 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
                     </Button>
                 </>
             )}
-
-
         </div>
     );
 }

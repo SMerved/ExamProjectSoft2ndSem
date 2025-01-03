@@ -9,7 +9,7 @@ import { Order } from '../types/orders.ts';
 import { GetOrdersAPIByCustomerID } from '../api/orders.ts';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import FeedbackForm from '../components/Feedback/feedbackForm.tsx';
-import UserKafkaWebSocketComponent from '../components/orders/UserKafkaWebSocketComponent.tsx';
+// import UserKafkaWebSocketComponent from '../components/orders/UserKafkaWebSocketComponent.tsx';
 
 function CustomerPage() {
     const location = useLocation();
@@ -25,7 +25,6 @@ function CustomerPage() {
     useEffect(() => {
         fetchOrders();
     }, []);
-
 
     const fetchRestaurants = async () => {
         try {
@@ -65,6 +64,7 @@ function CustomerPage() {
                         Restaurants
                     </h1>
                     <select
+                        id="cy_restaurantSelect"
                         onChange={handleRestaurantChange}
                         style={{
                             width: '25%',
@@ -88,9 +88,9 @@ function CustomerPage() {
             {restaurant && <RestaurantComponent restaurant={restaurant} user={user} />}
             {orders.length > 0 &&
                 orders
-                    .filter((order) => (order.status === OrderStatusEnum.Complete)&&(!order.feedbackID))
+                    .filter((order) => order.status === OrderStatusEnum.Complete && !order.feedbackID)
                     .map((order) => <FeedbackForm order={order}></FeedbackForm>)}
-            <UserKafkaWebSocketComponent />
+            {/* <UserKafkaWebSocketComponent /> */}
         </div>
     );
 }

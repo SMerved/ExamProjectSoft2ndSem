@@ -6,7 +6,6 @@ const UserKafkaWebSocketComponent = () => {
     const [currentMessage, setCurrentMessage] = useState<string>('');
     const serverUrl = 'ws://localhost:7080/v2/broker/?topics=user_events';
 
-
     useEffect(() => {
         const ws = new WebSocket(serverUrl);
 
@@ -31,7 +30,7 @@ const UserKafkaWebSocketComponent = () => {
         return () => {
             ws.close();
         };
-    }, [serverUrl,currentMessage]);
+    }, [serverUrl, currentMessage]);
 
     const formatMessage = (message: string) => {
         try {
@@ -52,13 +51,12 @@ const UserKafkaWebSocketComponent = () => {
         setPopupOpen(false);
     };
 
-
     return (
         <div>
             <Dialog open={popupOpen} onClose={handleClose}>
                 <DialogTitle>Your order has Arrived!</DialogTitle>
                 <DialogContent>
-                    <div>{ currentMessage}</div>
+                    <div>{currentMessage}</div>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">

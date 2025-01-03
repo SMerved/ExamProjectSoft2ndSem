@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Order , MenuItem} from '../../types/orders';
+import { Order, MenuItem } from '../../types/orders';
 import { Button } from '@mui/material';
 import { acceptRejectOrder } from '../../api/orders';
 interface Props {
@@ -8,14 +8,8 @@ interface Props {
 }
 
 const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
-    const [rejectReason, setRejectReason] = useState<string>(
-        selectedOrder.rejectReason || ''
-    );
-    async function handleRejectAcceptOrder(
-        selectedOrder: Order,
-        accept: boolean,
-        rejectReason?: string
-    ) {
+    const [rejectReason, setRejectReason] = useState<string>(selectedOrder.rejectReason || '');
+    async function handleRejectAcceptOrder(selectedOrder: Order, accept: boolean, rejectReason?: string) {
         try {
             if (accept) {
                 await acceptRejectOrder(selectedOrder._id, 2);
@@ -30,9 +24,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
     function isMenuItem(item: string | MenuItem): item is MenuItem {
         return typeof item === 'object' && item !== null && '_id' in item;
     }
-    
-    
-    
+
     useEffect(() => {
         setRejectReason(selectedOrder.rejectReason || '');
     }, [selectedOrder]);
@@ -152,6 +144,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
             </div>
             <div>
                 <input
+                    id="cy_rejectReasonInput"
                     type="text"
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
@@ -173,6 +166,7 @@ const OrderCardDetailed: React.FC<Props> = ({ selectedOrder, fetchOrders }) => {
                 }}
             >
                 <Button
+                    id="cy_rejectButton"
                     disabled={!rejectReason || selectedOrder.status !== 0}
                     variant="contained"
                     sx={{

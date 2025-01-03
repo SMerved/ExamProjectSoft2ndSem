@@ -10,7 +10,7 @@ import OrderCardDetailed from '../components/orders/orderCardDetailed.tsx';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import { Divider } from '@mui/material';
 import NoUser from './components/noUser.tsx';
-import RestaurantKafkaWebSocketComponent from '../components/orders/RestaurantKafkaWebSocketComponent.tsx';
+// import RestaurantKafkaWebSocketComponent from '../components/orders/RestaurantKafkaWebSocketComponent.tsx';
 
 function RestaurantPage() {
     const location = useLocation();
@@ -22,7 +22,6 @@ function RestaurantPage() {
     const [yData, setYData] = useState<number[]>([]);
     const [labels, setLabels] = useState<string[]>([]);
     const [labelType, setLabelType] = useState<string>('Income');
-
 
     const fetchOrders = async () => {
         try {
@@ -165,11 +164,7 @@ function RestaurantPage() {
                             >
                                 {filterOrders(orders, [OrderStatusEnum.Accepted, OrderStatusEnum.OnItsWay]).map(
                                     (order) => (
-                                        <OrderCard
-                                            key={order._id}
-                                            order={order}
-                                            setSelectedOrder={setSelectedOrder}
-                                        />
+                                        <OrderCard key={order._id} order={order} setSelectedOrder={setSelectedOrder} />
                                     )
                                 )}
                             </div>
@@ -195,11 +190,7 @@ function RestaurantPage() {
                             >
                                 {filterOrders(orders, [OrderStatusEnum.Complete, OrderStatusEnum.Rejected]).map(
                                     (order) => (
-                                        <OrderCard
-                                            key={order._id}
-                                            order={order}
-                                            setSelectedOrder={setSelectedOrder}
-                                        />
+                                        <OrderCard key={order._id} order={order} setSelectedOrder={setSelectedOrder} />
                                     )
                                 )}
                             </div>
@@ -227,10 +218,9 @@ function RestaurantPage() {
                     <h1>There are no accepted orders pending...</h1>
                     <p>Come back later to find tasks to deliver!</p>
                 </>
-
             )}
 
-            <RestaurantKafkaWebSocketComponent />
+            {/* <RestaurantKafkaWebSocketComponent /> */}
         </div>
     );
 }
