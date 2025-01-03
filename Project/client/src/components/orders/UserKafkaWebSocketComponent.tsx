@@ -4,7 +4,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/
 const UserKafkaWebSocketComponent = () => {
     const [popupOpen, setPopupOpen] = useState<boolean>(false);
     const [currentMessage, setCurrentMessage] = useState<string>('');
-    const serverUrl = 'ws://localhost:7080/v2/broker/?topics=user_events';
+    const serverUrl = 'ws://localhost:7080/v2/broker/?topics=user_events    ';
 
 
     useEffect(() => {

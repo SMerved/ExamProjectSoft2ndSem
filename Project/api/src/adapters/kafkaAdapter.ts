@@ -51,7 +51,6 @@ export class KafkaAdapter implements MessageBroker {
                 ],
             };
             await producer.send(message);
-            console.info('Event sent:', message);
         } finally {
             await producer.disconnect();
         }
@@ -68,33 +67,43 @@ export class KafkaAdapter implements MessageBroker {
             fromBeginning: false,
         });
 
-        await consumer.run({
-            eachMessage: async ({ topic, partition, message }) => {
-                if (!message.value) {
-                    console.warn('Message value is null');
-                    return;
-                }
+        const retries = 3;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+                await consumer.run({
+                    eachMessage: async ({ topic, partition, message }) => {
+                        if (!message.value) {
+                            console.warn('Message value is null');
+                            return;
+                        }
 
-                const event = JSON.parse(message.value.toString());
-                const { eventType, payload } = event;
+                        const event = JSON.parse(message.value.toString());
+                        const { eventType, payload } = event;
 
-                try {
-                    handler(eventType, payload);
-                } catch (error) {
-                    console.error(
-                        `Error handling event type: ${eventType}`,
-                        error
-                    );
-                }
+                        try {
+                            handler(eventType, payload);
+                        } catch (error) {
+                            console.error(
+                                `Error handling event type: ${eventType}`,
+                                error
+                            );
+                        }
 
-                await consumer.commitOffsets([
-                    {
-                        topic,
-                        partition,
-                        offset: (Number(message.offset) + 1).toString(),
+                        await consumer.commitOffsets([
+                            {
+                                topic,
+                                partition,
+                                offset: (Number(message.offset) + 1).toString(),
+                            },
+                        ]);
                     },
-                ]);
-            },
-        });
+                });
+            } catch (error) {
+                if (attempt === retries) {
+                    throw error;
+                }
+                console.warn(`Attempt ${attempt} failed. Retrying...`);
+            }
+        }
     }
 }
