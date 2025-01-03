@@ -41,12 +41,14 @@ services:
       - "2181:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - monitoring  
 
   kafka:
     image: bitnami/kafka:latest
     container_name: kafka
     ports:
-      - "9092:9092"
+      - "9092:9092" 
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
@@ -64,6 +66,9 @@ services:
       kafka-topics.sh --describe --topic test-topic --bootstrap-server kafka:9092 || kafka-topics.sh --create --topic test-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 && 
       kafka-topics.sh --describe --topic user-topic --bootstrap-server kafka:9092 || kafka-topics.sh --create --topic user-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 && 
       sleep infinity"
+    networks:
+      - monitoring
+      
   prometheus:
     image: prom/prometheus
     volumes:
@@ -76,3 +81,4 @@ services:
 networks:
   monitoring:
     name: monitoring
+    driver: "bridge"
