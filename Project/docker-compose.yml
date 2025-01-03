@@ -56,16 +56,14 @@ services:
     depends_on:
       - zookeeper
     command: >
-      sh -c "
-        /etc/confluent/docker/run &
-        sleep 10 &&
-        kafka-topics --create --topic restaurant_topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 3 &&
-        kafka-topics --create --topic my-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 && 
-        kafka-topics --create --topic test-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 &&
-        kafka-topics --create --topic user-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 &&
-        sleep infinity
-      "
-
+      bash -c "
+      /opt/bitnami/scripts/kafka/run.sh &
+      sleep 10 &&
+      kafka-topics.sh --create --topic restaurant_topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 3 &&
+      kafka-topics.sh --create --topic my-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 &&
+      kafka-topics.sh --create --topic test-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 &&
+      kafka-topics.sh --create --topic user-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 &&
+      sleep infinity"
   prometheus:
     image: prom/prometheus
     volumes:
