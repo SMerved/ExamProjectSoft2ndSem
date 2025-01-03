@@ -75,6 +75,8 @@ spec:
       targetPort: 9092
   selector:
     io.kompose.service: kafka
+  externalTrafficPolicy: Local
+  type: LoadBalancer
 
 ---
 apiVersion: v1
@@ -113,6 +115,8 @@ spec:
       targetPort: 2181
   selector:
     io.kompose.service: zookeeper
+  externalTrafficPolicy: Local
+  type: LoadBalancer
 
 ---
 apiVersion: apps/v1
