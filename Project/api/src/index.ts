@@ -60,11 +60,11 @@ app.use('/restaurantService', restaurantRouter);
 
 app.post('/pay', async (req, res) => {
     try {
-        const { price, customerId, cardNumber } = req.body;
+        const { price, customerId, paymentMethod } = req.body;
         const response = await paymentServiceValidatePayment(
             price,
             customerId,
-            cardNumber
+            paymentMethod
         );
 
         if (response) {
