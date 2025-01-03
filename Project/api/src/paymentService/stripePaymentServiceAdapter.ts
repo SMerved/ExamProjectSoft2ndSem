@@ -1,21 +1,20 @@
 import { Stripe } from 'stripe';
 import { PaymentStrategy } from './types/payment.ts';
 
-const apiKey =
-    'sk_test_51Q9kMkFpImY9hrD4SNtwYUp8z7y411DmXJ2sA3ahnPxmGcUT34ylDpJSVArqQpRVlkmFHFsXzkwszTi7cJaPEwR500E6HrAWDf';
-
-const stripe = new Stripe(apiKey);
 
 export class StripePaymentStrategy implements PaymentStrategy {
+  private apiKey = 'sk_test_51Q9kMkFpImY9hrD4SNtwYUp8z7y411DmXJ2sA3ahnPxmGcUT34ylDpJSVArqQpRVlkmFHFsXzkwszTi7cJaPEwR500E6HrAWDf';
+  
+  private stripe = new Stripe(this.apiKey);
   async pay(amount: number, customerId: string): Promise<boolean> {
     try {
-      const stripeUserId = await stripe.customers.create({ name: customerId });
-      const paymentMethod = await stripe.paymentMethods.create({
+      const stripeUserId = await this.stripe.customers.create({ name: customerId });
+      const paymentMethod = await this.stripe.paymentMethods.create({
         type: 'card',
         card: { token: 'tok_visa' },
       });
-      await stripe.paymentMethods.attach(paymentMethod.id, { customer: stripeUserId.id });
-      await stripe.paymentIntents.create({
+      await this.stripe.paymentMethods.attach(paymentMethod.id, { customer: stripeUserId.id });
+      await this.stripe.paymentIntents.create({
         amount,
         currency: 'dkk',
         payment_method: paymentMethod.id,
