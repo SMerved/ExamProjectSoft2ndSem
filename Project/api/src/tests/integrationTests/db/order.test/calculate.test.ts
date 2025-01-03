@@ -2,9 +2,14 @@ import { AppDataSource } from '../../../../ormconfig.ts';
 import * as orderAndFeedbackRepository from '../../../../monolithOrderAndFeedback/OrderAndFeedbackRepository.ts';
 import { ObjectId } from 'mongodb';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
-import { createOrders, createOrders2, setOrderHours } from '../../../utilities.ts';
+import {
+    createOrders,
+    createOrders2,
+    setOrderHours,
+} from '../../../utilities.ts';
 import { mockOrderWithId } from '../../../mocks/orderMocksDB.ts';
-
+jest.mock('../../../../adapters/messaging');
+jest.mock('../../../../adapters/kafkaAdapter');
 describe('calculate and complete order', () => {
     const orderRepository = AppDataSource.getMongoRepository(Order);
 
@@ -41,7 +46,10 @@ describe('calculate and complete order', () => {
             orderId: dummyOrder._id,
         };
 
-        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+        const feedback =
+            await orderAndFeedbackRepository.createFeedbackAndLinkOrder(
+                feedbackData
+            );
 
         dummyOrder = {
             ...(dummyOrder as Order),
@@ -54,9 +62,10 @@ describe('calculate and complete order', () => {
 
         if (!order.employeeID) throw new Error('Order was not created!');
 
-        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
-            order?._id.toString()
-        );
+        const calculatedUpdatedOrder =
+            await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+                order?._id.toString()
+            );
 
         expect(calculatedUpdatedOrder).not.toBeNull();
 
@@ -89,17 +98,27 @@ describe('calculate and complete order', () => {
             orderId: dummyOrder._id,
         };
 
-        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+        const feedback =
+            await orderAndFeedbackRepository.createFeedbackAndLinkOrder(
+                feedbackData
+            );
 
-        dummyOrder = setOrderHours(dummyOrder, feedback._id, [23, 30, 0, 0], [23, 35, 0, 0], [23, 45, 0, 0]);
+        dummyOrder = setOrderHours(
+            dummyOrder,
+            feedback._id,
+            [23, 30, 0, 0],
+            [23, 35, 0, 0],
+            [23, 45, 0, 0]
+        );
 
         const order = await orderRepository.save(dummyOrder);
 
         if (!order.employeeID) throw new Error('Order was not created!');
 
-        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
-            order?._id.toString()
-        );
+        const calculatedUpdatedOrder =
+            await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+                order?._id.toString()
+            );
 
         expect(calculatedUpdatedOrder).not.toBeNull();
 
@@ -127,7 +146,9 @@ describe('calculate and complete order', () => {
 
         const mockOrders = Array.from({ length: 201 }, () => mockOrderWithId);
 
-        const findOrderSpy = jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders);
+        const findOrderSpy = jest
+            .spyOn(orderRepository, 'find')
+            .mockResolvedValue(mockOrders);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
@@ -138,16 +159,26 @@ describe('calculate and complete order', () => {
             orderId: dummyOrder._id,
         };
 
-        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
-        dummyOrder = setOrderHours(dummyOrder, feedback._id, [19, 30, 0, 0], [20, 5, 0, 0], [20, 45, 0, 0]);
+        const feedback =
+            await orderAndFeedbackRepository.createFeedbackAndLinkOrder(
+                feedbackData
+            );
+        dummyOrder = setOrderHours(
+            dummyOrder,
+            feedback._id,
+            [19, 30, 0, 0],
+            [20, 5, 0, 0],
+            [20, 45, 0, 0]
+        );
 
         const order = await orderRepository.save(dummyOrder);
 
         if (!order.employeeID) throw new Error('Order was not created!');
 
-        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
-            order?._id.toString()
-        );
+        const calculatedUpdatedOrder =
+            await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+                order?._id.toString()
+            );
 
         findOrderSpy.mockRestore();
 
@@ -184,16 +215,26 @@ describe('calculate and complete order', () => {
             orderId: dummyOrder._id,
         };
 
-        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
-        dummyOrder = setOrderHours(dummyOrder, feedback._id, [19, 30, 0, 0], [20, 5, 0, 0], [20, 55, 0, 0]);
+        const feedback =
+            await orderAndFeedbackRepository.createFeedbackAndLinkOrder(
+                feedbackData
+            );
+        dummyOrder = setOrderHours(
+            dummyOrder,
+            feedback._id,
+            [19, 30, 0, 0],
+            [20, 5, 0, 0],
+            [20, 55, 0, 0]
+        );
 
         const order = await orderRepository.save(dummyOrder);
 
         if (!order.employeeID) throw new Error('Order was not created!');
 
-        const calculatedUpdatedOrder = await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
-            order?._id.toString()
-        );
+        const calculatedUpdatedOrder =
+            await orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+                order?._id.toString()
+            );
 
         expect(calculatedUpdatedOrder).not.toBeNull();
 
@@ -219,11 +260,17 @@ describe('calculate and complete order', () => {
     it('should fail to find order', async () => {
         dummyOrder = getOrder();
 
-        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest
+            .spyOn(orderRepository, 'findOne')
+            .mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        await expect(orderAndFeedbackRepository.calculateAndUpdateOrderPay(dummyOrder?._id.toString())).rejects.toThrow(
+        await expect(
+            orderAndFeedbackRepository.calculateAndUpdateOrderPay(
+                dummyOrder?._id.toString()
+            )
+        ).rejects.toThrow(
             `Order with ID ${dummyOrder?._id.toString()} not found`
         );
 

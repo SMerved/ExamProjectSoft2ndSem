@@ -4,7 +4,8 @@ import { ObjectId } from 'mongodb';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 import { Feedback } from '../../../../monolithOrderAndFeedback/Feedback.ts';
 import { createOrders, createOrders2 } from '../../../utilities.ts';
-
+jest.mock('../../../../adapters/messaging');
+jest.mock('../../../../adapters/kafkaAdapter');
 describe('get average rating', () => {
     const feedbackRepository = AppDataSource.getMongoRepository(Feedback);
     const orderRepository = AppDataSource.getMongoRepository(Order);
@@ -41,7 +42,10 @@ describe('get average rating', () => {
             orderId: dummyOrder._id,
         };
 
-        const feedback = await orderAndFeedbackRepository.createFeedbackAndLinkOrder(feedbackData);
+        const feedback =
+            await orderAndFeedbackRepository.createFeedbackAndLinkOrder(
+                feedbackData
+            );
 
         dummyOrder = {
             ...(dummyOrder as Order),
@@ -54,7 +58,9 @@ describe('get average rating', () => {
 
         if (!order.employeeID) throw new Error('Order was not created!');
 
-        const avgRating = await orderAndFeedbackRepository.getRatingAVG(new ObjectId(order?._id.toString()));
+        const avgRating = await orderAndFeedbackRepository.getRatingAVG(
+            new ObjectId(order?._id.toString())
+        );
 
         expect(avgRating).not.toBeNull();
         expect(avgRating).toEqual(4);
@@ -63,15 +69,17 @@ describe('get average rating', () => {
     it('should fail to find order', async () => {
         dummyOrder = getOrder();
 
-        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest
+            .spyOn(orderRepository, 'findOne')
+            .mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
         const wrongID = '672df427f54107237ff75569';
 
-        await expect(orderAndFeedbackRepository.getRatingAVG(new ObjectId(wrongID))).rejects.toThrow(
-            `Order with ID ${wrongID} not found`
-        );
+        await expect(
+            orderAndFeedbackRepository.getRatingAVG(new ObjectId(wrongID))
+        ).rejects.toThrow(`Order with ID ${wrongID} not found`);
 
         findOneOrderSpy.mockRestore();
     });
@@ -85,11 +93,17 @@ describe('get average rating', () => {
         };
         await orderRepository.save(dummyOrder);
 
-        const findOneFeedbackSpy = jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue(null);
+        const findOneFeedbackSpy = jest
+            .spyOn(feedbackRepository, 'findOne')
+            .mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        await expect(orderAndFeedbackRepository.getRatingAVG(new ObjectId(dummyOrder?._id))).rejects.toThrow(
+        await expect(
+            orderAndFeedbackRepository.getRatingAVG(
+                new ObjectId(dummyOrder?._id)
+            )
+        ).rejects.toThrow(
             `Feedback with ID ${dummyOrder?.feedbackID} not found`
         );
 
@@ -105,16 +119,22 @@ describe('get average rating', () => {
         };
         await orderRepository.save(dummyOrder);
 
-        const findOneFeedbackSpy = jest.spyOn(feedbackRepository, 'findOne').mockResolvedValue({
-            _id: new ObjectId('672df427f54107237ff75569'),
-            foodRating: 5,
-            deliveryRating: 3,
-            overallRating: null as unknown as number,
-        });
+        const findOneFeedbackSpy = jest
+            .spyOn(feedbackRepository, 'findOne')
+            .mockResolvedValue({
+                _id: new ObjectId('672df427f54107237ff75569'),
+                foodRating: 5,
+                deliveryRating: 3,
+                overallRating: null as unknown as number,
+            });
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        await expect(orderAndFeedbackRepository.getRatingAVG(new ObjectId(dummyOrder?._id))).rejects.toThrow(
+        await expect(
+            orderAndFeedbackRepository.getRatingAVG(
+                new ObjectId(dummyOrder?._id)
+            )
+        ).rejects.toThrow(
             `Feedback ratings are incomplete for feedback #${dummyOrder?.feedbackID}`
         );
 

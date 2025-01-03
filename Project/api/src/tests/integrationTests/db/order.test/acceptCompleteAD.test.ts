@@ -4,7 +4,8 @@ import { ObjectId } from 'mongodb';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 import { createOrders } from '../../../utilities.ts';
 import { mockOrder } from '../../../mocks/orderMocksDB.ts';
-
+jest.mock('../../../../adapters/messaging');
+jest.mock('../../../../adapters/kafkaAdapter');
 describe('accept/complete order as delivery driver', () => {
     const orderRepository = AppDataSource.getMongoRepository(Order);
 
@@ -36,14 +37,16 @@ describe('accept/complete order as delivery driver', () => {
             employeeID: new ObjectId('672df427f54107237ff75569'),
         };
 
-        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+        if (!dummyOrder?._id || !dummyOrder.employeeID)
+            throw new Error('Order was not created!');
 
         await orderRepository.save(dummyOrder);
 
-        const acceptedOrder = await orderAndFeedbackRepository.acceptOrderAsDelivery(
-            dummyOrder?._id.toString(),
-            dummyOrder.employeeID.toString()
-        );
+        const acceptedOrder =
+            await orderAndFeedbackRepository.acceptOrderAsDelivery(
+                dummyOrder?._id.toString(),
+                dummyOrder.employeeID.toString()
+            );
 
         expect(acceptedOrder).not.toBeNull();
 
@@ -70,19 +73,24 @@ describe('accept/complete order as delivery driver', () => {
                 3,
                 'This reason is not allowed because status is not 1'
             )
-        ).rejects.toThrow('There can only be a reason for rejecting, if status is set to 1, aka reject');
+        ).rejects.toThrow(
+            'There can only be a reason for rejecting, if status is set to 1, aka reject'
+        );
     });
 
     it('should fail to accept order because status not between 0 and 4', async () => {
-        await expect(orderAndFeedbackRepository.acceptRejectOrder('randomID', 9)).rejects.toThrow(
-            'Status must be between between 0 and 4, inclusive'
-        );
+        await expect(
+            orderAndFeedbackRepository.acceptRejectOrder('randomID', 9)
+        ).rejects.toThrow('Status must be between between 0 and 4, inclusive');
     });
 
     it('should fail to accept order because of wrong ID', async () => {
-        await expect(orderAndFeedbackRepository.acceptRejectOrder('672df427f54107237ff75561', 3)).rejects.toThrow(
-            'Order with ID 672df427f54107237ff75561 not found'
-        );
+        await expect(
+            orderAndFeedbackRepository.acceptRejectOrder(
+                '672df427f54107237ff75561',
+                3
+            )
+        ).rejects.toThrow('Order with ID 672df427f54107237ff75561 not found');
     });
 
     it('complete order as delivery', async () => {
@@ -94,11 +102,15 @@ describe('accept/complete order as delivery driver', () => {
             employeeID: new ObjectId('672df427f54107237ff75569'),
         };
 
-        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+        if (!dummyOrder?._id || !dummyOrder.employeeID)
+            throw new Error('Order was not created!');
 
         await orderRepository.save(dummyOrder);
 
-        const acceptedOrder = await orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString());
+        const acceptedOrder =
+            await orderAndFeedbackRepository.completeOrderAsDelivery(
+                dummyOrder?._id.toString()
+            );
 
         expect(acceptedOrder).not.toBeNull();
 
@@ -121,7 +133,9 @@ describe('accept/complete order as delivery driver', () => {
     it('fail to complete order because no order found', async () => {
         dummyOrder = getOrder();
 
-        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest
+            .spyOn(orderRepository, 'findOne')
+            .mockResolvedValue(null);
 
         dummyOrder = {
             ...(dummyOrder as Order),
@@ -129,7 +143,8 @@ describe('accept/complete order as delivery driver', () => {
             employeeID: new ObjectId('672df427f54107237ff75569'),
         };
 
-        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+        if (!dummyOrder?._id || !dummyOrder.employeeID)
+            throw new Error('Order was not created!');
 
         await orderRepository.save(dummyOrder);
 
@@ -138,7 +153,9 @@ describe('accept/complete order as delivery driver', () => {
                 dummyOrder?._id.toString(),
                 dummyOrder?.employeeID.toString()
             )
-        ).rejects.toThrow(`Order with ID ${dummyOrder?._id.toString()} not found`);
+        ).rejects.toThrow(
+            `Order with ID ${dummyOrder?._id.toString()} not found`
+        );
 
         findOneOrderSpy.mockRestore();
     });
@@ -146,7 +163,9 @@ describe('accept/complete order as delivery driver', () => {
     it('should fail to accept order because of no order ID', async () => {
         dummyOrder = getOrder();
 
-        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest
+            .spyOn(orderRepository, 'findOne')
+            .mockResolvedValue(null);
 
         dummyOrder = {
             ...(dummyOrder as Order),
@@ -154,7 +173,8 @@ describe('accept/complete order as delivery driver', () => {
             employeeID: new ObjectId('672df427f54107237ff75569'),
         };
 
-        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+        if (!dummyOrder?._id || !dummyOrder.employeeID)
+            throw new Error('Order was not created!');
 
         await expect(
             orderAndFeedbackRepository.acceptOrderAsDelivery(
@@ -175,7 +195,8 @@ describe('accept/complete order as delivery driver', () => {
             employeeID: new ObjectId('672df427f54107237ff75569'),
         };
 
-        if (!dummyOrder?._id || !dummyOrder.employeeID) throw new Error('Order was not created!');
+        if (!dummyOrder?._id || !dummyOrder.employeeID)
+            throw new Error('Order was not created!');
 
         await orderRepository.save(dummyOrder);
 
@@ -190,13 +211,17 @@ describe('accept/complete order as delivery driver', () => {
     it('complete order fail because status is not 2', async () => {
         dummyOrder = getOrder();
 
-        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue(null);
+        const findOneOrderSpy = jest
+            .spyOn(orderRepository, 'findOne')
+            .mockResolvedValue(null);
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        await expect(orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString())).rejects.toThrow(
-            `Order with ID ${dummyOrder?._id} not found`
-        );
+        await expect(
+            orderAndFeedbackRepository.completeOrderAsDelivery(
+                dummyOrder?._id.toString()
+            )
+        ).rejects.toThrow(`Order with ID ${dummyOrder?._id} not found`);
 
         findOneOrderSpy.mockRestore();
     });
@@ -206,11 +231,15 @@ describe('accept/complete order as delivery driver', () => {
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        const findOneOrderSpy = jest.spyOn(orderRepository, 'findOne').mockResolvedValue({ ...mockOrder, _id: dummyOrder._id });
+        const findOneOrderSpy = jest
+            .spyOn(orderRepository, 'findOne')
+            .mockResolvedValue({ ...mockOrder, _id: dummyOrder._id });
 
-        await expect(orderAndFeedbackRepository.completeOrderAsDelivery(dummyOrder?._id.toString())).rejects.toThrow(
-            'Order is not ready to be completed'
-        );
+        await expect(
+            orderAndFeedbackRepository.completeOrderAsDelivery(
+                dummyOrder?._id.toString()
+            )
+        ).rejects.toThrow('Order is not ready to be completed');
 
         findOneOrderSpy.mockRestore();
     });

@@ -1,9 +1,14 @@
 import { AppDataSource } from '../../../../ormconfig.ts';
 import * as orderAndFeedbackService from '../../../../monolithOrderAndFeedback/OrderAndFeedbackService.ts';
-import { getAllOrdersMockOrder1, getAllOrdersMockOrder2, mockOrderCreate } from '../../../mocks/orderMocksDB.ts';
+import {
+    getAllOrdersMockOrder1,
+    getAllOrdersMockOrder2,
+    mockOrderCreate,
+} from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 import { createOrders, createOrders2 } from '../../../utilities.ts';
-
+jest.mock('../../../../adapters/messaging');
+jest.mock('../../../../adapters/kafkaAdapter');
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     beforeAll(async () => {
         await AppDataSource.initialize();
@@ -36,7 +41,9 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         );
 
         if (!order) {
-            throw new Error('Order creation failed, cannot proceed with feedback creation');
+            throw new Error(
+                'Order creation failed, cannot proceed with feedback creation'
+            );
         }
 
         expect(order).not.toBeNull();

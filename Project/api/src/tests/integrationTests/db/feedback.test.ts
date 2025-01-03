@@ -7,7 +7,8 @@ import {
 import { Order } from '../../../monolithOrderAndFeedback/Order.ts';
 import { ObjectId } from 'mongodb';
 import { createOrders } from '../../utilities.ts';
-
+jest.mock('../../../adapters/messaging');
+jest.mock('../../../adapters/kafkaAdapter');
 describe('Database Functionality for createFeedbackAndLinkOrder', () => {
     let order: Order | null;
     let getOrder: () => Order | null;
@@ -28,7 +29,9 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         order = getOrder();
 
         if (!order) {
-            throw new Error('Order creation failed, cannot proceed with feedback creation');
+            throw new Error(
+                'Order creation failed, cannot proceed with feedback creation'
+            );
         }
         const feedbackData = {
             foodRating: 5,
@@ -54,7 +57,9 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         order = getOrder();
 
         if (!order) {
-            throw new Error('Order creation failed, cannot proceed with feedback creation');
+            throw new Error(
+                'Order creation failed, cannot proceed with feedback creation'
+            );
         }
         const feedbackData = {
             foodRating: 5,
@@ -72,7 +77,9 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
         order = getOrder();
 
         if (!order) {
-            throw new Error('Order creation failed, cannot proceed with feedback creation');
+            throw new Error(
+                'Order creation failed, cannot proceed with feedback creation'
+            );
         }
 
         const feedbackData = {
@@ -84,7 +91,9 @@ describe('Database Functionality for createFeedbackAndLinkOrder', () => {
 
         await createFeedbackAndLinkOrder(feedbackData);
 
-        const rating = await orderAndFeedbackRepository.getRatingAVG(feedbackData.orderId);
+        const rating = await orderAndFeedbackRepository.getRatingAVG(
+            feedbackData.orderId
+        );
 
         expect(rating).not.toBeNull();
         expect(rating).toBe(4);

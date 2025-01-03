@@ -3,7 +3,8 @@ import * as orderAndFeedbackRepository from '../../../../monolithOrderAndFeedbac
 import { getAllOrdersMockOrder1 } from '../../../mocks/orderMocksDB.ts';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 import { createOrders, createOrders2 } from '../../../utilities.ts';
-
+jest.mock('../../../../adapters/messaging');
+jest.mock('../../../../adapters/kafkaAdapter');
 describe('Accept and reject order as restuarant', () => {
     beforeAll(async () => {
         await AppDataSource.initialize();
@@ -31,11 +32,12 @@ describe('Accept and reject order as restuarant', () => {
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        const acceptedOrder = await orderAndFeedbackRepository.acceptRejectOrder(
-            dummyOrder?._id.toString(),
-            1,
-            'Han har bestilt bearnaise pizza, ewww :vomit:'
-        );
+        const acceptedOrder =
+            await orderAndFeedbackRepository.acceptRejectOrder(
+                dummyOrder?._id.toString(),
+                1,
+                'Han har bestilt bearnaise pizza, ewww :vomit:'
+            );
 
         expect(acceptedOrder).not.toBeNull();
 
@@ -60,7 +62,12 @@ describe('Accept and reject order as restuarant', () => {
 
         if (!dummyOrder?._id) throw new Error('Order was not created!');
 
-        const acceptedOrder = await orderAndFeedbackRepository.acceptRejectOrder(dummyOrder?._id.toString(), 2, '');
+        const acceptedOrder =
+            await orderAndFeedbackRepository.acceptRejectOrder(
+                dummyOrder?._id.toString(),
+                2,
+                ''
+            );
 
         expect(acceptedOrder).not.toBeNull();
 
