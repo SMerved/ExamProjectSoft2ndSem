@@ -10,6 +10,7 @@ export class KafkaAdapter implements MessageBroker {
 
     constructor(clientId: string, groupId: string, topic: string) {
         const brokers = process.env.KAFKA_BROKERS?.split(',') || [];
+        console.log('brokers:', brokers);
         this.kafka = new Kafka({
             clientId,
             brokers,
@@ -51,7 +52,6 @@ export class KafkaAdapter implements MessageBroker {
                 ],
             };
             await producer.send(message);
-            console.info('Event sent:', message);
         } finally {
             await producer.disconnect();
         }

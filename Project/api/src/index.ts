@@ -24,8 +24,6 @@ import { CustomError } from './types/generic.ts';
 import { paymentServiceValidatePayment } from './paymentService/paymentServiceAdapter.ts';
 import { restaurantServiceGetAllRestaurants } from './adapters/restaurantServiceAdapter.ts';
 import { restaurantRouter } from './RestaurantService/restaurantRoutes.ts';
-import { KafkaAdapter } from './adapters/kafkaAdapter.ts';
-import MessageBroker from './adapters/types/types.ts';
 import client from 'prom-client';
 
 const register = new client.Registry();
@@ -304,15 +302,17 @@ app.post('/completeOrderAsDelivery', async (req: Request, res: Response) => {
             res.status(401).json({ error: 'Invalid order data' });
             return;
         }
+        /*
         const messageBroker: MessageBroker = new KafkaAdapter(
             'mtogo',
             'mtogo-group',
             'user_events'
         );
+
         await messageBroker.sendEvent('OrderCompleted', {
             order: order1,
         });
-
+        */
         res.json(order1);
     } catch (error) {
         console.error('Error completing order: ', error);
