@@ -10,7 +10,7 @@ import OrderCardDetailed from '../components/orders/orderCardDetailed.tsx';
 import { OrderStatusEnum } from '../utilities/orders.ts';
 import { Divider } from '@mui/material';
 import NoUser from './components/noUser.tsx';
-import RestaurantKafkaWebSocketComponent from '../components/orders/RestaurantKafkaWebSocketComponent.tsx';
+//import RestaurantKafkaWebSocketComponent from '../components/orders/RestaurantKafkaWebSocketComponent.tsx';
 
 function RestaurantPage() {
     const location = useLocation();
@@ -230,7 +230,7 @@ function RestaurantPage() {
 
             )}
 
-            <RestaurantKafkaWebSocketComponent />
+
         </div>
     );
 }

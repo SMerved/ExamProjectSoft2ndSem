@@ -23,7 +23,7 @@ jest.mock('kafkajs', () => {
 
 describe('KafkaAdapter Functionality', () => {
     let kafkaAdapter: KafkaAdapter;
-    const brokers = ['broker1:9092', 'broker2:9092'];
+    const brokers: string[] = [];
     const clientId = 'my-client-id';
     const groupId = 'my-group-id';
     const topic = 'my-topic';
