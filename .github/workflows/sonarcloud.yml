@@ -34,7 +34,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem_client
+            -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem
             -Dsonar.organization=SMerved
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=Project/client
@@ -55,7 +55,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem_api
+            -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem
             -Dsonar.organization=SMerved
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=Project/api
