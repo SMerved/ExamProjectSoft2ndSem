@@ -35,7 +35,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem
-            -Dsonar.organization=SMerved
+            -Dsonar.organization=smerved
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=Project/client
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem
-            -Dsonar.organization=SMerved
+            -Dsonar.organization=smerved
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.sources=Project/api
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
