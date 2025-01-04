@@ -39,7 +39,7 @@ jobs:
       #  run: npm testCoverage
        # working-directory: Project/api
 
-      # Step 8: SonarCloud scan
+      # Step 8: SonarCloud scan2
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
