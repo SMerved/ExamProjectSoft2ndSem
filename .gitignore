@@ -32,3 +32,5 @@ Project/api/.idea/modules.xml
 Project/api/.idea/vcs.xml
 Project/api/.idea/api.iml
 
+#Load testing
+JMeter/apache-jmeter-5.6.3
