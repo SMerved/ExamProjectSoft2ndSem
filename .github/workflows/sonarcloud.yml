@@ -29,17 +29,6 @@ jobs:
        # run: npm testCoverage
        # working-directory: Project/client
 
-      # Step 5: SonarCloud scan for client
-      - name: SonarCloud Scan (Client)
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem
-            -Dsonar.organization=smerved
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.sources=Project/client
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-
       # Step 6: Install dependencies for API
       - name: Install dependencies (API)
         run: npm install
@@ -50,13 +39,12 @@ jobs:
       #  run: npm testCoverage
        # working-directory: Project/api
 
-      # Step 8: SonarCloud scan for API
-      - name: SonarCloud Scan (API)
+      # Step 8: SonarCloud scan
+      - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
             -Dsonar.projectKey=SMerved_ExamProjectSoft2ndSem
             -Dsonar.organization=smerved
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.sources=Project/api
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
