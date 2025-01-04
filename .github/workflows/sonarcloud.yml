@@ -22,12 +22,12 @@ jobs:
       # Step 3: Install dependencies for client
       - name: Install dependencies (Client)
         run: npm install
-        working-directory: ./client
+        working-directory: ./Project/client
 
       # Step 4: Run tests for client
       - name: Run tests (Client)
         run: npm test -- --coverage
-        working-directory: ./client
+        working-directory: ./Project/client
 
       # Step 5: SonarCloud scan for client
       - name: SonarCloud Scan (Client)
@@ -38,17 +38,17 @@ jobs:
             -Dsonar.organization=SMerved
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-        working-directory: ./client
+        working-directory: ./Project/client
 
       # Step 6: Install dependencies for API
       - name: Install dependencies (API)
         run: npm install
-        working-directory: ./api
+        working-directory: ./Project/api
 
       # Step 7: Run tests for API
       - name: Run tests (API)
         run: npm test -- --coverage
-        working-directory: ./api
+        working-directory: ./Project/api
 
       # Step 8: SonarCloud scan for API
       - name: SonarCloud Scan (API)
@@ -59,4 +59,4 @@ jobs:
             -Dsonar.organization=SMerved
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-        working-directory: ./api
+        working-directory: ./Project/api
