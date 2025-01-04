@@ -5,7 +5,8 @@ import { ObjectId } from 'mongodb';
 import { Order } from '../../../../monolithOrderAndFeedback/Order.ts';
 import { createOrders, createOrders2 } from '../../../utilities.ts';
 import { getAllOrdersMockOrder1 } from '../../../mocks/orderMocksDB.ts';
-
+jest.mock('../../../../adapters/messaging');
+jest.mock('../../../../adapters/kafkaAdapter');
 describe('Retrieve orders functions', () => {
     const orderRepository = AppDataSource.getMongoRepository(Order);
 
@@ -51,7 +52,8 @@ describe('Retrieve orders functions', () => {
     });
 
     it('should get all accepted orders', async () => {
-        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
+        if (!dummyOrder1 || !dummyOrder2)
+            throw new Error('An order was not created properly!');
 
         const orders = await orderAndFeedbackService.getAllAcceptedOrders();
 
@@ -82,18 +84,27 @@ describe('Retrieve orders functions', () => {
     });
 
     it('should throw error', async () => {
-        const findOrderSpy = jest.spyOn(orderRepository, 'find').mockRejectedValue(new Error('Database error'));
+        const findOrderSpy = jest
+            .spyOn(orderRepository, 'find')
+            .mockRejectedValue(new Error('Database error'));
 
-        await expect(orderAndFeedbackRepository.GetAllAcceptedOrders()).rejects.toThrow('Error: Database error');
+        await expect(
+            orderAndFeedbackRepository.GetAllAcceptedOrders()
+        ).rejects.toThrow('Error: Database error');
 
         findOrderSpy.mockRestore();
     });
 
     it('should get all own orders', async () => {
-        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
-        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+        if (!dummyOrder1 || !dummyOrder2)
+            throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID)
+            throw new Error('Order has no employeeID!');
 
-        const orders = await orderAndFeedbackRepository.GetOwnOrders(dummyOrder1.employeeID?.toString(), 2);
+        const orders = await orderAndFeedbackRepository.GetOwnOrders(
+            dummyOrder1.employeeID?.toString(),
+            2
+        );
 
         expect(orders).not.toBeNull();
 
@@ -122,15 +133,21 @@ describe('Retrieve orders functions', () => {
     });
 
     it('should fail to get all own orders because of wrong ID', async () => {
-        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
-        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+        if (!dummyOrder1 || !dummyOrder2)
+            throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID)
+            throw new Error('Order has no employeeID!');
 
-        await expect(orderAndFeedbackRepository.GetOwnOrders('wrongID', 2)).rejects.toThrow('Error retrieving orders');
+        await expect(
+            orderAndFeedbackRepository.GetOwnOrders('wrongID', 2)
+        ).rejects.toThrow('Error retrieving orders');
     });
 
     it('should get all orders basesd on restaurant id', async () => {
-        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
-        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+        if (!dummyOrder1 || !dummyOrder2)
+            throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID)
+            throw new Error('Order has no employeeID!');
 
         const orders = await orderAndFeedbackRepository.GetAllOrdersById(
             getAllOrdersMockOrder1.restaurantID.toString()
@@ -163,10 +180,13 @@ describe('Retrieve orders functions', () => {
     });
 
     it('should fail to get orders by restaurant id', async () => {
-        if (!dummyOrder1 || !dummyOrder2) throw new Error('An order was not created properly!');
-        if (!dummyOrder1.employeeID) throw new Error('Order has no employeeID!');
+        if (!dummyOrder1 || !dummyOrder2)
+            throw new Error('An order was not created properly!');
+        if (!dummyOrder1.employeeID)
+            throw new Error('Order has no employeeID!');
 
-        const orders = await orderAndFeedbackRepository.GetAllOrdersById('wrongID');
+        const orders =
+            await orderAndFeedbackRepository.GetAllOrdersById('wrongID');
 
         expect(orders).toBeNull();
     });

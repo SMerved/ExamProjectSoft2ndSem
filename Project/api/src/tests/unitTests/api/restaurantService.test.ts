@@ -4,7 +4,8 @@ import * as dbFunctions from '../../../RestaurantService/dbFunctions.ts';
 import { restaurantRouter } from '../../../RestaurantService/restaurantRoutes.ts';
 
 jest.mock('../../../RestaurantService/dbFunctions');
-
+jest.mock('../../../adapters/messaging');
+jest.mock('../../../adapters/kafkaAdapter');
 const app = express();
 app.use(express.json());
 app.use('/restaurantService', restaurantRouter);
@@ -20,18 +21,26 @@ describe('GET /restaurantService/getAllRestaurants', () => {
     });
 
     it('should return a list of restaurants if the database query is successful', async () => {
-        (dbFunctions.getAllRestaurants as jest.Mock).mockResolvedValue(mockRestaurants);
+        (dbFunctions.getAllRestaurants as jest.Mock).mockResolvedValue(
+            mockRestaurants
+        );
 
-        const response = await request(app).get('/restaurantService/getAllRestaurants');
+        const response = await request(app).get(
+            '/restaurantService/getAllRestaurants'
+        );
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual(mockRestaurants);
     });
 
     it('should return a 500 error if the database query fails', async () => {
-        (dbFunctions.getAllRestaurants as jest.Mock).mockRejectedValue(new Error('Database error'));
+        (dbFunctions.getAllRestaurants as jest.Mock).mockRejectedValue(
+            new Error('Database error')
+        );
 
-        const response = await request(app).get('/restaurantService/getAllRestaurants');
+        const response = await request(app).get(
+            '/restaurantService/getAllRestaurants'
+        );
 
         expect(response.status).toBe(500);
         expect(response.body).toEqual({

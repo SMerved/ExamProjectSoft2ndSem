@@ -1,8 +1,13 @@
 import { AppDataSource } from '../../../ormconfig.ts';
 import { ObjectId } from 'mongodb';
-import { Address, MenuItem, Restaurant } from '../../../RestaurantService/Restaurant.ts';
+import {
+    Address,
+    MenuItem,
+    Restaurant,
+} from '../../../RestaurantService/Restaurant.ts';
 import { getAllRestaurants } from '../../../RestaurantService/dbFunctions.ts';
-
+jest.mock('../../../adapters/messaging');
+jest.mock('../../../adapters/kafkaAdapter');
 describe('Database functionality for restaurant tests', () => {
     const restaurantRepository = AppDataSource.getMongoRepository(Restaurant);
     const addressRepository = AppDataSource.getMongoRepository(Address);
@@ -74,7 +79,12 @@ describe('Database functionality for restaurant tests', () => {
         };
 
         await addressRepository.save([address1, address2]);
-        await menuItemRepository.save([menuItem1, menuItem2, menuItem3, menuItem4]);
+        await menuItemRepository.save([
+            menuItem1,
+            menuItem2,
+            menuItem3,
+            menuItem4,
+        ]);
         await restaurantRepository.save([restaurant1, restaurant2]);
     });
 
@@ -92,7 +102,9 @@ describe('Database functionality for restaurant tests', () => {
     });
 
     it('should fail to receive orders', async () => {
-        const findRestaurantsSpy = jest.spyOn(restaurantRepository, 'find').mockResolvedValue([]);
+        const findRestaurantsSpy = jest
+            .spyOn(restaurantRepository, 'find')
+            .mockResolvedValue([]);
 
         const restaurants = await getAllRestaurants();
         expect(restaurants).toEqual([]);
