@@ -5,9 +5,11 @@ import { User, Address } from './User.ts';
 const userRepository = AppDataSource.getMongoRepository(User);
 const addressRepository = AppDataSource.getMongoRepository(Address);
 
-async function validateCredentials(credentials: UserCredentials) {
-    const { username, password } = credentials;
+async function validateCredentials(credentials: UserCredentials /*source*/) {
+    const { username /*tainted*/, password /*tainted*/ } = credentials;
 
+    //userRepository.findOne is a sink
+    //user is tainted
     const user = await userRepository.findOne({
         where: {
             username: username,
@@ -15,8 +17,11 @@ async function validateCredentials(credentials: UserCredentials) {
         },
     });
     if (!user) {
+        //Static return
         return null;
     }
+    //addressRepository.findOne is a sink
+    //address is tainted
     const address = await addressRepository.findOne({
         where: { _id: user.address },
     });
@@ -25,7 +30,7 @@ async function validateCredentials(credentials: UserCredentials) {
     } else {
         user.address = address;
     }
-
+    //sink
     return user;
 }
 

@@ -79,19 +79,23 @@ app.post('/pay', async (req, res) => {
 
 app.post('/login', async (req: Request, res: Response) => {
     try {
+        // request body is tainted input
         const credentials: UserCredentials = req.body;
-
+        // user is tainted
+        // loginServiceValidateCredentials is a sink
         const user = await loginServiceValidateCredentials(credentials);
-
+        // response is sink and tainted
         res.json(user);
     } catch (error: unknown) {
         if ((error as CustomError).response?.status === 401) {
             console.error('Error:', (error as CustomError).response.data.error);
+            // response is static and not tainted
             res.status(401).json({
                 error: 'Invalid username or password',
             });
             return;
         }
+        // response is static and not tainted
         res.status(500).json({
             error: 'Error finding user',
         });
