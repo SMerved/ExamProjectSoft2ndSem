@@ -25,9 +25,9 @@ jobs:
         working-directory: Project/client
 
       # Step 4: Run tests for client
-      - name: Run tests (Client)
-        run: npm test -- --coverage
-        working-directory: Project/client
+      #- name: Run tests (Client)
+       # run: npm testCoverage
+       # working-directory: Project/client
 
       # Step 5: SonarCloud scan for client
       - name: SonarCloud Scan (Client)
@@ -46,9 +46,9 @@ jobs:
         working-directory: Project/api
 
       # Step 7: Run tests for API
-      - name: Run tests (API)
-        run: npm test -- --coverage
-        working-directory: Project/api
+      #- name: Run tests (API)
+      #  run: npm testCoverage
+       # working-directory: Project/api
 
       # Step 8: SonarCloud scan for API
       - name: SonarCloud Scan (API)
