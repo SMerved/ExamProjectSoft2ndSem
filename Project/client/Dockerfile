@@ -1,38 +1,32 @@
-﻿# Build stage: Build the Vite app
-FROM node:16 AS build
+﻿# Use the official Node.js image as a base
+FROM node:16-alpine
 
-# Set the working directory inside the container
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock)
-COPY package*.json ./
+# Copy package.json and package-lock.json to the working directory
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install --frozen-lockfile
+RUN npm install
 
-# Copy the entire project to the container
+# Copy the rest of the application files
 COPY . .
 
 # Copy the environment file for the appropriate environment
 COPY .env.production .env
 
-# Build the Vite app (production build)
+# Build the React app
 RUN npm run buildProd
 
-# Production stage: Use a lightweight server to serve the static files
-FROM node:16-slim
+# Set the environment variable for the React app to be served
+ENV NODE_ENV=production
 
-# Set the working directory
-WORKDIR /app
+# Install a lightweight server to serve the React app
+RUN npm install -g serve
 
-RUN mkdir "shared"
-RUN mkdir "build"
+# Expose the port that the app will run on
+EXPOSE 5173
 
-# Install http-server globally to serve the static files
-RUN npm install -g http-server
-
-# Copy the built files from the build stage
-COPY --from=build /app/dist /app/build
-
-# Run http-server to serve the static files on the chosen port
-CMD mv build/* shared; http-server build -p 8080 --host 0.0.0.0
+# Start the app using the serve package
+CMD ["serve", "-s", "/app/dist", "-l", "5173"]

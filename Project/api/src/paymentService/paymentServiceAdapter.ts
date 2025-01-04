@@ -1,5 +1,6 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { PAYMENT_METHODS } from './types/payment.ts';
 
 dotenv.config();
 
@@ -9,13 +10,13 @@ const BASE_URL = `http://localhost:${port}/paymentService`;
 async function paymentServiceValidatePayment(
     price: number,
     customerId: string,
-    cardNumber: number
+    paymentMethod: PAYMENT_METHODS
 ): Promise<boolean> {
     try {
         const response = await axios.post(`${BASE_URL}/validatePayment`, {
             price,
             customerId,
-            cardNumber,
+            paymentMethod
         });
 
         return response.status == 200;

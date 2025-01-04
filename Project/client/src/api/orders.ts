@@ -41,8 +41,6 @@ export const GetOrdersAPIByCustomerID = async (userID: string): Promise<Order[]>
     return response.json();
 };
 
-
-
 export const GetAcceptedOrdersAPI = async (): Promise<Order[]> => {
     const response = await fetch(`${baseUrl}/acceptedOrders`, {
         method: 'GET',

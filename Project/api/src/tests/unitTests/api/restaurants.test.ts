@@ -3,6 +3,8 @@ import app from '../../../index.ts';
 import axios from 'axios';
 
 jest.mock('axios');
+jest.mock('../../../adapters/messaging');
+jest.mock('../../../adapters/kafkaAdapter');
 
 describe('GET /restaurants', () => {
     beforeEach(() => {
@@ -11,7 +13,7 @@ describe('GET /restaurants', () => {
 
     it('should return restaurant array', async () => {
         const mockRestaurants = [{ id: 1, name: 'Mock Restaurant' }];
-        (axios.get as jest.Mock).mockResolvedValue({data: mockRestaurants});
+        (axios.get as jest.Mock).mockResolvedValue({ data: mockRestaurants });
 
         const response = await request(app).get('/restaurants').send();
 
@@ -27,6 +29,8 @@ describe('GET /restaurants', () => {
         const response = await request(app).get('/restaurants').send();
 
         expect(response.status).toBe(500);
-        expect(response.body).toEqual({ error: 'An error occurred while fetching restaurants' });
+        expect(response.body).toEqual({
+            error: 'An error occurred while fetching restaurants',
+        });
     });
 });

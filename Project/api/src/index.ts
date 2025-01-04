@@ -24,8 +24,6 @@ import { CustomError } from './types/generic.ts';
 import { paymentServiceValidatePayment } from './paymentService/paymentServiceAdapter.ts';
 import { restaurantServiceGetAllRestaurants } from './adapters/restaurantServiceAdapter.ts';
 import { restaurantRouter } from './RestaurantService/restaurantRoutes.ts';
-import { KafkaAdapter } from './adapters/kafkaAdapter.ts';
-import MessageBroker from './adapters/types/types.ts';
 import client from 'prom-client';
 
 const register = new client.Registry();
@@ -62,11 +60,11 @@ app.use('/restaurantService', restaurantRouter);
 
 app.post('/pay', async (req, res) => {
     try {
-        const { price, customerId, cardNumber } = req.body;
+        const { price, customerId, paymentMethod } = req.body;
         const response = await paymentServiceValidatePayment(
             price,
             customerId,
-            cardNumber
+            paymentMethod
         );
 
         if (response) {
@@ -81,19 +79,23 @@ app.post('/pay', async (req, res) => {
 
 app.post('/login', async (req: Request, res: Response) => {
     try {
+        // request body is tainted input
         const credentials: UserCredentials = req.body;
-
+        // user is tainted
+        // loginServiceValidateCredentials is a sink
         const user = await loginServiceValidateCredentials(credentials);
-
+        // response is sink and tainted
         res.json(user);
     } catch (error: unknown) {
         if ((error as CustomError).response?.status === 401) {
             console.error('Error:', (error as CustomError).response.data.error);
+            // response is static and not tainted
             res.status(401).json({
                 error: 'Invalid username or password',
             });
             return;
         }
+        // response is static and not tainted
         res.status(500).json({
             error: 'Error finding user',
         });
@@ -265,7 +267,7 @@ app.post('/createFeedback', async (req: Request, res: Response) => {
             return;
         }
 
-        const order = await calculateAndUpdateOrderPay(orderId);
+        await calculateAndUpdateOrderPay(orderId);
 
         res.json(feedback);
     } catch (error) {
@@ -304,15 +306,17 @@ app.post('/completeOrderAsDelivery', async (req: Request, res: Response) => {
             res.status(401).json({ error: 'Invalid order data' });
             return;
         }
+        /*
         const messageBroker: MessageBroker = new KafkaAdapter(
             'mtogo',
             'mtogo-group',
             'user_events'
         );
+
         await messageBroker.sendEvent('OrderCompleted', {
             order: order1,
         });
-
+        */
         res.json(order1);
     } catch (error) {
         console.error('Error completing order: ', error);

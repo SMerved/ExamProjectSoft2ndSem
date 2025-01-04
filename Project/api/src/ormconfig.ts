@@ -14,21 +14,34 @@ dotenv.config();
 const isTestEnv = process.env.NODE_ENV === 'test';
 const databaseName = isTestEnv ? 'SoftExamTest' : 'SoftExam';
 
-export const AppDataSource = new DataSource({
-    type: 'mongodb',
-    url: process.env.DATABASE_URL,
-    database: databaseName,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    synchronize: true,
-    logging: true,
-    entities: [
-        User,
-        Restaurant,
-        MenuItem,
-        Order,
-        Feedback,
-        Address,
-        loginAddress,
-    ],
-});
+class DatabaseConnection {
+    private static instance: DataSource;
+
+    private constructor() {}
+
+    public static getInstance(): DataSource {
+        if (!DatabaseConnection.instance) {
+            DatabaseConnection.instance = new DataSource({
+                type: 'mongodb',
+                url: process.env.DATABASE_URL,
+                database: databaseName,
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                synchronize: true,
+                logging: true,
+                entities: [
+                    User,
+                    Restaurant,
+                    MenuItem,
+                    Order,
+                    Feedback,
+                    Address,
+                    loginAddress,
+                ],
+            });
+        }
+        return DatabaseConnection.instance;
+    }
+}
+
+export const AppDataSource = DatabaseConnection.getInstance();

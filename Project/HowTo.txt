@@ -1,0 +1,5 @@
+From this folder run the commands:
+
+docker compose build
+
+kubectl apply -f .\kubemanifests.yaml

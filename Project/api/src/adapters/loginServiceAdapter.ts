@@ -4,16 +4,19 @@ import { UserCredentials } from '../interfaces/users.ts';
 
 dotenv.config();
 
-const port = process.env.PORT
+const port = process.env.PORT;
 const BASE_URL = `http://localhost:${port}/loginService`;
 
 async function loginServiceValidateCredentials(credentials: UserCredentials) {
-    const { username, password } = credentials;
-    
-        const response = await axios.post(`${BASE_URL}/validateCredentials`, { username, password });
+    const { username /*Tainted*/, password /* Tainted */ } = credentials;
 
-        return response.data; //Potential errors get thrown to caller and handled.
+    const response = await axios.post(`${BASE_URL}/validateCredentials`, {
+        username,
+        password,
+    }); //Sink
+
+    //Sink
+    return response.data; //Potential errors get thrown to caller and handled.
 }
-
 
 export { loginServiceValidateCredentials };

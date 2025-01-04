@@ -10,6 +10,7 @@ export class KafkaAdapter implements MessageBroker {
 
     constructor(clientId: string, groupId: string, topic: string) {
         const brokers = process.env.KAFKA_BROKERS?.split(',') || [];
+        console.log('brokers:', brokers);
         this.kafka = new Kafka({
             clientId,
             brokers,
@@ -21,6 +22,7 @@ export class KafkaAdapter implements MessageBroker {
     createProducer() {
         if (!this.producer) {
             this.producer = this.kafka.producer();
+            console.log('Creating new producer');
         }
         return this.producer;
     }
@@ -28,30 +30,43 @@ export class KafkaAdapter implements MessageBroker {
     createConsumer(groupId: string) {
         if (!this.consumer) {
             this.consumer = this.kafka.consumer({ groupId: groupId });
+            console.log('Creating new consumer');
         }
         return this.consumer;
     }
 
     // Adapter method for sending events
     async sendEvent(eventType: string, payload: any): Promise<void> {
+        const retries = 3;
         const producer = this.createProducer();
-        await producer.connect();
 
         try {
-            const message = {
-                topic: this.topic,
-                messages: [
-                    {
-                        value: JSON.stringify({
-                            eventType,
-                            payload,
-                            timestamp: Date.now(),
-                        }),
-                    },
-                ],
-            };
-            await producer.send(message);
-            console.info('Event sent:', message);
+            await producer.connect();
+
+            for (let attempt = 1; attempt <= retries; attempt++) {
+                try {
+                    const message = {
+                        topic: this.topic,
+                        messages: [
+                            {
+                                value: JSON.stringify({
+                                    eventType,
+                                    payload,
+                                    timestamp: Date.now(),
+                                }),
+                            },
+                        ],
+                    };
+
+                    await producer.send(message);
+                    return; // Exit the function if the message is sent successfully
+                } catch (error) {
+                    if (attempt === retries) {
+                        throw error;
+                    }
+                    console.warn(`Attempt ${attempt} failed. Retrying...`);
+                }
+            }
         } finally {
             await producer.disconnect();
         }

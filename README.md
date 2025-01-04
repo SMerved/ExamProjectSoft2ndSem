@@ -15,22 +15,37 @@ With Node.js installed you can navigate to the downloaded GitHub repository fold
 
 Select one of the two application folders,`/Project/client` or `/Project/api` , and follow the steps below. Repeat for the other application folder. 
 
-### How to test
+
 Start a command terminal in the folder and write the command `npm install` which should download and install all dependicies for the application.
 
 With the dependicies installed, run `npm run test` or `npm run testCoverage`.
 
 This will then run all the tests in the application. With the command including coverage, it will display the static test coverage including coverage of statements, branches, functions and lines, as well as the coverage for each individual file and lastly it will display the uncovered lines for each file.
 
-### How to start the application locally
-Start a command terminal in the folder and write the command `npm install` which should download and install all dependicies for the application if not done already.
+## How to start the application locally
+Start a command terminal and then in the both the client folder and api folder write the command `npm install` which should download and install all dependicies for the application if not done already.
 
-With dependicies installed, run `npm run dev`.
+With dependicies installed return to the Project folder and run the commands: `docker compose build` and then `kubectl apply -f .\kubemanifests.yaml`
 
-You should then see in the terminal which port the application is running on.
-The "api" (Backend) runs on port [3001](http://localhost/3001) and "client" (Frontend) runs on port [5173](http://localhost/5173).
+The "api" (Backend) runs on port [3001](http://localhost/3001).
 
-To stop the application from the terminal use "Ctrl + C".
+The "client" (Frontend) runs on port [5173](http://localhost/5173).
+
+Grafana runs on port [3000](http://localhost:3000).
+
+Prometheus runs on port [9090](http://localhost:9090).
+
+If any of the links fail to connect you may need to check that the ports aren't already in use. Kubernetes/Docker has been known to keep ports when containers/pods have been stopped/removed/deleted even after restarting your computer. 
+
+The commands
+`netstat -ano | findstr :<yourPortNumber>`
+and
+`taskkill /PID <typeyourPIDhere> /F`
+can help in killing applications running on a port.
+
+After clearing the ports try restarting docker, as the application killed may have been docker itself, and/or the containers/pods.
+
+To remove the Kubernetes pods use the command `kubectl get pods` to get all pod names. Then use `kubectl delete pods -l app=<podName>` where podName is the name of the pod minus the identifiying numbers. Example: "api-649d66df74-knkcj" would be remove using `kubectl delete pods -l app=api`.
 
 ### Logins
 
@@ -51,4 +66,5 @@ Navigate the folders to `/.github/workflows` to view any yaml files made for aut
 
 "testBuildDeploy.yml" runs on the "deploy" branch and automaticly tests and transfer the newest version of our applications to a remote droplet and then deploys them.
 
-To acess the remote frontend navigate to [`http://134.122.90.179/`](http://134.122.90.179/).
+!NO LONGER WORKS!
+To acess the remote frontend navigate to `http://134.122.90.179/`.

@@ -1,11 +1,12 @@
 import { Restaurant } from '../../types/restaurants';
 import { MenuItem } from '../../types/restaurants';
 import { User } from '../../types/users';
-import { useState } from 'react';
+import {  ChangeEvent, useState } from 'react';
 import ShoppingCart from './ShoppingCart';
 import { createOrder } from '../../api/orders';
 import { ValidatePaymentAPI } from '../../api/payment.ts';
 import { Button } from '@mui/material';
+import { PAYMENT_METHODS } from '../../types/payment.ts';
 
 interface RestaurantPageProps {
     restaurant: Restaurant;
@@ -18,6 +19,13 @@ interface menuItemLine {
 }
 
 function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
+    const [menuItems, setMenuItems] = useState<menuItemLine[]>([]);
+    const [handlingPayment, setHandlingPayment] = useState<boolean>(false);
+    const [orderComplete, setOrderComplete] = useState<boolean>(false);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [card, setCard] = useState<number>(0);
+    const [paymentMethod, setPaymentMethod] = useState<PAYMENT_METHODS>(PAYMENT_METHODS.STRIPE);
+
     const handleProceedToPayment = async () => {
         if (menuItems.length == 0) return;
 
@@ -33,24 +41,18 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
 
     const handlePayment = async () => {
         try {
-            const paymentResponse = await ValidatePaymentAPI(totalPrice, user._id, card);
+            const paymentResponse = await ValidatePaymentAPI(totalPrice, user._id, card, paymentMethod);
 
             if (paymentResponse) {
-                const order = await createOrder(user._id, restaurant._id, menuItems, user.address, totalPrice);
+                await createOrder(user._id, restaurant._id, menuItems, user.address, totalPrice);
                 setHandlingPayment(false);
                 setOrderComplete(true);
-            } else {
             }
         } catch (error) {
             console.error('Error validating payment', error);
         }
     };
 
-    const [menuItems, setMenuItems] = useState<menuItemLine[]>([]);
-    const [handlingPayment, setHandlingPayment] = useState<boolean>(false);
-    const [orderComplete, setOrderComplete] = useState<boolean>(false);
-    const [totalPrice, setTotalPrice] = useState(0);
-    const [card, setCard] = useState<number>(0);
 
     const addToCart = (menuItem: MenuItem) => {
         const existingMenuItem = menuItems.find((item) => item.menuItemID._id === menuItem._id);
@@ -68,10 +70,23 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
         }
     };
 
-    const onCardChange = (e) => {
+    const onCardChange = (e: ChangeEvent<HTMLInputElement>) => {
         const re = /^[0-9\b]+$/;
         if (e.target.value === '' || re.test(e.target.value)) {
-            setCard(e.target.value);
+            setCard(Number(e.target.value));
+        }
+    };
+
+    const isPaymentMethod = (value: any): value is PAYMENT_METHODS => {
+        return Object.values(PAYMENT_METHODS).includes(value);
+    }
+
+    const onPaymentMethodChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        const selectedValue = e.target.value;
+        if (isPaymentMethod(selectedValue)) {
+            setPaymentMethod(selectedValue);
+        } else {
+            console.error("Invalid payment method selected");
         }
     };
 
@@ -227,6 +242,30 @@ function RestaurantComponent({ restaurant, user }: RestaurantPageProps) {
                                 >
                                     Total Price: ${totalPrice.toFixed(2)}
                                 </h1>
+                                <h3
+                                style={{
+                                    color: '#555',
+                                    fontSize: '18px',
+                                    marginBottom: '10px',
+                                }}
+                            >
+                                Payment Method
+                            </h3>
+                            <select
+                                value={paymentMethod}
+                                onChange={onPaymentMethodChange}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px',
+                                    fontSize: '16px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    marginBottom: '20px',
+                                }}
+                            >
+                                <option value={PAYMENT_METHODS.STRIPE}>Stripe</option>
+                                <option value={PAYMENT_METHODS.PAYPAL}>PayPal</option>
+                            </select>
                                 <h3
                                     style={{
                                         color: '#555',

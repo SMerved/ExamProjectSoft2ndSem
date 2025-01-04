@@ -33,17 +33,9 @@ async function createOrder(
         'order-service-group',
         'restaurant_topic'
     );
-    const retries = 3;
-    for (let attempt = 1; attempt <= 3; attempt++) {
-        try {
-            await messageBroker.sendEvent('order', order);
-        } catch (error) {
-            if (attempt === retries) {
-                throw error;
-            }
-            console.warn(`Attempt ${attempt} failed. Retrying...`);
-        }
-    }
+
+    await messageBroker.sendEvent('order', order);
+
     return order;
 }
 

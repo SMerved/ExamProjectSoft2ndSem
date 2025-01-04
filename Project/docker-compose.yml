@@ -1,0 +1,84 @@
+services:
+  api:
+    container_name: api
+    build:
+      context: ./api
+    ports:
+      - "3001:3001"
+    depends_on:
+      - grafana
+      - prometheus
+      - kafka
+    networks:
+      - monitoring
+
+  client:
+    container_name: client
+    build: 
+      context: ./client
+    ports:
+      - "5173:5173"
+    networks:
+     - monitoring      
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./api/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - monitoring
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - monitoring  
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092" 
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    command: >
+      bash -c "
+      /opt/bitnami/scripts/kafka/run.sh & 
+      sleep 10 && 
+      kafka-topics.sh --describe --topic restaurant_topic --bootstrap-server kafka:9092 || kafka-topics.sh --create --topic restaurant_topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 3 && 
+      kafka-topics.sh --describe --topic my-topic --bootstrap-server kafka:9092 || kafka-topics.sh --create --topic my-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 && 
+      kafka-topics.sh --describe --topic test-topic --bootstrap-server kafka:9092 || kafka-topics.sh --create --topic test-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 && 
+      kafka-topics.sh --describe --topic user-topic --bootstrap-server kafka:9092 || kafka-topics.sh --create --topic user-topic --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 && 
+      sleep infinity"
+    networks:
+      - monitoring
+      
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./api/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    name: monitoring
+    driver: "bridge"
