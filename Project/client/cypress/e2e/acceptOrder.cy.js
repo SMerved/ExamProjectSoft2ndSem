@@ -1,4 +1,4 @@
-describe('template spec', () => {
+describe('Accept order', () => {
     it('passes', () => {
         cy.intercept('GET', '/ordersById').as('ordersById');
         cy.intercept('POST', '/createOrder').as('createOrder');
