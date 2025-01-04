@@ -79,12 +79,25 @@ app.post('/pay', async (req, res) => {
 
 app.post('/login', async (req: Request, res: Response) => {
     try {
-        // request body is tainted input
+        //validate input
+        if (
+            typeof req.body.username !== 'string' ||
+            typeof req.body.password !== 'string' ||
+            !/^[a-zA-Z0-9_]+$/.test(req.body.username) || // Only allow alphanumeric and underscores
+            !/^[a-zA-Z0-9_]+$/.test(req.body.password) // Only allow alphanumeric and underscores
+        ) {
+            res.status(400).json({
+                error: 'invalid input',
+            });
+            return;
+        }
+
+        // sanitized
         const credentials: UserCredentials = req.body;
-        // user is tainted
+
         // loginServiceValidateCredentials is a sink
         const user = await loginServiceValidateCredentials(credentials);
-        // response is sink and tainted
+        // response is sink 
         res.json(user);
     } catch (error: unknown) {
         if ((error as CustomError).response?.status === 401) {

@@ -6,7 +6,20 @@ const loginRouter = express.Router();
 
 loginRouter.post('/validateCredentials', async (req /*source*/, res) => {
     try {
-        const credentials: UserCredentials = req.body; //tainted
+        //Validate input
+        if (
+            typeof req.body.username !== 'string' ||
+            typeof req.body.password !== 'string' ||
+            !/^[a-zA-Z0-9_]+$/.test(req.body.username) || // Only allow alphanumeric and underscores
+            !/^[a-zA-Z0-9_]+$/.test(req.body.password) // Only allow alphanumeric and underscores
+        ) {
+            res.status(400).json({
+                error: 'invalid input',
+            });
+            return;
+        }
+
+        const credentials: UserCredentials = req.body; //sanitized
 
         //Validate credentials is a sink
         //user is tainted

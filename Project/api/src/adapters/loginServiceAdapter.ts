@@ -8,7 +8,7 @@ const port = process.env.PORT;
 const BASE_URL = `http://localhost:${port}/loginService`;
 
 async function loginServiceValidateCredentials(credentials: UserCredentials) {
-    const { username /*Tainted*/, password /* Tainted */ } = credentials;
+    const { username /*sanitized*/, password /* sanitized */ } = credentials;
 
     const response = await axios.post(`${BASE_URL}/validateCredentials`, {
         username,
