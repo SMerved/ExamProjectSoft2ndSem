@@ -64,7 +64,7 @@ Navigate the folders to `/.github/workflows` to view any yaml files made for aut
 
 "issues.yml" were meant to automate our use of Project on GitHub by automating the creation and closing of issues and branches, but it failed due to GitHub removing the functionality from GitHub and not replacing it with an updated method.
 
-"testBuildDeploy.yml" runs on the "deploy" branch and automaticly tests and transfer the newest version of our applications to a remote droplet and then deploys them.
+"testBuildDeploy.yml" runs on the "deploy" branch and automaticaly tests and transfer the newest version of our applications to a remote droplet and then deploys them.
 
 !NO LONGER WORKS!
 To acess the remote frontend navigate to `http://134.122.90.179/`.
